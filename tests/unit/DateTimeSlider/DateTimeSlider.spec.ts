@@ -21,6 +21,6 @@ describe('MyButton', () => {
     vm.$emit = jest.fn()
     vm.toggleNow()
     expect(vm.$emit.mock.calls[0]).toEqual(['select-now', false])
-    expect(vm.$emit.mock.calls[1]).toEqual(['input', '2021-10-21T00:00:00.000Z'])
+    expect(vm.$emit.mock.calls[1]).toEqual(['input', new Date('2021-10-21')])
   })
 })
