@@ -5,10 +5,16 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
+    "build-lib": "vue-cli-service build --target lib src/index.ts && npm pack && shx mv ./fews-web-oc-components-0.1.0.tgz ..",
     "storybook:build": "vue-cli-service storybook:build -c config/storybook",
     "storybook:serve": "vue-cli-service storybook:serve -p 6006 -c config/storybook"
   },
+  "main": "./dist/fews-web-oc-components.umd.js",
+  "files": [
+    "dist/*"
+  ],
   "dependencies": {
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
@@ -17,15 +23,22 @@
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
+    "@storybook/addon-actions": "^4.1.0 || ^5.0.0",
     "@storybook/addon-essentials": "^6.0.26",
+    "@storybook/addon-knobs": "^4.1.0 || ^5.0.0",
+    "@storybook/addon-links": "^4.1.0 || ^5.0.0",
+    "@storybook/addon-notes": "^4.1.0 || ^5.0.0",
     "@storybook/vue": "^6.0.26",
+    "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-plugin-unit-jest": "^4.5.14",
     "@vue/cli-service": "~4.5.0",
     "@vue/eslint-config-standard": "^5.1.2",
     "@vue/eslint-config-typescript": "^7.0.0",
+    "@vue/test-utils": "^1.0.3",
     "babel-loader": "^8.0.4",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
