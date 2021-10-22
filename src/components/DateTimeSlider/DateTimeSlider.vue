@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="date-time-slider">
     <Keypress key-event="keydown" @any="keydownListener" />
     <Keypress key-event="keyup" @any="keyupListener" />
     <div style="display:flex;flex-direction:row;flex-grow:1;padding:6px 16px">
@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
-import _ from 'lodash'
+import { throttle } from 'lodash'
 import KeyPressObject from 'vue-keypress'
 
 // import * as d3 from 'd3'
@@ -62,7 +62,7 @@ export default class DateTimeSlider extends Vue {
     this.updateIndexValueChange()
     this.currentDate = this.value
     this.$emit('select-now', this.useNow)
-    this.throttledUpdate = _.throttle(this.inputChanged, 1000, { leading: true, trailing: true })
+    this.throttledUpdate = throttle(this.inputChanged, 1000, { leading: true, trailing: true })
   }
 
   get max (): number {
@@ -70,12 +70,6 @@ export default class DateTimeSlider extends Vue {
   }
 
   get nowInDateRange (): boolean {
-    // if (this.dates.length > 1) {
-    //   const now = new Date().getTime()
-    //   const graceTime = 5 * 60 * 1000
-    //   return now > this.dates[0].getTime() - graceTime && now < this.dates[this.dates.length - 1].getTime() + graceTime
-    // }
-    // return false
     return true
   }
 
