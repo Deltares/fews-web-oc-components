@@ -151,6 +151,7 @@ export default class DateTimeSlider extends Vue {
           this.index = Math.max(0, i - 1)
           break
         }
+        this.index = this.dates.length - 1
       }
       this.stopPlay()
       this.updateDate()
