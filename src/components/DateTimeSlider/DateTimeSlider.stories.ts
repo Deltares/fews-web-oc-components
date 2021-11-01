@@ -20,10 +20,10 @@ const Template = (args: any, { argTypes }: any) => ({
   args,
   components: { DateTimeSlider },
   props: Object.keys(argTypes),
-  template: '<DateTimeSlider :value="value" :dates="dates" @input="input" @select-now="selectNow" />',
+  template: '<DateTimeSlider :value="value" :dates="dates" @input="input" @update:now="selectNow" />',
   methods: {
     input: action('input'),
-    selectNow: action('selectNow')
+    selectNow: action('update:now')
   }
 })
 

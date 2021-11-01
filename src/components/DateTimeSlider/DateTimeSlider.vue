@@ -48,21 +48,31 @@ import KeyPressObject from 'vue-keypress'
   }
 })
 export default class DateTimeSlider extends Vue {
-  @Prop({ default: () => { return new Date() } }) private value!: Date
-  @Prop({ default: () => { return [new Date()] } }) private dates!: Date[]
+  @Prop({ default: () => { return new Date() } })
+  private value!: Date
+
+  @Prop({ default: () => { return [new Date()] } })
+  private dates!: Date[]
+
+  @Prop({ default: true })
+  private now!: boolean
 
   index = 0
   currentDate!: Date
   useNow = true
   isPlaying = false
-  intervalTimer: any = 0
+  intervalTimer: ReturnType<typeof setInterval> = 0
   throttledUpdate!: any
 
   created (): void {
     this.updateIndexValueChange()
     this.currentDate = this.value
-    this.$emit('select-now', this.useNow)
     this.throttledUpdate = throttle(this.inputChanged, 1000, { leading: true, trailing: true })
+  }
+
+  mounted (): void {
+    this.useNow = this.now
+    this.$emit('update:now', this.useNow)
   }
 
   get max (): number {
@@ -94,6 +104,7 @@ export default class DateTimeSlider extends Vue {
     } else {
       this.isPlaying = true
       this.useNow = false
+      this.$emit('update:now', this.useNow)
       this.intervalTimer = setInterval(this.play, 200)
     }
   }
@@ -136,14 +147,14 @@ export default class DateTimeSlider extends Vue {
       this.stopPlay()
       this.updateDate()
     }
-    this.$emit('select-now', this.useNow)
+    this.$emit('update:now', this.useNow)
     if (this.dates[this.index]) this.$emit('input', this.dates[this.index])
   }
 
   backward (step?: number): void {
     if (this.useNow) {
       this.useNow = false
-      this.$emit('select-now', this.useNow)
+      this.$emit('update:now', this.useNow)
     }
     this.decrement(step)
     if (this.isPlaying) this.stopPlay()
@@ -153,7 +164,7 @@ export default class DateTimeSlider extends Vue {
   forward (step?: number): void {
     if (this.useNow) {
       this.useNow = false
-      this.$emit('select-now', this.useNow)
+      this.$emit('update:now', this.useNow)
     }
     this.increment(step)
     if (this.isPlaying) this.stopPlay()
@@ -184,13 +195,13 @@ export default class DateTimeSlider extends Vue {
   inputChanged (): void {
     if (this.useNow) {
       this.useNow = false
-      this.$emit('select-now', this.useNow)
+      this.$emit('update:now', this.useNow)
     }
     if (this.dates[this.index]) this.$emit('input', this.dates[this.index])
   }
 
-  keydownListener (input: KeyPressObject): void {
-    const event = (input as any).event
+  keydownListener (input: any): void {
+    const event = input.event
     switch (event.code) {
       case 'ArrowRight':
         if (!event.repeat) this.forward(event.shiftKey ? 6 : 1)
