@@ -4,6 +4,7 @@
       height="0">
     </v-slider>
     <div style="display:flex;flex-direction:row;flex-grow:1;padding:6px 16px">
+      <!-- @slot Prepend item in toolbar -->
       <slot name="prepend"></slot>
       <div style="width:1px;height:100%;max-height:100%;background-color:lightgray;">
       </div>
@@ -31,6 +32,7 @@
             </v-icon>
           </v-btn>
         </div>
+        <!-- @slot Append item in toolbar -->
         <slot name="append"></slot>
       </div>
     </div>
@@ -43,12 +45,21 @@ import { throttle } from 'lodash'
 
 @Component
 export default class DateTimeSlider extends Vue {
+  /**
+   * Selected date
+   */
   @Prop({ default: () => { return new Date() } })
   private value!: Date
 
+  /**
+   * Array with dates
+   */
   @Prop({ default: () => { return [new Date()] } })
   private dates!: Date[]
 
+  /**
+   * If the slider should follow the actual date time
+   */
   @Prop({ default: true })
   private now!: boolean
 
@@ -156,8 +167,20 @@ export default class DateTimeSlider extends Vue {
       this.stopPlay()
       this.updateDate()
     }
+
+    /**
+     * Emitted when now mode is toggled
+     * @arg {boolean} now mode
+     */
     this.$emit('update:now', this.useNow)
-    if (this.dates[this.index]) this.$emit('input', this.dates[this.index])
+    if (this.dates[this.index]) {
+      /**
+       * Emitted when selected date changes
+       * @event input
+       * @arg {Date} date selected date
+       */
+      this.$emit('input', this.dates[this.index])
+    }
   }
 
   backward (step?: number): void {
