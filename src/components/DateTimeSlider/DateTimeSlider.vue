@@ -1,5 +1,8 @@
 <template>
   <div class="date-time-slider">
+    <v-slider v-model="index" :max="this.max" step="1" tick-size="6" tabindex="0" @input="this.onInput" hide-details
+      height="0">
+    </v-slider>
     <div style="display:flex;flex-direction:row;flex-grow:1;padding:6px 16px">
       <slot name="prepend"></slot>
       <div style="width:1px;height:100%;max-height:100%;background-color:lightgray;">
