@@ -134,6 +134,11 @@ export default class DateTimeSlider extends Vue {
     }
   }
 
+  @Watch('now')
+  onNowChange (): void {
+    this.useNow = this.now
+  }
+
   toggleNow (): void {
     this.useNow = !this.useNow
     if (this.useNow) {

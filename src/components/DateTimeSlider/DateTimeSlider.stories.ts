@@ -10,6 +10,7 @@ const dates = [
   new Date('2021-10-24'),
   new Date('2021-10-25')
 ]
+const now = true
 
 export default {
   title: 'DateTimeSlider',
@@ -20,9 +21,9 @@ const Template = (args: any, { argTypes }: any) => ({
   args,
   components: { DateTimeSlider },
   props: Object.keys(argTypes),
-  template: '<DateTimeSlider :value="value" :dates="dates" @input="input" @update:now="selectNow" />',
+  template: '<DateTimeSlider :value="value" :dates="dates" :now="now" @input="onInput" @update:now="selectNow" />',
   methods: {
-    input: action('input'),
+    onInput: action('input'),
     selectNow: action('update:now')
   }
 })
@@ -30,5 +31,6 @@ const Template = (args: any, { argTypes }: any) => ({
 export const Default: any = Template.bind({})
 Default.args = {
   value,
-  dates
+  dates,
+  now
 }
