@@ -1,7 +1,5 @@
 <template>
   <div class="date-time-slider">
-    <Keypress key-event="keydown" @any="keydownListener" />
-    <Keypress key-event="keyup" @any="keyupListener" />
     <div style="display:flex;flex-direction:row;flex-grow:1;padding:6px 16px">
       <slot name="prepend"></slot>
       <div style="width:1px;height:100%;max-height:100%;background-color:lightgray;">
@@ -39,14 +37,8 @@
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
 import { throttle } from 'lodash'
-import KeyPressObject from 'vue-keypress'
 
-// import * as d3 from 'd3'
-@Component({
-  components: {
-    Keypress: () => import('vue-keypress')
-  }
-})
+@Component
 export default class DateTimeSlider extends Vue {
   @Prop({ default: () => { return new Date() } })
   private value!: Date
@@ -73,6 +65,14 @@ export default class DateTimeSlider extends Vue {
   mounted (): void {
     this.useNow = this.now
     this.$emit('update:now', this.useNow)
+    window.addEventListener('keyup', this.keyupListener)
+    window.addEventListener('keydown', this.keydownListener)
+  }
+
+  destroyed (): void {
+    if (this.intervalTimer !== 0) clearInterval(this.intervalTimer)
+    window.removeEventListener('keyup', this.keyupListener)
+    window.removeEventListener('keydown', this.keydownListener)
   }
 
   get max (): number {
@@ -205,8 +205,7 @@ export default class DateTimeSlider extends Vue {
     if (this.dates[this.index]) this.$emit('input', this.dates[this.index])
   }
 
-  keydownListener (input: any): void {
-    const event = input.event
+  keydownListener (event: KeyboardEvent): void {
     switch (event.code) {
       case 'ArrowRight':
         if (!event.repeat) this.forward(event.shiftKey ? 6 : 1)
@@ -217,7 +216,7 @@ export default class DateTimeSlider extends Vue {
       case 'KeyN':
         this.toggleNow()
         break
-      case 'Space':
+      case 'Enter':
         this.togglePlay()
         break
       default:
@@ -225,8 +224,7 @@ export default class DateTimeSlider extends Vue {
     }
   }
 
-  keyupListener (input: any): void {
-    const event = input.event
+  keyupListener (event: KeyboardEvent): void {
     switch (event.code) {
       case 'ArrowRight':
         this.stopPlay()
