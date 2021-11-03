@@ -1,0 +1,8 @@
+//cypress.storybook.json
+{
+  "baseUrl": "http://localhost:6006",
+  "defaultCommandTimeout": 30000,
+  "viewportWidth": 1000,
+  "viewportHeight": 568,
+  "integrationFolder": "cypress/storybook"
+}

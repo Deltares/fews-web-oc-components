@@ -10,10 +10,10 @@
       </div>
       <div style="display:flex;flex-grow:1;justify-content:space-between">
         <div style="display:flex;">
-          <v-btn icon :color="nowColor" @click="toggleNow" ref="NowButton">
+          <v-btn class="now-button" icon :color="nowColor" @click="toggleNow" ref="NowButton">
             <v-icon>mdi-clock</v-icon>
           </v-btn>
-          <div style="margin:auto;width:15ch;flex:2 0 20%" class="body-2"> {{ dateString }}</div>
+          <div style="margin:auto;width:15ch;flex:2 0 20%" class="now-text body-2"> {{ dateString }}</div>
         </div>
         <div style="display:flex;">
           <v-btn @mousedown="backward()" @mouseup="stopPlay" icon ref="BackButton">

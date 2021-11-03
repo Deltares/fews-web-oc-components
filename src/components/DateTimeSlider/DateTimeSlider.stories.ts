@@ -25,6 +25,11 @@ const Template = (args: any, { argTypes }: any) => ({
   methods: {
     onInput: action('input'),
     selectNow: action('update:now')
+  },
+  parameters: {
+    docs: {
+      storyDescription: 'test'
+    }
   }
 })
 
@@ -32,5 +37,5 @@ export const Default: any = Template.bind({})
 Default.args = {
   value,
   dates,
-  now
+  now,
 }
