@@ -19,7 +19,7 @@
       v-bind:key="i"
       >
     <v-list-item-group>
-      <v-list-item v-for="item in item.children" v-bind:key="item.id" @click="(event) => { onItemClick(event, item) }" :to="item.to">
+      <v-list-item v-for="item in item.children" v-bind:key="item.id" @click="(event) => { onItemClick(event, item) }">
         <v-list-item-content>
           <v-list-item-title v-text="item.text"></v-list-item-title>
         </v-list-item-content>
@@ -39,7 +39,17 @@ import { ColumnItem } from './ColumnItem'
 
 @Component
 export default class ColumnMenu extends Vue {
-  @Prop({ default: () => { return {} } }) items!: ColumnItem
+  /**
+   * Array with menu items
+   */
+  @Prop({ default: () => { return {} } })
+  items!: ColumnItem
+
+  /**
+   * Array with menu items
+   */
+  @Prop({ default: () => { return {} } })
+  value!: { panelId: '', groupId: '' }
 
   stack: ColumnItem[] = []
 
@@ -47,15 +57,19 @@ export default class ColumnMenu extends Vue {
   onItemsChange (): void {
     this.stack = []
     this.stack.push(this.items)
-    const groupId = this.$route.params.groupId
+    const groupId = this.value.groupId
     if (groupId) {
       this.findInCurrentLevel(groupId)
     }
-    const panelId = this.$route.params.panelId
+    const panelId = this.value.panelId
     if (panelId) {
       this.findInCurrentLevel(panelId)
       this.stack.pop()
     }
+  }
+
+  mounted (): void {
+    this.onItemsChange()
   }
 
   get currentTitle (): string {
@@ -76,6 +90,7 @@ export default class ColumnMenu extends Vue {
     if (item.children) {
       this.stack.push(item)
     }
+    console.log('click?', event, item)
     this.$emit('click', event, item)
   }
 
