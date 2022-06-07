@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="column-menu">
     <v-toolbar dense flat>
       <v-btn v-if="currentLevel" icon @click="onTitleClick">
         <v-icon>mdi-arrow-left</v-icon>
@@ -19,7 +19,7 @@
       v-bind:key="i"
       >
     <v-list-item-group>
-      <v-list-item v-for="item in item.children" v-bind:key="item.id" @click="(event) => { onItemClick(event, item) }">
+      <v-list-item v-for="item in item.children" :class="`list-item--${item.id}`" v-bind:key="item.id" @click="(event) => { onItemClick(event, item) }" :to="item.to" >
         <v-list-item-content>
           <v-list-item-title v-text="item.text"></v-list-item-title>
         </v-list-item-content>
@@ -56,6 +56,7 @@ export default class ColumnMenu extends Vue {
   @Watch('items', { deep: true })
   onItemsChange (): void {
     this.stack = []
+    console.log(this.items)
     this.stack.push(this.items)
     const groupId = this.value.groupId
     if (groupId) {
@@ -90,7 +91,6 @@ export default class ColumnMenu extends Vue {
     if (item.children) {
       this.stack.push(item)
     }
-    console.log('click?', event, item)
     this.$emit('click', event, item)
   }
 

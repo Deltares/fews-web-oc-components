@@ -23,4 +23,39 @@ describe('DateTimeSlider', () => {
     expect(vm.$emit.mock.calls[0]).toEqual(['update:now', false])
     expect(vm.$emit.mock.calls[1]).toEqual(['input', new Date('2021-10-21')])
   })
+
+  it('get max: return max of dates array', () => {
+    vm.dates = ['test', 'test']
+    expect(vm.max).toEqual(1)
+  })
+
+  it('get nowInDateRange: returns true', () => {
+    expect(vm.nowInDateRange).toBeTruthy()
+  })
+
+  it('get dateString: returns true', () => {
+    vm.dates = []
+    expect(vm.dateString).toEqual('')
+  })
+
+  it('get nowColor', () => {
+    vm.useNow = false
+    expect(vm.nowColor).toEqual('')
+    vm.useNow = true
+    expect(vm.nowColor).toEqual('orange')
+  })
+
+  it('get playColor', () => {
+    vm.isPlaying = false
+    expect(vm.playColor).toEqual('')
+    vm.isPlaying = true
+    expect(vm.playColor).toEqual('orange')
+  })
+
+  it('togglePlay: updates intervalTimer when playing', () => {
+    vm.isPlaying = true
+    expect(vm.intervalTimer).toEqual(0)
+    vm.isPlaying = false
+    expect(vm.playColor).toEqual('orange')
+  })
 })
