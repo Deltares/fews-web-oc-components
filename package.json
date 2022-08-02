@@ -1,7 +1,10 @@
 {
-  "name": "fews-web-oc-components",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@Deltares/fews-web-oc-components",
+  "version": "0.1.1",
+  "private": false,
+  "repository": {
+    "url": "https://github.com/Deltares/fews-web-oc-components.git"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
