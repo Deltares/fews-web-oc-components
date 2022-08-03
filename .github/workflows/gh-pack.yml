@@ -20,7 +20,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: dist-artifact
-          path: ./dist
+          path: dist
 
   test:
     needs: build
@@ -48,6 +48,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: dist-artifact
+          path: dist
       - run: ls -l
       - run: npm publish
         env:
