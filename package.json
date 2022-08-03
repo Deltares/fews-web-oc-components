@@ -20,7 +20,7 @@
   },
   "main": "./dist/fews-web-oc-components.umd.js",
   "files": [
-    "./dist"
+    "dist"
   ],
   "dependencies": {
     "@cypress/vue": "^2.2.3",
