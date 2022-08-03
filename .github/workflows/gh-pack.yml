@@ -44,12 +44,10 @@ jobs:
         with:
           node-version: 12.x
           registry-url: https://npm.pkg.github.com/
-      - run: ls -l
       - uses: actions/download-artifact@v3
         with:
           name: dist-artifact
           path: dist
-      - run: ls -l
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
