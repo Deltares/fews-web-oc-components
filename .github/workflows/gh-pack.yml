@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 12.x
       - run: npm ci
-      - run: npm build
+      - run: npm run-script build
       - uses: actions/upload-artifact@v3
         with:
           name: dist-artifact
