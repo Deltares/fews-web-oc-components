@@ -4,5 +4,6 @@ module.exports = {
   setupFiles: ['./tests/setup.ts'],
   collectCoverage: true,
   collectCoverageFrom: ['<rootDir>/src/**/*.vue'],
-  coverageReporters: ['text-summary', 'html', 'lcov', 'clover']
+  testResultsProcessor: 'jest-teamcity-reporter',
+  coverageReporters: ['text-summary', 'html', 'lcov', 'clover', 'teamcity']
 }
