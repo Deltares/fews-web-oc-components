@@ -8,8 +8,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import Vue2SsdViewer from '@/components/Vue2ssdViewer'
-import DateTimeSlider from '@/components/DateTimeSlider'
+import Vue2SsdViewer from './components/Vue2ssdViewer'
+import DateTimeSlider from './components/DateTimeSlider'
 
 @Component({
   components: {

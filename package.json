@@ -1,32 +1,31 @@
 {
   "name": "@deltares/fews-web-oc-components",
-  "version": "0.1.3-alpha.3",
+  "version": "0.1.3-alpha.4",
+  "description": "Library for components used in the FEWS web oc",
+  "license": "AGPL",
+  "type": "module",
+  "main": "./dist/fews-web-oc-components.umd.js",
+  "typings": "./dist/types/src/index.d.ts",
   "private": false,
-  "repository": {
-    "url": "https://github.com/Deltares/fews-web-oc-components.git"
-  },
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "npm run clean && cross-env NODE_ENV=production webpack --progress && npm pack",
+    "clean": "shx rm -rf dist",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "ci:test:e2e": "vue-cli-service test:e2e --headless",
     "ci:storybook:serve": "vue-cli-service storybook:serve -p 6006 -s public -- --ci --quiet",
     "ci:start-and-test-storybook": "cross-env START_SERVER_AND_TEST_INSECURE=1 \"start-server-and-test ci:storybook:serve http://localhost:6006 ci:test:e2e\"",
     "lint": "vue-cli-service lint",
-    "build-lib": "vue-cli-service build --target lib src/index.ts && npm pack",
     "storybook:build": "vue-cli-service storybook:build",
     "storybook:serve": "vue-cli-service storybook:serve -p 6006"
   },
-  "main": "./dist/fews-web-oc-components.umd.js",
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "@cypress/vue": "^2.2.3",
     "cross-env": "^7.0.3",
     "cypress": "^8.7.0",
     "shx": "^0.3.3",
+    "ts-loader": "^8.4.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-keypress": "^2.1.1",
@@ -43,6 +42,7 @@
     "@storybook/vue": "^6.0.26",
     "@types/jest": "^24.0.19",
     "@types/lodash": "^4.14.176",
+    "@types/node": "^18.15.11",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-e2e-cypress": "^4.5.15",
@@ -60,18 +60,35 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
+    "fork-ts-checker-webpack-plugin": "^6.5.3",
+    "jest-junit": "^13.0.0",
+    "jest-teamcity-reporter": "^0.9.0",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",
     "start-server-and-test": "^1.14.0",
     "typescript": "~4.1.5",
     "vue-cli-plugin-storybook": "~2.1.0",
     "vue-cli-plugin-vuetify": "~2.4.3",
+    "vue-loader": "^15.4.0",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0",
-    "jest-junit": "^13.0.0",
-    "jest-teamcity-reporter": "^0.9.0"
+    "webpack-cli": "^4.10.0"
   },
   "optionalDependencies": {
     "fsevents": "^2.3.2"
+  },
+  "jest-junit": {
+    "outputDirectory": "reports/",
+    "outputName": "junit.xml"
+  },
+  "files": [
+    "dist/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deltares/fews-web-oc-components"
+  },
+  "bugs": {
+    "url": "https://github.com/Deltares/fews-pi-requests/issues"
   }
 }
