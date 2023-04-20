@@ -7,9 +7,12 @@ module.exports = {
 
   extends: [
     "plugin:vue/essential",
+    "plugin:cypress/recommended",
     "@vue/standard",
     "@vue/typescript/recommended"
   ],
+
+  plugins: ['vue'],
 
   parserOptions: {
     ecmaVersion: 2020
@@ -23,15 +26,4 @@ module.exports = {
     "@typescript-eslint/no-var-requires": 1
   },
 
-  overrides: [
-    {
-      files: [
-        "**/__tests__/*.{j,t}s?(x)",
-        "**/tests/unit/**/*.spec.{j,t}s?(x)"
-      ],
-      env: {
-        jest: true
-      }
-    }
-  ]
 };
