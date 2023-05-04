@@ -11,6 +11,7 @@
     "serve": "vue-cli-service serve",
     "build": "npm run clean && cross-env NODE_ENV=production webpack --progress && npm pack",
     "clean": "shx rm -rf dist",
+    "test": "jest",
     "test:unit": "jest unit",
     "test:e2e": "vue-cli-service test:e2e",
     "ci:test:e2e": "vue-cli-service test:e2e --headless",
