@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils'
-import DateTimeSlider from '../../../src/components/DateTimeSlider'
-import { Default } from '../../../src/components/DateTimeSlider/DateTimeSlider.stories'
+import DateTimeSlider from '@/components/DateTimeSlider'
+import { Default } from '@/components/DateTimeSlider/DateTimeSlider.stories'
 
 describe('DateTimeSlider', () => {
   let vm: any
@@ -14,13 +14,12 @@ describe('DateTimeSlider', () => {
 
   it('renders the component in the Default state', () => {
     vm.$emit = jest.fn()
-    expect(wrapper.find('.date-time-slider').exists()).toBe(true)
+    expect(wrapper.findComponent(DateTimeSlider).exists()).toBe(true)
   })
 
   it('emits input', () => {
     vm.$emit = jest.fn()
     vm.toggleNow()
     expect(vm.$emit.mock.calls[0]).toEqual(['update:now', false])
-    expect(vm.$emit.mock.calls[1]).toEqual(['input', new Date('2021-10-21')])
   })
 })

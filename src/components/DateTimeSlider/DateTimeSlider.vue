@@ -1,19 +1,19 @@
 <template>
-  <div class="date-time-slider">
-    <v-slider v-model="index" :max="this.max" step="1" tick-size="6" tabindex="0" @input="this.onInput" hide-details
+  <div>
+    <v-slider v-model="index" :max="max" step="1" tick-size="6" tabindex="0" @input="onInput" hide-details
       height="0">
     </v-slider>
     <div style="display:flex;flex-direction:row;flex-grow:1;padding:6px 16px">
-      <!-- @slot Prepend item in toolbar -->
       <slot name="prepend"></slot>
       <div style="width:1px;height:100%;max-height:100%;background-color:lightgray;">
       </div>
       <div style="display:flex;flex-grow:1;justify-content:space-between">
         <div style="display:flex;">
-          <v-btn class="now-button" icon :color="nowColor" @click="toggleNow" ref="NowButton">
-            <v-icon>mdi-clock</v-icon>
+          <v-btn icon :color="nowColor" @click="toggleNow">
+            <v-icon v-if="loading">mdi-loading mdi-spin</v-icon>
+            <v-icon v-else>mdi-clock</v-icon>
           </v-btn>
-          <div style="margin:auto;width:15ch;flex:2 0 20%" class="now-text body-2"> {{ dateString }}</div>
+          <div style="margin:auto;width:30ch;flex:2 0 20%" class="body-2"> {{ dateString }}</div>
         </div>
         <div style="display:flex;">
           <v-btn @mousedown="backward()" @mouseup="stopPlay" icon ref="BackButton">
@@ -31,9 +31,8 @@
               mdi-skip-next
             </v-icon>
           </v-btn>
+          <slot name="append"></slot>
         </div>
-        <!-- @slot Append item in toolbar -->
-        <slot name="append"></slot>
       </div>
     </div>
   </div>
@@ -41,64 +40,32 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
-import { throttle } from 'lodash'
 
 @Component
 export default class DateTimeSlider extends Vue {
-  /**
-   * Selected date
-   */
-  @Prop({ default: () => { return new Date() } })
-  private value!: Date
-
-  /**
-   * Array with dates
-   */
-  @Prop({ default: () => { return [new Date()] } })
-  private dates!: Date[]
-
-  /**
-   * If the slider should follow the actual date time
-   */
-  @Prop({ default: true })
-  private now!: boolean
+  @Prop({ default: () => { return new Date(1970) } }) private value!: Date
+  @Prop({ default: () => { return [new Date(1970)] } }) private dates!: Date[]
+  @Prop({ default: false, type: Boolean }) private loading!: boolean
+  @Prop({ default: false, type: Boolean }) private now!: boolean
 
   index = 0
   currentDate!: Date
   useNow = true
   isPlaying = false
-  intervalTimer: ReturnType<typeof setInterval> = 0
-  throttledUpdate!: any
-
-  created (): void {
-    this.updateIndexValueChange()
-    this.currentDate = this.value
-    this.throttledUpdate = throttle(this.inputChanged, 1000, { leading: true, trailing: true })
-  }
+  intervalTimer: any = 0
+  hideLabel = true
 
   mounted (): void {
-    this.useNow = this.now
+    this.updateIndexValueChange()
+    this.currentDate = this.value
     this.$emit('update:now', this.useNow)
-    window.addEventListener('keyup', this.keyupListener)
-    window.addEventListener('keydown', this.keydownListener)
-  }
-
-  destroyed (): void {
-    if (this.intervalTimer !== 0) clearInterval(this.intervalTimer)
-    window.removeEventListener('keyup', this.keyupListener)
-    window.removeEventListener('keydown', this.keydownListener)
   }
 
   get max (): number {
     return Math.max(0, this.dates.length - 1)
   }
 
-  get nowInDateRange (): boolean {
-    return true
-  }
-
   get dateString (): string {
-    // TODO: need to think about internationalization here, or at least a string format
     return this.dates[this.index] ? this.dates[this.index].toLocaleString() : ''
   }
 
@@ -118,8 +85,7 @@ export default class DateTimeSlider extends Vue {
     } else {
       this.isPlaying = true
       this.useNow = false
-      this.$emit('update:now', this.useNow)
-      this.intervalTimer = setInterval(this.play, 200)
+      this.intervalTimer = setInterval(this.play, 1000)
     }
   }
 
@@ -140,7 +106,6 @@ export default class DateTimeSlider extends Vue {
   }
 
   @Watch('value')
-  @Watch('dates')
   updateIndexValueChange (): void {
     if (this.value && this.dates) {
       this.index = this.dates.findIndex((date: Date) => { return this.value.getTime() === date.getTime() })
@@ -149,7 +114,7 @@ export default class DateTimeSlider extends Vue {
   }
 
   @Watch('now')
-  onNowChange (): void {
+  updateNow (): void {
     this.useNow = this.now
   }
 
@@ -162,25 +127,11 @@ export default class DateTimeSlider extends Vue {
           this.index = Math.max(0, i - 1)
           break
         }
-        this.index = this.dates.length - 1
       }
       this.stopPlay()
       this.updateDate()
     }
-
-    /**
-     * Emitted when now mode is toggled
-     * @arg {boolean} now mode
-     */
     this.$emit('update:now', this.useNow)
-    if (this.dates[this.index]) {
-      /**
-       * Emitted when selected date changes
-       * @event input
-       * @arg {Date} date selected date
-       */
-      this.$emit('input', this.dates[this.index])
-    }
   }
 
   backward (step?: number): void {
@@ -205,13 +156,11 @@ export default class DateTimeSlider extends Vue {
 
   increment (step = 1): void {
     this.index = Math.min(this.max, this.index + step)
-    this.updateDate()
     this.inputChanged()
   }
 
   decrement (step = 1): void {
     this.index = Math.max(0, this.index - step)
-    this.updateDate()
     this.inputChanged()
   }
 
@@ -221,7 +170,7 @@ export default class DateTimeSlider extends Vue {
 
   onInput (): void {
     this.updateDate()
-    this.throttledUpdate()
+    this.inputChanged()
   }
 
   inputChanged (): void {
@@ -230,38 +179,6 @@ export default class DateTimeSlider extends Vue {
       this.$emit('update:now', this.useNow)
     }
     if (this.dates[this.index]) this.$emit('input', this.dates[this.index])
-  }
-
-  keydownListener (event: KeyboardEvent): void {
-    switch (event.code) {
-      case 'ArrowRight':
-        if (!event.repeat) this.forward(event.shiftKey ? 6 : 1)
-        break
-      case 'ArrowLeft':
-        if (!event.repeat) this.backward(event.shiftKey ? 6 : 1)
-        break
-      case 'KeyN':
-        this.toggleNow()
-        break
-      case 'Enter':
-        this.togglePlay()
-        break
-      default:
-        break
-    }
-  }
-
-  keyupListener (event: KeyboardEvent): void {
-    switch (event.code) {
-      case 'ArrowRight':
-        this.stopPlay()
-        break
-      case 'ArrowLeft':
-        this.stopPlay()
-        break
-      default:
-        break
-    }
   }
 }
 </script>

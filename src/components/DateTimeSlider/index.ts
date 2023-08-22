@@ -1,1 +1,2 @@
-export { default } from './DateTimeSlider.vue'
+import DateTimeSlider from './DateTimeSlider.vue'
+export default DateTimeSlider

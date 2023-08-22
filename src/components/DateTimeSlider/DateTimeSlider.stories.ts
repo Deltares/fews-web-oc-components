@@ -1,5 +1,4 @@
 import { action } from '@storybook/addon-actions'
-import { withKnobs, text, boolean } from '@storybook/addon-knobs'
 import DateTimeSlider from './DateTimeSlider.vue'
 
 const value = new Date('2021-10-21')
