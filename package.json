@@ -83,9 +83,6 @@
     "webpack": "^5.82.0",
     "webpack-cli": "^5.1.4"
   },
-  "optionalDependencies": {
-    "fsevents": "^2.3.2"
-  },
   "jest-junit": {
     "outputDirectory": "reports/",
     "outputName": "junit.xml"
