@@ -22,7 +22,6 @@
     "storybook:serve": "vue-cli-service storybook:serve -p 6006",
     "sonar": "sonar-scanner -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$SONAR_KEY -Dsonar.projectName='Delft-FEWS Web OC Components'"
   },
-  "main": "./dist/fews-web-oc-components.umd.js",
   "dependencies": {
     "@cypress/vue": "^2.2.3",
     "cross-env": "^7.0.3",
@@ -81,7 +80,8 @@
     "vue-loader": "^15.4.0",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0",
-    "webpack": "^5.82.0"
+    "webpack": "^5.82.0",
+    "webpack-cli": "^5.1.4"
   },
   "optionalDependencies": {
     "fsevents": "^2.3.2"
