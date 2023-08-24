@@ -14,6 +14,7 @@
     "baseUrl": ".",
     "build": true,
     "emitDecoratorMetadata": true,
+    "allowJs": true,
     "declarationDir": "dist/types",
     "outDir": "dist/lib",
     "typeRoots": [
