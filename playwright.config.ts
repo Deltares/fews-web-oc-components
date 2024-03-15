@@ -1,5 +1,5 @@
 import process from 'node:process'
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/experimental-ct-vue';
 
 /**
  * Read environment variables from file.
@@ -11,9 +11,10 @@ import { defineConfig, devices } from '@playwright/test'
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './',
+  testMatch: '**/*.spec.ts',
   /* Maximum time one test can run for. */
-  timeout: 30 * 1000,
+  timeout: 10 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -34,7 +35,7 @@ export default defineConfig({
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:5173',
+    // baseURL: 'http://localhost:5173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -57,12 +58,12 @@ export default defineConfig({
         ...devices['Desktop Firefox']
       }
     },
-    {
-      name: 'webkit',
-      use: {
-        ...devices['Desktop Safari']
-      }
-    }
+    // {
+    //   name: 'webkit',
+    //   use: {
+    //     ...devices['Desktop Safari']
+    //   }
+    // }
 
     /* Test against mobile viewports. */
     // {

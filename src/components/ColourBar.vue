@@ -1,6 +1,6 @@
 <template>
   <div id="legend">
-    <svg id="colourbar" class="colourbar"></svg>
+    <svg id="colourbar" class="colourbar" data-testid="colourbar"></svg>
   </div>
 </template>
 
