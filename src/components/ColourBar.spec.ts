@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/experimental-ct-vue'
-import ColourBar from '../src/components/ColourBar.vue'
+import ColourBar from './ColourBar.vue'
 
 test.use({ viewport: { width: 500, height: 500 } })
 
