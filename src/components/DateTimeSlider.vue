@@ -1,57 +1,98 @@
 <template>
-  <div class="slider-container">
-    <v-slider
-      v-model="dateIndex"
-      :max="maxIndex"
-      step="1"
-      hide-details
-      thumb-size="15"
-    />
-  </div>
-  <div class="controls-container">
-    <slot name="prepend"></slot>
-    <div class="now-tracking-control">
-      <v-btn
-        density="compact"
-        variant="flat"
-        :icon="nowButtonIcon"
-        :color="nowButtonColor"
-        @click="toggleFollowNow"
-      />
-      <span class="text-body-2 selected-date">{{ dateString }}</span>
+  <div class="datetime-slider">
+    <div class="slider-container">
+      <v-slider
+        v-model="dateIndex"
+        :ticks="marks"
+        :step="1"
+        :max="maxIndex"
+        hide-details
+        show-ticks="always"
+        tick-size="8"
+        thumb-label
+        @update:model-value="stopFollowNow"
+      >
+        <template #tick-label="{ tick }">
+          <v-chip label variant="elevated">{{ tick.label }}</v-chip>
+        </template>
+        <template #thumb-label>
+          {{ dates[dateIndex]?.toLocaleString() ?? '' }}
+        </template>
+      </v-slider>
     </div>
-    <v-spacer />
-    <div class="play-controls">
-      <v-btn
-        density="compact"
-        variant="flat"
-        icon="mdi-skip-previous"
-        @mousedown="stepBackward"
-        @mouseup="stopPlay"
-      />
-      <v-btn
-        density="compact"
-        variant="flat"
-        :icon="playButtonIcon"
-        :color="playButtonColor"
-        @click="togglePlay"
-      />
-      <v-btn
-        density="compact"
-        variant="flat"
-        icon="mdi-skip-next"
-        @mousedown="stepForward"
-        @mouseup="stopPlay"
-      />
+    <div class="datetime-slider__actions">
+      <slot name="prepend"></slot>
+      <div class="now-tracking-control">
+        <v-btn
+          density="compact"
+          variant="text"
+          :icon="nowButtonIcon"
+          :color="nowButtonColor"
+          @click="toggleFollowNow"
+        />
+        <span class="datetime-slider__datefield">{{ dateString }}</span>
+      </div>
+      <v-spacer />
+      <div class="play-controls">
+        <v-menu offset="25" transition="fade-transition">
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" density="compact" variant="text" icon>
+              <v-icon>mdi-play-speed</v-icon>
+              <v-tooltip location="top" activator="parent">
+                <span>Playback speed</span>
+              </v-tooltip>
+            </v-btn>
+          </template>
+
+          <v-list class="pa-1">
+            <v-list-item
+              v-for="speed in availableSpeeds"
+              :active="speed === currentSpeed"
+              rounded
+              density="compact"
+              @click="setSpeed(speed)"
+              :title="formatSpeed(speed)"
+            />
+          </v-list>
+        </v-menu>
+        <v-btn
+          density="compact"
+          variant="text"
+          icon="mdi-skip-previous"
+          @mousedown="stepBackward"
+          @mouseup="stopPlay"
+        />
+        <v-btn
+          density="compact"
+          variant="text"
+          :icon="playButtonIcon"
+          :color="playButtonColor"
+          @click="togglePlay"
+        />
+        <v-btn
+          density="compact"
+          variant="text"
+          icon="mdi-skip-next"
+          @mousedown="stepForward"
+          @mouseup="stopPlay"
+        />
+      </div>
+      <slot name="append"></slot>
     </div>
-    <slot name="append"></slot>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { scaleTime } from 'd3-scale'
+import { DateTime } from 'luxon'
+import { VSlider } from 'vuetify/components'
 
-interface Props {
+import { onMounted } from 'vue'
+import { findDateIndex } from '@/lib/utils/findDateIndex'
+
+interface Properties {
+  selectedDate?: Date
   dates: Date[]
   isLoading?: boolean
   doFollowNow?: boolean
@@ -59,60 +100,100 @@ interface Props {
   followNowInterval?: number
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Properties>(), {
   isLoading: false,
-  doFollowNow: false,
+  doFollowNow: true,
   playInterval: 1000,
-  followNowInterval: 10000,
+  followNowInterval: 60000
 })
-const selectedDate = defineModel<Date>('selectedDate', { required: true })
-const emit = defineEmits(['update:doFollowNow'])
+const emit = defineEmits(['update:selectedDate', 'update:doFollowNow'])
 
 // Step size when playing an animation, and when clicking the previous and next frame buttons.
 const playIncrement = 1
 const stepIncrement = 1
 const dateIndex = ref(0)
 
-const isPlaying = ref(false)
-let playIntervalTimer: ReturnType<typeof setInterval> | null = null
+const defaultSpeed = 1
+const currentSpeed = ref(defaultSpeed)
+const availableSpeeds = [0.5, 1, 2, 4]
+
+const playTimeoutTimer = ref<ReturnType<typeof setTimeout>>()
 
 const doFollowNow = ref(props.doFollowNow)
 let followNowIntervalTimer: ReturnType<typeof setInterval> | null = null
 
+onMounted(() => {
+  if (props.doFollowNow) {
+    startFollowNow()
+  }
+})
+
+const marks = computed(() => {
+  const dayMarks: Record<number, any> = {}
+  const dateScale = scaleTime().domain(props.dates)
+  const ticks = dateScale.ticks(5)
+  let tickIndex = 0
+  let now = DateTime.now()
+  const remainder = 10 - (now.minute % 10)
+  now = now.plus({ minutes: remainder }).startOf('minute')
+  for (const index in props.dates) {
+    const date = DateTime.fromJSDate(props.dates[index])
+    if (tickIndex < ticks.length && date.toMillis() >= ticks[tickIndex].getTime()) {
+      tickIndex++
+      dayMarks[index] = date.toJSDate().toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric'
+      })
+    }
+  }
+  return dayMarks
+})
+
 // Synchronise selectedDate property and local index variable.
 watch(dateIndex, (index) => {
-  selectedDate.value = props.dates[index] ?? new Date('invalid')
+  emit('update:selectedDate', props.dates[index])
 })
 
 watch(
-  selectedDate,
-  () => {
-    const index = findIndexForDate(selectedDate.value)
-    if (index == dateIndex.value) return
+  () => props.selectedDate,
+  (selectedDate) => {
+    if (selectedDate === undefined) return
+    let index = findDateIndex(props.dates, selectedDate)
+    if (index === dateIndex.value) return
     dateIndex.value = index
-  },
-  { immediate: true },
+  }
 )
 
 // Synchronise doFollowNow property and local variable.
 watch(doFollowNow, (doFollowNow) => {
   emit('update:doFollowNow', doFollowNow)
 })
+
 watch(
   () => props.doFollowNow,
   (doFollowNowProp) => {
     doFollowNow.value = doFollowNowProp
-  },
+  }
 )
 
 // When the input dates change, make sure the selected index is updated to point to the correct
 // member of the new dates array.
 watch(
   () => props.dates,
-  (_, oldDates) => {
-    const oldDate = oldDates[dateIndex.value]
-    dateIndex.value = findIndexForDate(oldDate)
-  },
+  () => {
+    if (doFollowNow.value) {
+      setDateToNow()
+      if (props.selectedDate?.getTime() !== props.dates[dateIndex.value]?.getTime()) {
+        emit('update:selectedDate', props.dates[dateIndex.value])
+      }
+    } else {
+      if (props.selectedDate) {
+        const oldDate = props.selectedDate
+        dateIndex.value = findDateIndex(props.dates, oldDate)
+      }
+    }
+  }
 )
 
 const maxIndex = computed(() => {
@@ -123,21 +204,13 @@ const maxIndex = computed(() => {
 })
 
 // Now and play button styling is dependent on properties.
-const nowButtonIcon = computed(() =>
-  props.isLoading ? 'mdi-loading mdi-spin' : 'mdi-clock',
-)
-const playButtonIcon = computed(() =>
-  isPlaying.value ? 'mdi-pause' : 'mdi-play',
-)
-const nowButtonColor = computed(() =>
-  doFollowNow.value ? 'orange' : undefined,
-)
-const playButtonColor = computed(() => (isPlaying.value ? 'orange' : undefined))
+const nowButtonIcon = computed(() => (props.isLoading ? 'mdi-loading mdi-spin' : 'mdi-clock'))
+const playButtonIcon = computed(() => (playTimeoutTimer.value ? 'mdi-pause' : 'mdi-play'))
+const nowButtonColor = computed(() => (doFollowNow.value ? 'primary' : undefined))
+const playButtonColor = computed(() => (playTimeoutTimer.value ? 'primary' : undefined))
 
 const dateString = computed(() =>
-  props.dates[dateIndex.value]
-    ? props.dates[dateIndex.value].toLocaleString()
-    : '',
+  props.dates[dateIndex.value] ? props.dates[dateIndex.value].toLocaleString() : ''
 )
 
 function toggleFollowNow(): void {
@@ -164,47 +237,36 @@ function stopFollowNow(): void {
 
 function setDateToNow(): void {
   const now = new Date()
-  dateIndex.value = findIndexForDate(now)
-}
-
-function findIndexForDate(date: Date): number {
-  const index = props.dates.findIndex((current) => current >= date)
-  if (index === -1) {
-    // No time was found that was larger than the current time, so use the first date.
-    return 0
-  } else {
-    return index
-  }
+  dateIndex.value = findDateIndex(props.dates, now)
 }
 
 function togglePlay(): void {
-  isPlaying.value = !isPlaying.value
-  if (isPlaying.value) {
-    startPlay()
-  } else {
+  if (playTimeoutTimer.value) {
     stopPlay()
+  } else {
+    startPlay()
   }
 }
 
 function startPlay(): void {
-  isPlaying.value = true
   stopFollowNow()
-  playIntervalTimer = setInterval(play, props.playInterval)
+  play()
 }
 
 function stopPlay(): void {
-  isPlaying.value = false
-  if (playIntervalTimer) {
-    clearInterval(playIntervalTimer)
-    playIntervalTimer = null
+  if (playTimeoutTimer.value) {
+    clearTimeout(playTimeoutTimer.value)
+    playTimeoutTimer.value = undefined
   }
 }
 
 function play(): void {
-  increment(playIncrement)
   if (dateIndex.value === maxIndex.value) {
-    stopPlay()
+    dateIndex.value = 0
+  } else {
+    increment(playIncrement)
   }
+  playTimeoutTimer.value = setTimeout(play, props.playInterval * (1 / currentSpeed.value))
 }
 
 function stepBackward(): void {
@@ -224,6 +286,14 @@ function decrement(step: number): void {
 function increment(step: number): void {
   dateIndex.value = Math.min(dateIndex.value + step, maxIndex.value)
 }
+
+function setSpeed(speed: number) {
+  currentSpeed.value = speed
+}
+
+function formatSpeed(speed: number) {
+  return speed === defaultSpeed ? 'Normal' : `${speed}x`
+}
 </script>
 
 <style scoped>
@@ -231,15 +301,15 @@ function increment(step: number): void {
   padding: 0px 10px;
 }
 
-.controls-container {
+.datetime-slider__actions {
   display: flex;
   flex-direction: row;
-  padding: 0 16px 10px;
+  padding: 0px 10px 6px;
 }
 
-.selected-date {
+.datetime-slider__datefield {
   margin: auto;
-  width: 30ch;
+  width: 24ch;
   flex: 2 0 20%;
 }
 
@@ -253,5 +323,22 @@ function increment(step: number): void {
   display: flex;
   flex-direction: row;
   gap: 10px;
+}
+
+:deep(.v-slider-thumb__label) {
+  width: max-content;
+}
+
+:deep(.v-slider-track__tick-label) {
+  top: -30px;
+  left: 4px; /* Tick size divided by 2 */
+  transform: translate(-50%, -100%) !important;
+  display: none;
+}
+
+:deep(div:has(~ .v-slider-track__tick:hover) > .v-slider-track__tick-label),
+:deep(.v-slider-track__tick:hover ~ div > .v-slider-track__tick-label),
+:deep(.v-slider-track__tick:hover > .v-slider-track__tick-label) {
+  display: block;
 }
 </style>
