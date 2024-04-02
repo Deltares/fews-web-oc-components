@@ -131,6 +131,7 @@ onMounted(() => {
 const marks = computed(() => {
   const dayMarks: Record<number, any> = {}
   const dateScale = scaleTime().domain(props.dates)
+  // TODO: this currently assumes there are 5 days in the dates spread?
   const ticks = dateScale.ticks(5)
   let tickIndex = 0
   let now = DateTime.now()
@@ -336,8 +337,11 @@ function formatSpeed(speed: number) {
   display: none;
 }
 
+/* Display label if a succeeding tick is hovered */
 :deep(div:has(~ .v-slider-track__tick:hover) > .v-slider-track__tick-label),
+/* Display label if a preceding tick is hovered */
 :deep(.v-slider-track__tick:hover ~ div > .v-slider-track__tick-label),
+/* Display label if the tick itself is hovered */
 :deep(.v-slider-track__tick:hover > .v-slider-track__tick-label) {
   display: block;
 }
