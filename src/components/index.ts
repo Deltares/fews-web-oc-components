@@ -1,4 +1,4 @@
-import DateTimeSlider from './DateTimeSlider.vue'
-import ColourBar from './ColourBar.vue'
+import DateTimeSlider from './DateTimeSlider/DateTimeSlider.vue'
+import ColourBar from './ColourBar/ColourBar.vue'
 
 export { DateTimeSlider, ColourBar }
