@@ -89,7 +89,7 @@ import { DateTime } from 'luxon'
 import { VSlider } from 'vuetify/components'
 
 import { onMounted } from 'vue'
-import { findDateIndex } from '@/lib/utils/findDateIndex'
+import { findDateIndex } from '@/utils/findDateIndex'
 
 interface Properties {
   selectedDate?: Date

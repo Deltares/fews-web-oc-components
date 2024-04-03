@@ -3,6 +3,18 @@
  * @param dates - The array of dates to search in.
  * @param targetDate - The target date to find the index of.
  * @returns The index of the target date in the array, or the length of the array if the target date is not found.
+ * @example
+ * ```
+ * const dates = [
+ *  new Date('2022-01-01'),
+ *  new Date('2022-02-01'),
+ *  new Date('2022-03-01'),
+ *  new Date('2022-04-01'),
+ *  ]
+ *  const targetDate = new Date('2022-03-01')
+ *  const result = findDateIndex(dates, targetDate)
+ *  console.log(result) // => 2
+ *  ```
  */
 export function findDateIndex(dates: Date[], targetDate: Date): number {
   let left = 0

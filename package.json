@@ -1,6 +1,6 @@
 {
   "name": "fews-web-oc-components",
-  "version": "0.2.0",
+  "version": "0.2.0-beta.0",
   "description": "Library for components used in the FEWS Web OC",
   "license": "AGPL",
   "private": false,
@@ -21,6 +21,7 @@
   "scripts": {
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
+    "test": "run-p test:*",
     "test:unit": "vitest",
     "test:component": "playwright test",
     "build-only": "vite build",

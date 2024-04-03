@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { findDateIndex } from './findDateIndex'
+import { findDateIndex } from '.'
 
 test('should return the index of the target date in the array', () => {
   const dates = [
