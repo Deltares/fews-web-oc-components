@@ -84,9 +84,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { scaleTime } from 'd3-scale'
+import { scaleTime } from 'd3'
 import { DateTime } from 'luxon'
-import { VSlider } from 'vuetify/components'
 
 import { onMounted } from 'vue'
 import { findDateIndex } from '@/utils/findDateIndex'
