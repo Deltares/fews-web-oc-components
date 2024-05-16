@@ -8,8 +8,10 @@
         :max="maxIndex"
         hide-details
         show-ticks="always"
-        tick-size="8"
+        :tick-size="tickSize"
         thumb-label
+        density="compact"
+        :color="colors?.primary"
         @update:model-value="stopFollowNow"
       >
         <template #tick-label="{ tick }">
@@ -36,7 +38,7 @@
       <div class="play-controls">
         <v-menu offset="25" transition="fade-transition">
           <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" density="compact" variant="text" icon>
+            <v-btn v-bind="props" density="compact" variant="text" icon :color="colors?.primary">
               <v-icon>mdi-play-speed</v-icon>
               <v-tooltip location="top" activator="parent">
                 <span>Playback speed</span>
@@ -61,6 +63,7 @@
           icon="mdi-skip-previous"
           @mousedown="stepBackward"
           @mouseup="stopPlay"
+          :color="colors?.primary"
         />
         <v-btn
           density="compact"
@@ -75,6 +78,7 @@
           icon="mdi-skip-next"
           @mousedown="stepForward"
           @mouseup="stopPlay"
+          :color="colors?.primary"
         />
       </div>
       <slot name="append"></slot>
@@ -101,20 +105,30 @@ import {
 import { onMounted } from 'vue'
 import { findDateIndex } from '@/utils/findDateIndex'
 
-interface Properties {
+interface Colors {
+  primary: string
+  accent: string
+}
+
+interface Props {
   selectedDate?: Date
   dates: Date[]
   isLoading?: boolean
   doFollowNow?: boolean
   playInterval?: number
   followNowInterval?: number
+  dateFormatter?: (date: Date) => string
+  colors?: Colors
+  tickSize?: number
 }
 
-const props = withDefaults(defineProps<Properties>(), {
+const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
   doFollowNow: true,
   playInterval: 1000,
-  followNowInterval: 60000
+  followNowInterval: 60000,
+  dateFormatter: (date: Date) => date.toLocaleString(),
+  tickSize: 8
 })
 const emit = defineEmits(['update:selectedDate', 'update:doFollowNow'])
 
@@ -217,11 +231,15 @@ const maxIndex = computed(() => {
 // Now and play button styling is dependent on properties.
 const nowButtonIcon = computed(() => (props.isLoading ? 'mdi-loading mdi-spin' : 'mdi-clock'))
 const playButtonIcon = computed(() => (playTimeoutTimer.value ? 'mdi-pause' : 'mdi-play'))
-const nowButtonColor = computed(() => (doFollowNow.value ? 'primary' : undefined))
-const playButtonColor = computed(() => (playTimeoutTimer.value ? 'primary' : undefined))
+const nowButtonColor = computed(() =>
+  doFollowNow.value ? props.colors?.accent : props.colors?.primary
+)
+const playButtonColor = computed(() =>
+  playTimeoutTimer.value ? props.colors?.accent : props.colors?.primary
+)
 
 const dateString = computed(() =>
-  props.dates[dateIndex.value] ? props.dates[dateIndex.value].toLocaleString() : ''
+  props.dates[dateIndex.value] ? props.dateFormatter(props.dates[dateIndex.value]) : ''
 )
 
 function toggleFollowNow(): void {
@@ -315,6 +333,7 @@ function formatSpeed(speed: number) {
 .datetime-slider__actions {
   display: flex;
   flex-direction: row;
+  align-items: center;
   padding: 0px 10px 6px;
 }
 
@@ -342,7 +361,7 @@ function formatSpeed(speed: number) {
 
 :deep(.v-slider-track__tick-label) {
   top: -30px;
-  left: 4px; /* Tick size divided by 2 */
+  left: v-bind(props.tickSize / 2)px; /* Tick size divided by 2 */
   transform: translate(-50%, -100%) !important;
   display: none;
 }
