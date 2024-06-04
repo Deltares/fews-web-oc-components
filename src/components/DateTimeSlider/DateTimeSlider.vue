@@ -15,7 +15,9 @@
         @update:model-value="stopFollowNow"
       >
         <template #tick-label="{ tick }">
-          <v-chip label variant="elevated">{{ tick.label }}</v-chip>
+          <v-chip label variant="elevated" density="comfortable" class="px-2">
+            {{ tick.label }}
+          </v-chip>
         </template>
         <template #thumb-label>
           {{ dates[dateIndex]?.toLocaleString() ?? '' }}
@@ -89,7 +91,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { scaleTime } from 'd3'
-import { DateTime } from 'luxon'
 import {
   VSlider,
   VBtn,
@@ -104,6 +105,7 @@ import {
 
 import { onMounted } from 'vue'
 import { findDateIndex } from '@/utils/findDateIndex'
+import { formatDate } from '@/utils/formatDate'
 
 interface Colors {
   primary: string
@@ -118,6 +120,7 @@ interface Props {
   playInterval?: number
   followNowInterval?: number
   dateFormatter?: (date: Date) => string
+  tickDateFormatter?: (date: Date) => string
   colors?: Colors
   tickSize?: number
   speedControl?: boolean
@@ -154,25 +157,19 @@ onMounted(() => {
 })
 
 const marks = computed(() => {
-  const dayMarks: Record<number, any> = {}
+  const dayMarks: Record<number, string> = {}
   const dateScale = scaleTime().domain(props.dates)
-  // TODO: this currently assumes there are 5 days in the dates spread?
   const ticks = dateScale.ticks(5)
+  const formattedTicks = ticks.map(props.tickDateFormatter ?? formatDate)
+
   let tickIndex = 0
-  let now = DateTime.now()
-  const remainder = 10 - (now.minute % 10)
-  now = now.plus({ minutes: remainder }).startOf('minute')
-  for (const index in props.dates) {
-    const date = DateTime.fromJSDate(props.dates[index])
-    if (tickIndex < ticks.length && date.toMillis() >= ticks[tickIndex].getTime()) {
+  props.dates.forEach((date, i) => {
+    if (tickIndex < ticks.length && date.getTime() >= ticks[tickIndex].getTime()) {
+      dayMarks[i] = formattedTicks[tickIndex]
       tickIndex++
-      dayMarks[index] = date.toJSDate().toLocaleString(undefined, {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric'
-      })
     }
-  }
+  })
+
   return dayMarks
 })
 
@@ -361,9 +358,10 @@ function formatSpeed(speed: number) {
 }
 
 :deep(.v-slider-track__tick-label) {
-  top: -30px;
-  left: v-bind(props.tickSize / 2)px; /* Tick size divided by 2 */
-  transform: translate(-50%, -100%) !important;
+  transform: translate(
+    calc(-50% + var(--v-slider-tick-size) / 4),
+    calc(-100% - var(--v-slider-tick-size) - 1rem)
+  ) !important;
   display: none;
 }
 

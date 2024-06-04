@@ -22,12 +22,11 @@ export default defineConfig({
       fileName: 'fews-web-oc-components',
     },
     rollupOptions: {
-      external: ['vue', '@deltares/fews-web-oc-charts', 'luxon', 'd3', 'vuetify/components'],
+      external: ['vue', '@deltares/fews-web-oc-charts', 'd3', 'vuetify/components'],
       output: {
         globals: {
           vue: 'Vue',
           '@deltares/fews-web-oc-charts': 'webOcCharts',
-          luxon: 'luxon',
           d3: 'd3',
           'vuetify/components': 'vuetifyComponents',
         },

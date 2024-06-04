@@ -33,7 +33,6 @@
     "@deltares/fews-web-oc-charts": "^3.0.2",
     "@deltares/fews-wms-requests": "^1.0.0",
     "d3": "^7.8.5",
-    "luxon": "^3.4.4",
     "vue": "^3.4.21",
     "vuetify": "^3.5.4"
   },
@@ -44,7 +43,6 @@
     "@tsconfig/node20": "^20.1.2",
     "@types/d3": "^7.4.3",
     "@types/jsdom": "^21.1.6",
-    "@types/luxon": "^3.4.2",
     "@types/node": "^20.11.25",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-prettier": "^8.0.0",
