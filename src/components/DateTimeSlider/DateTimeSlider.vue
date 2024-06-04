@@ -36,7 +36,7 @@
       </div>
       <v-spacer />
       <div class="play-controls">
-        <v-menu offset="25" transition="fade-transition">
+        <v-menu v-if="speedControl !== false" offset="25" transition="fade-transition">
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" density="compact" variant="text" icon :color="colors?.primary">
               <v-icon>mdi-play-speed</v-icon>
@@ -120,6 +120,7 @@ interface Props {
   dateFormatter?: (date: Date) => string
   colors?: Colors
   tickSize?: number
+  speedControl?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
