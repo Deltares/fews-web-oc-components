@@ -17,7 +17,7 @@ export interface UseWmsReturn {
 
 export function useWmsLayerCapabilities(
   baseUrl: string,
-  layerName: MaybeRefOrGetter<string>,
+  layerName: MaybeRefOrGetter<string | undefined>,
   filter?: MaybeRefOrGetter<Partial<GetCapabilitiesFilter>>
 ): UseWmsReturn {
   const wmsUrl = `${baseUrl}/wms`
@@ -30,6 +30,12 @@ export function useWmsLayerCapabilities(
     const _layers = toValue(layerName)
     const _filter = toValue(filter)
 
+    if (_layers === undefined) {
+      capabilities.value = undefined
+      layerCapabilities.value = undefined
+      return
+    }
+
     try {
       capabilities.value = await wmsProvider.getCapabilities({
         layers: _layers,
@@ -38,7 +44,7 @@ export function useWmsLayerCapabilities(
         forecastCount: 1,
         ..._filter
       })
-      if (capabilities.value.layers.length > 0) {
+      if (capabilities.value?.layers?.length > 0) {
         layerCapabilities.value =
           capabilities.value.layers.find((l) => l.name === _layers) ?? capabilities.value.layers[0]
       }
@@ -93,7 +99,7 @@ export function useWmsLegend(
     const _colorScaleRange = toValue(colorScaleRange)
     const _style = toValue(style)
 
-    if (_layers === '') {
+    if (_layers === undefined) {
       legendGraphic.value = undefined
       return
     }
