@@ -86,7 +86,7 @@ export function useWmsLayerCapabilities(
 
 export function useWmsLegend(
   baseUrl: string,
-  layerName: MaybeRefOrGetter<string>,
+  layerName: MaybeRefOrGetter<string | undefined>,
   useDisplayUnits: MaybeRefOrGetter<boolean>,
   colorScaleRange?: MaybeRefOrGetter<string | undefined>,
   style?: MaybeRefOrGetter<Style>
