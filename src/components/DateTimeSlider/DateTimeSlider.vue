@@ -104,7 +104,7 @@ import {
 } from 'vuetify/components'
 
 import { onMounted } from 'vue'
-import { findDateIndex } from '@/utils/findDateIndex'
+import { findClosestIndex } from '@/utils/findClosestIndex'
 import { formatDate } from '@/utils/formatDate'
 
 interface Colors {
@@ -120,6 +120,7 @@ interface Props {
   playInterval?: number
   followNowInterval?: number
   dateFormatter?: (date: Date) => string
+  dateComparator?: (a: Date, b: Date) => number
   tickDateFormatter?: (date: Date) => string
   colors?: Colors
   tickSize?: number
@@ -132,6 +133,7 @@ const props = withDefaults(defineProps<Props>(), {
   playInterval: 1000,
   followNowInterval: 60000,
   dateFormatter: (date: Date) => date.toLocaleString(),
+  dateComparator: (a: Date, b: Date) => a.getTime() - b.getTime(),
   tickSize: 8
 })
 const emit = defineEmits(['update:selectedDate', 'update:doFollowNow'])
@@ -182,7 +184,7 @@ watch(
   () => props.selectedDate,
   (selectedDate) => {
     if (selectedDate === undefined) return
-    let index = findDateIndex(props.dates, selectedDate)
+    let index = findClosestIndex(props.dates, selectedDate, props.dateComparator)
     if (index === dateIndex.value) return
     dateIndex.value = index
   }
@@ -213,7 +215,7 @@ watch(
     } else {
       if (props.selectedDate) {
         const oldDate = props.selectedDate
-        dateIndex.value = findDateIndex(props.dates, oldDate)
+        dateIndex.value = findClosestIndex(props.dates, oldDate, props.dateComparator)
       }
     }
   }
@@ -264,7 +266,7 @@ function stopFollowNow(): void {
 
 function setDateToNow(): void {
   const now = new Date()
-  dateIndex.value = findDateIndex(props.dates, now)
+  dateIndex.value = findClosestIndex(props.dates, now, props.dateComparator)
 }
 
 function togglePlay(): void {

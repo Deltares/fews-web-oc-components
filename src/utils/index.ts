@@ -1,2 +1,2 @@
 export * from './absoluteUrl'
-export * from './findDateIndex'
+export * from './findClosestIndex'
