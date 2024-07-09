@@ -187,7 +187,8 @@ watch(
     let index = findClosestIndex(props.dates, selectedDate, props.dateComparator)
     if (index === dateIndex.value) return
     dateIndex.value = index
-  }
+  },
+  { immediate: true }
 )
 
 // Synchronise doFollowNow property and local variable.
