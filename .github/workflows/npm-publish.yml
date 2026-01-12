@@ -11,13 +11,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 16.x
+          node-version: 22.x
       - run: npm ci
       - run: npm run-script build
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v6
         with:
           name: dist-artifact
           path: dist
@@ -26,10 +26,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 16.x
+          node-version: 22.x
       - run: npm ci    
       - run: npm run test:unit
 
@@ -40,12 +40,12 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 16.x
+          node-version: 22.x
           registry-url: https://registry.npmjs.org/
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v7
         with:
           name: dist-artifact
           path: dist
