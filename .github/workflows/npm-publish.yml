@@ -3,6 +3,10 @@
 
 name: Node.js npm Package
 
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
 on:
   release:
     types: [created]
@@ -11,44 +15,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
         with:
-          node-version: 22.x
+          node-version: 22
       - run: npm ci
-      - run: npm run-script build
-      - uses: actions/upload-artifact@v6
-        with:
-          name: dist-artifact
-          path: dist
+      - run: npm run test:unit
 
-  test:
+  publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
         with:
-          node-version: 22.x
-      - run: npm ci    
-      - run: npm run test:unit
-
-  publish-gpr:
-    needs: test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22.x
-          registry-url: https://registry.npmjs.org/
-      - uses: actions/download-artifact@v7
-        with:
-          name: dist-artifact
-          path: dist
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          node-version: 22
+      - name: Update npm # 11.5.0 required for OIDC authentication
+        run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish
