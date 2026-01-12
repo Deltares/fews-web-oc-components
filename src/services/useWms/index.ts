@@ -16,17 +16,17 @@ export interface UseWmsReturn {
 }
 
 export function useWmsLayerCapabilities(
-  baseUrl: string,
+  baseUrl: MaybeRefOrGetter<string>,
   layerName: MaybeRefOrGetter<string | undefined>,
   filter?: MaybeRefOrGetter<Partial<GetCapabilitiesFilter>>
 ): UseWmsReturn {
-  const wmsUrl = `${baseUrl}/wms`
-  const wmsProvider = new WMSProvider(wmsUrl)
+  
   const times = ref<Date[]>()
   const layerCapabilities = ref<Layer>()
   const capabilities = ref<GetCapabilitiesResponse>()
 
   async function loadLayer(): Promise<void> {
+    const _baseUrl = toValue(baseUrl)
     const _layers = toValue(layerName)
     const _filter = toValue(filter)
 
@@ -37,6 +37,8 @@ export function useWmsLayerCapabilities(
     }
 
     try {
+      const wmsUrl = `${_baseUrl}/wms`
+      const wmsProvider = new WMSProvider(wmsUrl)
       capabilities.value = await wmsProvider.getCapabilities({
         layers: _layers,
         importFromExternalDataSource: false,
@@ -85,7 +87,7 @@ export function useWmsLayerCapabilities(
 }
 
 export function useWmsLegend(
-  baseUrl: string,
+  baseUrl: MaybeRefOrGetter<string>,
   layerName: MaybeRefOrGetter<string | undefined>,
   useDisplayUnits: MaybeRefOrGetter<boolean>,
   colorScaleRange?: MaybeRefOrGetter<string | undefined>,
@@ -94,6 +96,7 @@ export function useWmsLegend(
   const legendGraphic = ref<GetLegendGraphicResponse>()
 
   async function loadLegend(): Promise<void> {
+    const _baseUrl = toValue(baseUrl)
     const _layers = toValue(layerName)
     const _useDisplayUnits = toValue(useDisplayUnits)
     const _colorScaleRange = toValue(colorScaleRange)
@@ -105,7 +108,7 @@ export function useWmsLegend(
     }
 
     legendGraphic.value = await fetchWmsLegend(
-      baseUrl,
+      _baseUrl,
       _layers,
       _useDisplayUnits,
       _colorScaleRange,
