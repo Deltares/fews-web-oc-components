@@ -1,0 +1,10 @@
+{
+  "latestErrorEvent": {
+    "code": "TYPE-001",
+    "message": "Failed to generate type declaration. Execute the below cmd to reproduce and fix the error. #TYPE-001\nargs: {\"cmd\":\"npx vue-tsc --project C:\\\\Users\\\\krame_wr\\\\Projects\\\\WebOC\\\\fews-mf-demo\\\\node_modules\\\\.federation\\\\tsconfig.28d3baec7bd84d7b2d77c5ef7c5f807d.json\"}\nView the docs to see how to solve: https://module-federation.io/guide/troubleshooting/type#type-001",
+    "args": {
+      "cmd": "npx vue-tsc --project C:\\Users\\krame_wr\\Projects\\WebOC\\fews-mf-demo\\node_modules\\.federation\\tsconfig.28d3baec7bd84d7b2d77c5ef7c5f807d.json"
+    },
+    "timestamp": 1778574969080
+  }
+}

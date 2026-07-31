@@ -5,17 +5,16 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run -w @deltares/fews-web-oc-components dev",
-    "serve": "npm run -w @deltares/fews-web-oc-components serve",
-    "build": "npm run -w @deltares/fews-web-oc-components build",
-    "clean": "npm run -w @deltares/fews-web-oc-components clean",
-    "test": "npm run -w @deltares/fews-web-oc-components test",
-    "test:unit": "npm run -w @deltares/fews-web-oc-components test:unit",
-    "test:components": "npm run -w @deltares/fews-web-oc-components test:components",
-    "test:components:ui": "npm run -w @deltares/fews-web-oc-components test:components:ui",
-    "test:e2e": "npm run -w @deltares/fews-web-oc-components test:e2e",
-    "ci:test:e2e": "npm run -w @deltares/fews-web-oc-components ci:test:e2e",
-    "lint": "npm run -w @deltares/fews-web-oc-components lint"
+    "dev:components": "npm run -w @deltares/fews-web-oc-components dev",
+    "dev:mf": "npm run -w fews-mf-demo dev",
+    "build": "npm run -ws --if-present build",
+    "test": "npm run -ws --if-present test",
+    "test:unit": "npm run -ws --if-present test:unit",
+    "test:components": "npm run -ws --if-present test:components",
+    "test:components:ui": "npm run -ws --if-present test:components:ui",
+    "test:e2e": "npm run -ws --if-present test:e2e",
+    "ci:test:e2e": "npm run -ws --if-present ci:test:e2e",
+    "lint": "npm run -ws --if-present lint"
   },
   "volta": {
     "node": "24.18.1"
