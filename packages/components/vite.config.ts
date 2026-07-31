@@ -13,6 +13,13 @@ export default defineConfig({
       insertTypesEntry: true
     })
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler'
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')
