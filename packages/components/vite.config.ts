@@ -3,15 +3,11 @@ import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'node:path'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    dts({
-      outDir: 'dist/types',
-      tsconfigPath: './tsconfig.json',
-      include: ['src'],
-      insertTypesEntry: true
-    })
+    dts(),
   ],
   resolve: {
     alias: {
@@ -19,13 +15,21 @@ export default defineConfig({
     }
   },
   build: {
-    target: 'es2022',
-    sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'FewsWebOcComponents',
-      formats: ['es', 'umd'],
-      fileName: (format) => `fews-web-oc-components.${format}.js`
-    }
-  }
+      name: 'fews-web-oc-components',
+      fileName: 'fews-web-oc-components',
+    },
+    rolldownOptions: {
+      external: ['vue', '@deltares/fews-web-oc-charts', 'd3', 'vuetify/components'],
+      output: {
+        globals: {
+          vue: 'Vue',
+          '@deltares/fews-web-oc-charts': 'webOcCharts',
+          d3: 'd3',
+          'vuetify/components': 'vuetifyComponents',
+        },
+      },
+    },
+  },
 })
