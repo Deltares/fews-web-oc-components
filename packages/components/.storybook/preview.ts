@@ -1,12 +1,41 @@
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
+import { VApp } from 'vuetify/components'
 import vuetify from '../src/plugins/vuetify'
+import './preview.css'
 
 setup((app) => {
   app.use(vuetify)
 })
 
 const preview: Preview = {
+  globalTypes: {
+    theme: {
+      description: 'Vuetify theme',
+      toolbar: {
+        title: 'Theme',
+        icon: 'circlehollow',
+        items: [
+          { value: 'light', title: 'Light', icon: 'sun' },
+          { value: 'dark', title: 'Dark', icon: 'moon' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
+  initialGlobals: {
+    theme: 'light',
+  },
+  decorators: [
+    (story, context) => ({
+      components: { VApp },
+      setup() {
+        return { theme: context.globals.theme ?? 'light' }
+      },
+      template:
+        '<v-app :theme="theme" class="storybook-app"><story /></v-app>',
+    }),
+  ],
   parameters: {
     controls: {
       matchers: {

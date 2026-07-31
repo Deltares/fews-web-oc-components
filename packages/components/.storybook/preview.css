@@ -1,0 +1,8 @@
+.storybook-app .v-application__wrap {
+  min-height: auto !important;
+  height: auto !important;
+}
+
+.storybook-app.v-layout--full-height {
+  height: auto !important;
+}
