@@ -15,11 +15,7 @@
     "test:components:ui": "npm run -w @deltares/fews-web-oc-components test:components:ui",
     "test:e2e": "npm run -w @deltares/fews-web-oc-components test:e2e",
     "ci:test:e2e": "npm run -w @deltares/fews-web-oc-components ci:test:e2e",
-    "ci:storybook:serve": "npm run -w @deltares/fews-web-oc-components ci:storybook:serve",
-    "ci:start-and-test-storybook": "npm run -w @deltares/fews-web-oc-components ci:start-and-test-storybook",
-    "lint": "npm run -w @deltares/fews-web-oc-components lint",
-    "storybook:build": "npm run -w @deltares/fews-web-oc-components storybook:build",
-    "storybook:serve": "npm run -w @deltares/fews-web-oc-components storybook:serve"
+    "lint": "npm run -w @deltares/fews-web-oc-components lint"
   },
   "volta": {
     "node": "24.18.1"

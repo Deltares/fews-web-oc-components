@@ -9,7 +9,8 @@ module.exports = {
     "plugin:vue/essential",
     "plugin:cypress/recommended",
     "@vue/standard",
-    "@vue/typescript/recommended"
+    "@vue/typescript/recommended",
+    "plugin:storybook/recommended"
   ],
 
   plugins: ['vue'],

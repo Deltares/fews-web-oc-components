@@ -29,12 +29,10 @@
     "test:components:ui": "playwright test --project=components --ui",
     "test:e2e": "cypress open --config-file cypress.json",
     "ci:test:e2e": "cypress run --config-file cypress.json",
-    "ci:storybook:serve": "storybook dev -p 6006 --ci --quiet -s public",
-    "ci:start-and-test-storybook": "cross-env START_SERVER_AND_TEST_INSECURE=1 \"start-server-and-test ci:storybook:serve http://localhost:6006 ci:test:e2e\"",
     "lint": "eslint --ext .js,.ts,.vue src tests",
-    "storybook:build": "storybook build",
-    "storybook:serve": "storybook dev -p 6006 -s public",
-    "sonar": "sonar-scanner -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$SONAR_KEY -Dsonar.projectName='Delft-FEWS Web OC Components'"
+    "sonar": "sonar-scanner -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$SONAR_KEY -Dsonar.projectName='Delft-FEWS Web OC Components'",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "vue": "^3.5.40",
@@ -55,7 +53,18 @@
     "vite": "^8.0.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.1.10",
-    "vue-tsc": "^2.1.10"
+    "vue-tsc": "^2.1.10",
+    "storybook": "10.5.2",
+    "@storybook/vue3-vite": "10.5.2",
+    "@chromatic-com/storybook": "^5.2.1",
+    "@storybook/addon-vitest": "10.5.2",
+    "@storybook/addon-a11y": "10.5.2",
+    "@storybook/addon-docs": "10.5.2",
+    "@storybook/addon-onboarding": "10.5.2",
+    "eslint-plugin-storybook": "10.5.2",
+    "@vitest/browser-playwright": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.10",
+    "playwright": "^1.62.1"
   },
   "files": [
     "dist/*"
