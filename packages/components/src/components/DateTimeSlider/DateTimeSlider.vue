@@ -71,7 +71,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
 
-interface Props {
+export interface Props {
   dates?: Date[]
   loading?: boolean
   floating?: boolean

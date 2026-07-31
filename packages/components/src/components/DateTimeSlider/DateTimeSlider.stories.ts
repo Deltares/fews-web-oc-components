@@ -1,4 +1,3 @@
-import { action } from '@storybook/addon-actions'
 import DateTimeSlider from './DateTimeSlider.vue'
 
 const value = new Date('2021-10-21')
@@ -16,13 +15,19 @@ export default {
   component: DateTimeSlider
 }
 
+const action = (name: string) => (...args: unknown[]) => {
+  // Keep lightweight logging in stories without requiring addon-actions.
+  console.log(name, ...args)
+}
+
 const Template = (args: any, { argTypes }: any) => ({
   args,
   components: { DateTimeSlider },
   props: Object.keys(argTypes),
-  template: '<DateTimeSlider :value="value" :dates="dates" :now="now" @input="onInput" @update:now="selectNow" />',
+  template:
+    '<DateTimeSlider v-model="value" :dates="dates" v-model:now="now" @update:modelValue="onInput" @update:now="selectNow" />',
   methods: {
-    onInput: action('input'),
+    onInput: action('update:modelValue'),
     selectNow: action('update:now')
   },
   parameters: {
