@@ -3,7 +3,7 @@
     class="time-slider-container"
     :class="[themeClass, floatingClass]"
   >
-    <v-slider v-model="index" :max="max" step="1" tick-size="6" tabindex="0" @input="onInput" hide-details
+    <v-slider v-model="index" :max="max" step="1" tick-size="6" tabindex="0" @update:modelValue="onInput" hide-details
       height="0">
     </v-slider>
     <div style="display:flex;flex-direction:row;flex-grow:1;padding:6px 16px">
@@ -41,157 +41,149 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Watch, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue'
+import { useTheme } from 'vuetify'
 
-@Component
-export default class DateTimeSlider extends Vue {
-  @Prop({ default: () => { return new Date(1970) } }) value!: Date
-  @Prop({ default: () => { return [new Date(1970)] } }) dates!: Date[]
-  @Prop({ default: false, type: Boolean }) loading!: boolean
-  @Prop({ default: false, type: Boolean }) now!: boolean
-  @Prop({ default: false, type: Boolean }) floating!: boolean
+const props = withDefaults(defineProps<{
+  modelValue?: Date
+  dates?: Date[]
+  loading?: boolean
+  now?: boolean
+  floating?: boolean
+}>(), {
+  modelValue: () => new Date(1970),
+  dates: () => [new Date(1970)],
+  loading: false,
+  now: false,
+  floating: false,
+})
 
-  index: number = 0
-  currentDate!: Date
-  useNow: boolean = true
-  isPlaying: boolean = false
-  intervalTimer: ReturnType<typeof setInterval> = 0
-  hideLabel: boolean = true
+const emit = defineEmits<{
+  'update:modelValue': [value: Date]
+  'update:now': [value: boolean]
+}>()
 
-  mounted (): void {
-    this.updateIndexValueChange()
-    this.currentDate = this.value
-    this.$emit('update:now', this.useNow)
+const theme = useTheme()
+
+const index = ref(0)
+const currentDate = ref<Date>(props.modelValue)
+const useNow = ref(true)
+const isPlaying = ref(false)
+const intervalTimer = ref<ReturnType<typeof setInterval> | 0>(0)
+
+const max = computed(() => Math.max(0, props.dates.length - 1))
+const dateString = computed(() => props.dates[index.value] ? props.dates[index.value].toLocaleString() : '')
+const nowColor = computed(() => useNow.value ? 'orange' : '')
+const playColor = computed(() => isPlaying.value ? 'orange' : '')
+const themeClass = computed(() => theme.current.value.dark ? 'dark' : 'light')
+const floatingClass = computed(() => props.floating ? 'floating' : 'non-floating')
+
+function updateIndexValueChange(): void {
+  if (props.modelValue && props.dates) {
+    index.value = props.dates.findIndex((date: Date) => props.modelValue.getTime() === date.getTime())
+    currentDate.value = props.dates[index.value]
   }
+}
 
-  get max (): number {
-    return Math.max(0, this.dates.length - 1)
+watch(() => props.modelValue, updateIndexValueChange)
+watch(() => props.now, (val) => { useNow.value = val })
+
+onMounted(() => {
+  updateIndexValueChange()
+  currentDate.value = props.modelValue
+  emit('update:now', useNow.value)
+})
+
+function togglePlay(): void {
+  if (isPlaying.value) {
+    isPlaying.value = false
+    clearInterval(intervalTimer.value)
+    intervalTimer.value = 0
+  } else {
+    isPlaying.value = true
+    useNow.value = false
+    intervalTimer.value = setInterval(play, 1000)
   }
+}
 
-  get dateString (): string {
-    return this.dates[this.index] ? this.dates[this.index].toLocaleString() : ''
+function stopPlay(): void {
+  if (intervalTimer.value) {
+    isPlaying.value = false
+    clearInterval(intervalTimer.value)
+    intervalTimer.value = 0
   }
+}
 
-  get nowColor (): string {
-    return this.useNow ? 'orange' : ''
+function play(): void {
+  if (max.value === index.value) {
+    stopPlay()
+  } else {
+    increment()
   }
+}
 
-  get playColor (): string {
-    return this.isPlaying ? 'orange' : ''
-  }
-
-  get themeClass (): string {
-    return this.$vuetify.theme.dark ? 'dark' : 'light'
-  }
-
-  get floatingClass (): string {
-    return this.floating ? 'floating' : 'non-floating'
-  }
-
-  togglePlay (): void {
-    if (this.isPlaying) {
-      this.isPlaying = false
-      clearInterval(this.intervalTimer)
-      this.intervalTimer = 0
-    } else {
-      this.isPlaying = true
-      this.useNow = false
-      this.intervalTimer = setInterval(this.play, 1000)
-    }
-  }
-
-  stopPlay (): void {
-    if (this.intervalTimer) {
-      this.isPlaying = false
-      clearInterval(this.intervalTimer)
-      this.intervalTimer = 0
-    }
-  }
-
-  play (): void {
-    if (this.max === this.index) {
-      this.stopPlay()
-    } else {
-      this.increment()
-    }
-  }
-
-  @Watch('value')
-  updateIndexValueChange (): void {
-    if (this.value && this.dates) {
-      this.index = this.dates.findIndex((date: Date) => { return this.value.getTime() === date.getTime() })
-      this.currentDate = this.dates[this.index]
-    }
-  }
-
-  @Watch('now')
-  updateNow (): void {
-    this.useNow = this.now
-  }
-
-  toggleNow (): void {
-    this.useNow = !this.useNow
-    if (this.useNow) {
-      const now = new Date()
-      for (let i = 0; i < this.dates.length; i++) {
-        if (this.dates[i] > now) {
-          this.index = Math.max(0, i - 1)
-          break
-        }
+function toggleNow(): void {
+  useNow.value = !useNow.value
+  if (useNow.value) {
+    const now = new Date()
+    for (let i = 0; i < props.dates.length; i++) {
+      if (props.dates[i] > now) {
+        index.value = Math.max(0, i - 1)
+        break
       }
-      this.stopPlay()
-      this.updateDate()
     }
-    this.$emit('update:now', this.useNow)
+    stopPlay()
+    updateDate()
   }
+  emit('update:now', useNow.value)
+}
 
-  backward (step?: number): void {
-    if (this.useNow) {
-      this.useNow = false
-      this.$emit('update:now', this.useNow)
-    }
-    this.decrement(step)
-    if (this.isPlaying) this.stopPlay()
-    this.intervalTimer = setInterval(() => this.decrement(step), 200)
+function backward(step?: number): void {
+  if (useNow.value) {
+    useNow.value = false
+    emit('update:now', useNow.value)
   }
+  decrement(step)
+  if (isPlaying.value) stopPlay()
+  intervalTimer.value = setInterval(() => decrement(step), 200)
+}
 
-  forward (step?: number): void {
-    if (this.useNow) {
-      this.useNow = false
-      this.$emit('update:now', this.useNow)
-    }
-    this.increment(step)
-    if (this.isPlaying) this.stopPlay()
-    this.intervalTimer = setInterval(() => this.increment(step), 200)
+function forward(step?: number): void {
+  if (useNow.value) {
+    useNow.value = false
+    emit('update:now', useNow.value)
   }
+  increment(step)
+  if (isPlaying.value) stopPlay()
+  intervalTimer.value = setInterval(() => increment(step), 200)
+}
 
-  increment (step = 1): void {
-    this.index = Math.min(this.max, this.index + step)
-    this.inputChanged()
-  }
+function increment(step = 1): void {
+  index.value = Math.min(max.value, index.value + step)
+  inputChanged()
+}
 
-  decrement (step = 1): void {
-    this.index = Math.max(0, this.index - step)
-    this.inputChanged()
-  }
+function decrement(step = 1): void {
+  index.value = Math.max(0, index.value - step)
+  inputChanged()
+}
 
-  updateDate (): void {
-    this.currentDate = this.dates[this.index]
-  }
+function updateDate(): void {
+  currentDate.value = props.dates[index.value]
+}
 
-  onInput (): void {
-    this.updateDate()
-    this.inputChanged()
-  }
+function onInput(): void {
+  updateDate()
+  inputChanged()
+}
 
-  inputChanged (): void {
-    if (this.useNow) {
-      this.useNow = false
-      this.$emit('update:now', this.useNow)
-    }
-    if (this.dates[this.index]) this.$emit('input', this.dates[this.index])
+function inputChanged(): void {
+  if (useNow.value) {
+    useNow.value = false
+    emit('update:now', useNow.value)
   }
+  if (props.dates[index.value]) emit('update:modelValue', props.dates[index.value])
 }
 </script>
 <style scoped>
