@@ -1,7 +1,7 @@
 {
   "name": "@deltares/fews-web-oc-components",
   "version": "0.1.3-alpha.7",
-  "description": "Library for components used in the FEWS web oc",
+  "description": "Library for components and composables used in the FEWS Web OC",
   "license": "AGPL",
   "type": "module",
   "main": "./dist/fews-web-oc-components.umd.js",
