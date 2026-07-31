@@ -11,6 +11,8 @@
     "clean": "npm run -w @deltares/fews-web-oc-components clean",
     "test": "npm run -w @deltares/fews-web-oc-components test",
     "test:unit": "npm run -w @deltares/fews-web-oc-components test:unit",
+    "test:components": "npm run -w @deltares/fews-web-oc-components test:components",
+    "test:components:ui": "npm run -w @deltares/fews-web-oc-components test:components:ui",
     "test:e2e": "npm run -w @deltares/fews-web-oc-components test:e2e",
     "ci:test:e2e": "npm run -w @deltares/fews-web-oc-components ci:test:e2e",
     "ci:storybook:serve": "npm run -w @deltares/fews-web-oc-components ci:storybook:serve",
