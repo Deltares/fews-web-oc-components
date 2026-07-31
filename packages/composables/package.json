@@ -16,6 +16,6 @@
     "lint": "echo \"No lint task configured for composables\""
   },
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "typescript": "^5.9.3"
   }
 }
