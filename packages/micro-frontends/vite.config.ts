@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { federation } from '@module-federation/vite'
 import vuetify from 'vite-plugin-vuetify'
+import mfConfig from './module-federation.config.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,20 +15,7 @@ export default defineConfig({
   base: 'http://localhost:2010/',
   plugins: [
     vue(),
-    federation({
-      filename: 'remoteEntry.js',
-      name: 'test-micro-frontend',
-      manifest: true,
-      exposes: {
-        './main_component': './src/components/MainComponent.vue',
-      },
-      shared: {
-        vue: {
-          singleton: true,
-        },
-        'vuetify/lib/framework.mjs': { singleton: true },
-      },
-    }),
+    federation(mfConfig),
     vuetify({
       autoImport: true,
     }),
