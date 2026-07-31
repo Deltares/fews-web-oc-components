@@ -1,24 +1,35 @@
-# fews-web-oc-components
+# fews-web-oc-components monorepo
+
+## Workspace layout
+
+- `packages/components`: Vue component library package
+- `packages/composables`: Shared composables package
 
 ## Project setup
-```
-npm install
-```
 
-### Compiles and hot-reloads for development
-```
+Dependency updates and installation are intentionally deferred to the next step.
+
+## Root convenience scripts
+
+These run against the `@deltares/fews-web-oc-components` workspace package.
+
+```bash
+npm run dev
 npm run serve
-```
-
-### Compiles and minifies for production
-```
 npm run build
-```
-
-### Lints and fixes files
-```
 npm run lint
+npm run test
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Run scripts directly in a workspace
+
+```bash
+npm run -w @deltares/fews-web-oc-components build
+npm run -w @deltares/fews-web-oc-composables build
+```
+
+## Vite migration target
+
+- Current state: `packages/components` still uses Vue CLI + Webpack scripts.
+- Prepared now: a stable `dev` script is available at root and workspace level.
+- Follow-up step: replace `packages/components` build and dev scripts with Vite equivalents and update dependencies in one pass.

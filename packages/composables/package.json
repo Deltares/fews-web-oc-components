@@ -1,0 +1,23 @@
+{
+  "name": "@deltares/fews-web-oc-composables",
+  "version": "0.1.0",
+  "description": "Composable utilities for FEWS Web OC",
+  "license": "AGPL",
+  "type": "module",
+  "private": false,
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "clean": "shx rm -rf dist",
+    "test": "echo \"No tests configured for composables\"",
+    "lint": "echo \"No lint task configured for composables\""
+  },
+  "devDependencies": {
+    "shx": "^0.3.3",
+    "typescript": "^4.9.5"
+  }
+}
