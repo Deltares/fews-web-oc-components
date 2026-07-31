@@ -11,7 +11,7 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
     "test": "echo \"No tests configured for composables\"",
     "lint": "echo \"No lint task configured for composables\""
   },
