@@ -19,5 +19,8 @@
     "storybook:build": "npm run -w @deltares/fews-web-oc-components storybook:build",
     "storybook:serve": "npm run -w @deltares/fews-web-oc-components storybook:serve",
     "sonar": "npm run -w @deltares/fews-web-oc-components sonar"
+  },
+  "volta": {
+    "node": "24.18.1"
   }
 }
