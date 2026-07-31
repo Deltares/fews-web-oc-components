@@ -25,6 +25,7 @@
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
+    "playwright:install": "playwright install --with-deps",
     "test:components": "playwright test --project=components",
     "test:components:ui": "playwright test --project=components --ui",
     "test:e2e": "cypress open --config-file cypress.json",
