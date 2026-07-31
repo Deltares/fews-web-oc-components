@@ -1,5 +1,5 @@
 <template>
-  <div class="time-slider-container" :class="[themeClass, floatingClass]">
+  <v-sheet class="time-slider-container" :class="floatingClass">
     <v-slider
       v-model="index"
       :max="max"
@@ -9,67 +9,39 @@
       @update:modelValue="onInput"
       hide-details
       height="0"
-    >
-    </v-slider>
-    <div
-      style="
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-        padding: 6px 16px;
-      "
-    >
-      <slot name="prepend"></slot>
-      <div
-        style="
-          width: 1px;
-          height: 100%;
-          max-height: 100%;
-          background-color: lightgray;
-        "
-      ></div>
-      <div style="display: flex; flex-grow: 1; justify-content: space-between">
-        <div style="display: flex">
+    />
+    <div class="d-flex flex-row flex-grow-1 px-4 py-1">
+      <slot name="prepend" />
+      <v-divider vertical />
+      <div class="d-flex flex-grow-1 justify-space-between">
+        <div class="d-flex align-center">
           <v-btn icon :color="nowColor" @click="toggleNow">
             <v-icon v-if="loading">mdi-loading mdi-spin</v-icon>
             <v-icon v-else>mdi-clock</v-icon>
           </v-btn>
-          <div style="margin: auto; width: 30ch; flex: 2 0 20%" class="body-2">
+          <span class="text-body-2 mx-auto" style="width: 30ch">
             {{ dateString }}
-          </div>
+          </span>
         </div>
-        <div style="display: flex">
-          <v-btn
-            @mousedown="backward()"
-            @mouseup="stopPlay"
-            icon
-            ref="BackButton"
-          >
-            <v-icon> mdi-skip-previous </v-icon>
+        <div class="d-flex">
+          <v-btn icon ref="BackButton" @mousedown="backward()" @mouseup="stopPlay">
+            <v-icon>mdi-skip-previous</v-icon>
           </v-btn>
-          <v-btn :color="playColor" icon @click="togglePlay" ref="PlayButton">
-            <v-icon>
-              {{ isPlaying ? 'mdi-pause' : 'mdi-play' }}
-            </v-icon>
+          <v-btn icon :color="playColor" ref="PlayButton" @click="togglePlay">
+            <v-icon>{{ isPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
           </v-btn>
-          <v-btn
-            @mousedown="forward()"
-            @mouseup="stopPlay"
-            icon
-            ref="ForwardButton"
-          >
-            <v-icon> mdi-skip-next </v-icon>
+          <v-btn icon ref="ForwardButton" @mousedown="forward()" @mouseup="stopPlay">
+            <v-icon>mdi-skip-next</v-icon>
           </v-btn>
-          <slot name="append"></slot>
+          <slot name="append" />
         </div>
       </div>
     </div>
-  </div>
+  </v-sheet>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { useTheme } from 'vuetify'
 
 export interface Props {
   dates?: Date[]
@@ -86,8 +58,6 @@ const props = withDefaults(defineProps<Props>(), {
   floating: false,
 })
 
-const theme = useTheme()
-
 const index = ref(0)
 const currentDate = ref<Date>(modelValue.value)
 const isPlaying = ref(false)
@@ -99,7 +69,6 @@ const dateString = computed(() =>
 )
 const nowColor = computed(() => (useNow.value ? 'orange' : ''))
 const playColor = computed(() => (isPlaying.value ? 'orange' : ''))
-const themeClass = computed(() => (theme.current.value.dark ? 'dark' : 'light'))
 const floatingClass = computed(() =>
   props.floating ? 'floating' : 'non-floating',
 )
@@ -213,11 +182,4 @@ function inputChanged(): void {
   filter: drop-shadow(3px 3px 3px #888);
 }
 
-.time-slider-container.dark {
-  background-color: black;
-}
-
-.time-slider-container.light {
-  background-color: white;
-}
 </style>
