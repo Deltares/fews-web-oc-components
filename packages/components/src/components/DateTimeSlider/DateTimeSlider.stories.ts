@@ -15,11 +15,10 @@ const meta = {
   component: DateTimeSlider,
   tags: ['autodocs'],
   args: {
-    modelValue: dates[0],
+    selectedDate: dates[0],
     dates,
-    now: false,
-    loading: false,
-    floating: false,
+    doFollowNow: false,
+    isLoading: false,
   },
 } satisfies Meta<typeof DateTimeSlider>
 
@@ -30,19 +29,13 @@ export const Default: Story = {}
 
 export const Loading: Story = {
   args: {
-    loading: true,
-  },
-}
-
-export const Floating: Story = {
-  args: {
-    floating: true,
+    isLoading: true,
   },
 }
 
 export const NowActive: Story = {
   args: {
-    now: true,
+    doFollowNow: true,
   },
 }
 

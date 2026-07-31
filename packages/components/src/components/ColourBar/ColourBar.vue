@@ -1,7 +1,11 @@
 <template>
   <div id="legend">
     <svg id="colourbar" class="colourbar" data-testid="colourbar">
-      <g ref="group" transform="translate(25, 25)" style="pointer-events: visiblePainted" />
+      <g
+        ref="group"
+        transform="translate(25, 25)"
+        style="pointer-events: visiblePainted"
+      />
     </svg>
   </div>
 </template>
@@ -12,10 +16,10 @@ import {
   ColourBar,
   type ColourMap,
   type ColourBarOptions,
-  AxisPosition
+  AxisPosition,
 } from '@deltares/fews-web-oc-charts'
 
-interface Props {
+export interface Props {
   colourMap?: ColourMap
   options?: Partial<ColourBarOptions>
   width?: number
@@ -24,7 +28,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   width: 250,
-  height: 10
+  height: 10,
 })
 
 const group = useTemplateRef('group')
@@ -33,7 +37,7 @@ watchEffect(updateColourBar)
 function updateColourBar() {
   if (!props.colourMap || !group.value) return
 
- // Remove possible previous colour map.
+  // Remove possible previous colour map.
   group.value.innerHTML = ''
 
   // Create new colour bar and make it visible.
@@ -41,10 +45,16 @@ function updateColourBar() {
     type: 'nonlinear',
     useGradients: true,
     position: AxisPosition.Bottom,
-    ...props.options
+    ...props.options,
   }
 
-  new ColourBar(group.value, props.colourMap, props.width, props.height, options)
+  new ColourBar(
+    group.value,
+    props.colourMap,
+    props.width,
+    props.height,
+    options,
+  )
 }
 </script>
 
@@ -57,8 +67,7 @@ function updateColourBar() {
 }
 
 .colourbar :deep(.axis .tick line) {
-  filter:
-    drop-shadow(0px 0px 1px rgb(var(--v-theme-background)))
+  filter: drop-shadow(0px 0px 1px rgb(var(--v-theme-background)))
     drop-shadow(0px 0px 1px rgb(var(--v-theme-background)))
     drop-shadow(0px 0px 1px rgb(var(--v-theme-background)));
 }
