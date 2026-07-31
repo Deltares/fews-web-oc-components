@@ -1,4 +1,10 @@
 import type { Preview } from '@storybook/vue3-vite'
+import { setup } from '@storybook/vue3-vite'
+import vuetify from '../src/plugins/vuetify'
+
+setup((app) => {
+  app.use(vuetify)
+})
 
 const preview: Preview = {
   parameters: {
