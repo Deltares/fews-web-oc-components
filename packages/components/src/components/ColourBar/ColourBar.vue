@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef, watchEffect } from 'vue'
+import { computed, useTemplateRef, watchEffect } from 'vue'
 import {
   ColourBar,
   type ColourMap,
@@ -32,6 +32,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const group = useTemplateRef('group')
+const colourbarWidth = computed(() => `${props.width + 50}px`)
+const colourbarHeight = computed(() => `${props.height + 50}px`)
 
 watchEffect(updateColourBar)
 function updateColourBar() {
@@ -48,7 +50,7 @@ function updateColourBar() {
     ...props.options,
   }
 
-  new ColourBar(
+  void new ColourBar(
     group.value,
     props.colourMap,
     props.width,
@@ -60,8 +62,8 @@ function updateColourBar() {
 
 <style scoped>
 .colourbar {
-  width: v-bind(`${width + 50}px`);
-  height: v-bind(`${height + 50}px`);
+  width: v-bind(colourbarWidth);
+  height: v-bind(colourbarHeight);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
