@@ -3,12 +3,13 @@
   <div class="text">{{ data || 'No Data' }}</div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-@Component({})
-export default class Vue2ssdViewer extends Vue {
-  @Prop() data!: string;
+<script setup lang="ts">
+interface Props {
+  data?: string
 }
+
+const props = defineProps<Props>()
+const data = props.data
 </script>
 
 <style scoped lang="scss">

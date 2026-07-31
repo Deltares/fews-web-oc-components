@@ -1,23 +1,14 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
-    <vue2ssd-viewer />
+    <vue-2-ssd-viewer />
     <date-time-slider />
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
 import Vue2SsdViewer from './components/Vue2ssdViewer'
 import DateTimeSlider from './components/DateTimeSlider'
-
-@Component({
-  components: {
-    Vue2SsdViewer,
-    DateTimeSlider
-  }
-})
-export default class App extends Vue {}
 </script>
 
 <style lang="scss">
