@@ -38,9 +38,19 @@
       </div>
       <v-spacer />
       <div class="play-controls">
-        <v-menu v-if="speedControl !== false" offset="25" transition="fade-transition">
+        <v-menu
+          v-if="speedControl !== false"
+          offset="25"
+          transition="fade-transition"
+        >
           <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" density="compact" variant="text" icon :color="colors?.primary">
+            <v-btn
+              v-bind="props"
+              density="compact"
+              variant="text"
+              icon
+              :color="colors?.primary"
+            >
               <v-icon>mdi-play-speed</v-icon>
               <v-tooltip location="top" activator="parent">
                 <span>Playback speed</span>
@@ -90,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { scaleTime } from 'd3'
 import {
   VSlider,
@@ -101,10 +111,9 @@ import {
   VSpacer,
   VChip,
   VIcon,
-  VTooltip
+  VTooltip,
 } from 'vuetify/components'
 
-import { onMounted } from 'vue'
 import { findClosestIndex } from '@/utils/findClosestIndex'
 import { formatDate } from '@/utils/formatDate'
 
@@ -135,7 +144,7 @@ const props = withDefaults(defineProps<Props>(), {
   followNowInterval: 60000,
   dateFormatter: (date: Date) => date.toLocaleString(),
   dateComparator: (a: Date, b: Date) => a.getTime() - b.getTime(),
-  tickSize: 8
+  tickSize: 8,
 })
 const emit = defineEmits(['update:selectedDate', 'update:doFollowNow'])
 
@@ -167,7 +176,10 @@ const marks = computed(() => {
 
   let tickIndex = 0
   props.dates.forEach((date, i) => {
-    if (tickIndex < ticks.length && date.getTime() >= ticks[tickIndex].getTime()) {
+    if (
+      tickIndex < ticks.length &&
+      date.getTime() >= ticks[tickIndex].getTime()
+    ) {
       dayMarks[i] = formattedTicks[tickIndex]
       tickIndex++
     }
@@ -185,11 +197,15 @@ watch(
   () => props.selectedDate,
   (selectedDate) => {
     if (selectedDate === undefined) return
-    let index = findClosestIndex(props.dates, selectedDate, props.dateComparator)
+    let index = findClosestIndex(
+      props.dates,
+      selectedDate,
+      props.dateComparator,
+    )
     if (index === dateIndex.value) return
     dateIndex.value = index
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // Synchronise doFollowNow property and local variable.
@@ -201,7 +217,7 @@ watch(
   () => props.doFollowNow,
   (doFollowNowProp) => {
     doFollowNow.value = doFollowNowProp
-  }
+  },
 )
 
 // When the input dates change, make sure the selected index is updated to point to the correct
@@ -211,16 +227,21 @@ watch(
   () => {
     if (doFollowNow.value) {
       setDateToNow()
-      if (props.selectedDate?.getTime() !== props.dates[dateIndex.value]?.getTime()) {
+      if (
+        props.selectedDate?.getTime() !==
+        props.dates[dateIndex.value]?.getTime()
+      ) {
         emit('update:selectedDate', props.dates[dateIndex.value])
       }
-    } else {
-      if (props.selectedDate) {
-        const oldDate = props.selectedDate
-        dateIndex.value = findClosestIndex(props.dates, oldDate, props.dateComparator)
-      }
+    } else if (props.selectedDate) {
+      const oldDate = props.selectedDate
+      dateIndex.value = findClosestIndex(
+        props.dates,
+        oldDate,
+        props.dateComparator,
+      )
     }
-  }
+  },
 )
 
 const maxIndex = computed(() => {
@@ -231,17 +252,23 @@ const maxIndex = computed(() => {
 })
 
 // Now and play button styling is dependent on properties.
-const nowButtonIcon = computed(() => (props.isLoading ? 'mdi-loading mdi-spin' : 'mdi-clock'))
-const playButtonIcon = computed(() => (playTimeoutTimer.value ? 'mdi-pause' : 'mdi-play'))
+const nowButtonIcon = computed(() =>
+  props.isLoading ? 'mdi-loading mdi-spin' : 'mdi-clock',
+)
+const playButtonIcon = computed(() =>
+  playTimeoutTimer.value ? 'mdi-pause' : 'mdi-play',
+)
 const nowButtonColor = computed(() =>
-  doFollowNow.value ? props.colors?.accent : props.colors?.primary
+  doFollowNow.value ? props.colors?.accent : props.colors?.primary,
 )
 const playButtonColor = computed(() =>
-  playTimeoutTimer.value ? props.colors?.accent : props.colors?.primary
+  playTimeoutTimer.value ? props.colors?.accent : props.colors?.primary,
 )
 
 const dateString = computed(() =>
-  props.dates[dateIndex.value] ? props.dateFormatter(props.dates[dateIndex.value]) : ''
+  props.dates[dateIndex.value]
+    ? props.dateFormatter(props.dates[dateIndex.value])
+    : '',
 )
 
 function toggleFollowNow(): void {
@@ -297,7 +324,10 @@ function play(): void {
   } else {
     increment(playIncrement)
   }
-  playTimeoutTimer.value = setTimeout(play, props.playInterval * (1 / currentSpeed.value))
+  playTimeoutTimer.value = setTimeout(
+    play,
+    props.playInterval * (1 / currentSpeed.value),
+  )
 }
 
 function stepBackward(): void {
