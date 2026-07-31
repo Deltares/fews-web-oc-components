@@ -102,13 +102,13 @@ function drawLocations(geojson: FeatureCollection<Geometry, Location>) {
   circles
     .attr('cx', (d) => {
       const coords = d.geometry.type === 'Point' ? d.geometry.coordinates : [0, 0]
-      // @ts-expect-error --- IGNORE ---
-      return projection(coords as [number, number])[0]
+      const projected = projection(coords as [number, number])
+      return projected ? projected[0] : 0
     })
     .attr('cy', (d) => {
       const coords = d.geometry.type === 'Point' ? d.geometry.coordinates : [0, 0]
-      // @ts-expect-error --- IGNORE ---
-      return projection(coords as [number, number])[1]
+      const projected = projection(coords as [number, number])
+      return projected ? projected[1] : 0
     })
     .attr('r', 5)
     .attr('fill', (d) =>
