@@ -20,7 +20,7 @@ import boundaries from '@/assets/eThekwini_Municipal_Boundary.geojson.json'
 import land from '@/assets/south-africa.geojson.json'
 
 interface Props {
-  locationIds: string | null
+  locationIds?: string
   geojson: FeatureCollection<Geometry, Location>
 }
 
@@ -28,9 +28,7 @@ interface Emits {
   (event: 'click:location', location: Location): void
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  locationIds: null,
-})
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const svgRef = useTemplateRef('svgRef')
