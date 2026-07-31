@@ -17,8 +17,7 @@
     "ci:start-and-test-storybook": "npm run -w @deltares/fews-web-oc-components ci:start-and-test-storybook",
     "lint": "npm run -w @deltares/fews-web-oc-components lint",
     "storybook:build": "npm run -w @deltares/fews-web-oc-components storybook:build",
-    "storybook:serve": "npm run -w @deltares/fews-web-oc-components storybook:serve",
-    "sonar": "npm run -w @deltares/fews-web-oc-components sonar"
+    "storybook:serve": "npm run -w @deltares/fews-web-oc-components storybook:serve"
   },
   "volta": {
     "node": "24.18.1"

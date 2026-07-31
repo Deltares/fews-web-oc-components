@@ -1,12 +1,21 @@
-module.exports = {
-  plugins: [
-    'cypress'
-  ],
+// eslint.config.js
+import { defineConfig } from "eslint/config";
+
+export default defineConfig([
+	{
   env: {
-    mocha: true,
-    'cypress/globals': true
+    node: true,
   },
+  extends: [
+    'eslint:recommended',
+    'plugin:vue/vue3-recommended',
+    '@vue/eslint-config-typescript/recommended',
+    '@vue/eslint-config-prettier',
+  ],
   rules: {
-    strict: 'off'
-  }
-}
+    // override/add rules settings here, such as:
+    // 'vue/no-unused-vars': 'error'
+  },
+
+	},
+])
