@@ -7,14 +7,14 @@
   "scripts": {
     "dev:components": "npm run -w @deltares/fews-web-oc-components dev",
     "dev:mf": "npm run -w fews-mf-demo dev",
-    "build": "npm run -ws --if-present build",
-    "test": "npm run -ws --if-present test",
-    "test:unit": "npm run -ws --if-present test:unit",
-    "test:components": "npm run -ws --if-present test:components",
-    "test:components:ui": "npm run -ws --if-present test:components:ui",
-    "test:e2e": "npm run -ws --if-present test:e2e",
-    "ci:test:e2e": "npm run -ws --if-present ci:test:e2e",
-    "lint": "npm run -ws --if-present lint"
+    "build": "npm run --workspaces --if-present build",
+    "test": "npm run --workspaces --if-present test",
+    "test:unit": "npm run --workspaces --if-present test:unit",
+    "test:components": "npm run --workspaces --if-present test:components",
+    "test:components:ui": "npm run --workspaces --if-present test:components:ui",
+    "test:e2e": "npm run --workspaces --if-present test:e2e",
+    "ci:test:e2e": "npm run --workspaces --if-present ci:test:e2e",
+    "lint": "npm run --workspaces --if-present lint"
   },
   "volta": {
     "node": "24.18.1"
