@@ -122,7 +122,7 @@ interface Colors {
   accent: string
 }
 
-interface Props {
+export interface Props {
   selectedDate?: Date
   dates: Date[]
   isLoading?: boolean
