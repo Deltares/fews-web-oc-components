@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "ignoreDeprecations": "6.0",
     "strict": true,
     "importHelpers": true,
     "moduleResolution": "Bundler",
