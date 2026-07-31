@@ -30,6 +30,6 @@ npm run -w @deltares/fews-web-oc-composables build
 
 ## Vite migration target
 
-- Current state: `packages/components` still uses Vue CLI + Webpack scripts.
-- Prepared now: a stable `dev` script is available at root and workspace level.
-- Follow-up step: replace `packages/components` build and dev scripts with Vite equivalents and update dependencies in one pass.
+- Applied: `packages/components` now uses Vite v8 scripts via `rolldown-vite` for dev/build/preview.
+- Applied: library outputs are configured through `vite.config.ts` and package exports point to Vite artifacts.
+- Follow-up step: install dependencies and run verification (`dev`, `build`, tests) after dependency refresh.
