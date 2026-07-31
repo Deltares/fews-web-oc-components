@@ -17,18 +17,11 @@
     "declarationDir": "dist/types",
     "outDir": "dist",
     "isolatedModules": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "typeRoots": ["node_modules/@types"],
     "paths": {
       "@/*": ["./src/*"]
     },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": [
     "vite.config.ts",
@@ -36,9 +29,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
-, "tests/setup.js"  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "tests/**/*.tsx",
+  ],
+  "exclude": ["node_modules"]
 }
