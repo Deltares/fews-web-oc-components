@@ -1,6 +1,6 @@
 {
   "name": "@deltares/fews-web-oc-composables",
-  "version": "0.1.0",
+  "version": "0.3.0-alpha.0",
   "description": "Composable utilities for FEWS Web OC",
   "license": "AGPL",
   "type": "module",

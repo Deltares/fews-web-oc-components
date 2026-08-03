@@ -1,6 +1,6 @@
 {
   "name": "@deltares/fews-web-oc-micro-frontends",
-  "version": "0.0.1",
+  "version": "0.3.0-alpha.0",
   "private": true,
   "type": "module",
   "scripts": {
