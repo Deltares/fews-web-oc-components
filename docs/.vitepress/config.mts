@@ -5,14 +5,13 @@ export default defineConfig({
   description: 'Documentation for FEWS Web OC components and composables.',
   lang: 'en-US',
   base: process.env.VITEPRESS_BASE ?? '/fews-web-oc-components/',
-  ignoreDeadLinks: ['/storybook/', '/storybook/index'],
   cleanUrls: true,
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Components', link: '/components/' },
       { text: 'Composables', link: '/composables/' },
-      { text: 'Storybook', link: '/storybook/' }
+      { text: 'Storybook', link: 'https://deltares.github.io/fews-web-oc-components/storybook/', target: '_blank' }
     ],
     sidebar: {
       '/guide/': [
