@@ -16,6 +16,14 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
+      - name: Run linter
+        run: npm run lint
+
+      - run: npm run playwright:install --workspace=packages/components
+
+      - name: Run component tests
+        run: npm run test:component
+
       # - name: Test Report
       #   uses: dorny/test-reporter@v1
       #   if: success() || failure() # run this step even if previous step failed
@@ -24,5 +32,4 @@ jobs:
       #     path: reports/junit.xml # Path to test results
       #     reporter: jest-junit # Format of test results
 
-      - name: Run linter
-        run: npm run lint
+
