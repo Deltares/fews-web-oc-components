@@ -9,6 +9,7 @@
     "dev:mf": "npm run -w @deltares/fews-web-oc-micro-frontends dev",
     "build": "npm run --workspaces --if-present build",
     "playwright:install": "npm run --workspaces --if-present playwright:install",
+    "publish:packages": "npm publish -w @deltares/fews-web-oc-components --access public && npm publish -w @deltares/fews-web-oc-composables --access public",
     "test": "npm run --workspaces --if-present test",
     "test:unit": "npm run --workspaces --if-present test:unit",
     "test:component": "npm run --workspaces --if-present test:component",
