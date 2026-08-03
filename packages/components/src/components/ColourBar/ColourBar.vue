@@ -50,7 +50,7 @@ function updateColourBar() {
     ...props.options,
   }
 
-  void new ColourBar(
+  new ColourBar(
     group.value,
     props.colourMap,
     props.width,
