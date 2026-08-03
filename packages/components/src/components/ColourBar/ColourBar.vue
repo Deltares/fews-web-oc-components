@@ -50,7 +50,7 @@ function updateColourBar() {
     ...props.options,
   }
 
-  new ColourBar(
+  new ColourBar( // NOSONAR(S1848) - creates DOM element on group.value element
     group.value,
     props.colourMap,
     props.width,
