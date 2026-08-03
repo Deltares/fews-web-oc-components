@@ -17,6 +17,10 @@ const meta = {
   args: {
     selectedDate: dates[0],
     dates,
+    colors: {
+      primary: '#1976d2',
+      accent: '#e91e63',
+    },
     doFollowNow: false,
     isLoading: false,
   },
