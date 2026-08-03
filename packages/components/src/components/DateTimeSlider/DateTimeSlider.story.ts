@@ -23,6 +23,10 @@ export const Stateful = defineComponent(() => {
           nowValue.value = value
         },
         dates: baseDates,
+        colors: {
+          primary: '#1976d2',
+          accent: '#e91e63',
+        }
       }),
       h('form', { hidden: true }, [
         h('input', {
