@@ -24,7 +24,8 @@ const config: StorybookConfig = {
   framework: getAbsolutePath('@storybook/vue3-vite'),
   async viteFinal(config) {
     return mergeConfig(config, {
-      base: '/fews-web-oc-components/storybook/',
+      publicDir: false,
+      base: process.env.STORYBOOK_BASE ?? '/',
     })
   },
 }
