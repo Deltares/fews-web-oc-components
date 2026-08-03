@@ -12,8 +12,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "echo \"No tests configured for composables\"",
-    "lint": "echo \"No lint task configured for composables\""
+    "test": "echo \"No tests configured for composables\""
   },
   "devDependencies": {
     "typescript": "^5.9.3"
