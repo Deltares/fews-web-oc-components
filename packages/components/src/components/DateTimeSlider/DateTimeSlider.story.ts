@@ -26,7 +26,7 @@ export const Stateful = defineComponent(() => {
         colors: {
           primary: '#1976d2',
           accent: '#e91e63',
-        }
+        },
       }),
       h('form', { hidden: true }, [
         h('input', {
@@ -42,3 +42,5 @@ export const Stateful = defineComponent(() => {
       ]),
     ])
 })
+
+export default Stateful
