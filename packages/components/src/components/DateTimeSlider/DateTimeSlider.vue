@@ -30,11 +30,12 @@
         <v-btn
           density="compact"
           variant="text"
+          aria-label="Follow current time"
           :icon="nowButtonIcon"
           :color="nowButtonColor"
           @click="toggleFollowNow"
         />
-        <span class="datetime-slider__datefield">{{ dateString }}</span>
+        <output class="datetime-slider__datefield">{{ dateString }}</output>
       </div>
       <v-spacer />
       <div class="play-controls">
