@@ -28,5 +28,9 @@
     "access": "public",
     "tag": "alpha",
     "registry": "https://registry.npmjs.org"
+  },
+  "dependencies": {
+    "@deltares/fews-wms-requests": "^4.0.1",
+    "vue": "^3.5.40"
   }
 }
