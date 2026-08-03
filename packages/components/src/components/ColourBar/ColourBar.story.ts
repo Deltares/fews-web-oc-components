@@ -13,3 +13,5 @@ const defaultColourMap: ColourMap = [
 export const Default = defineComponent(() => () =>
   h(ColourBarVue, { colourMap: defaultColourMap, width: 250, height: 20 }),
 )
+
+export default Default
