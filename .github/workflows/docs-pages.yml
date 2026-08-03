@@ -39,6 +39,8 @@ jobs:
         run: npm run docs:build
 
       - name: Build Storybook
+        env:
+          STORYBOOK_BASE: /fews-web-oc-components/storybook/
         run: npm run -w @deltares/fews-web-oc-components build-storybook -- --output-dir storybook-static
 
       - name: Compose static site artifact
