@@ -3,7 +3,7 @@ node_modules
 dist/
 playwright-report/
 test-results/
-.vitepress/
+**/.vitepress/cache/**
 storybook-static
 coverage
 
