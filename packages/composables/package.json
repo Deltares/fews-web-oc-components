@@ -16,5 +16,17 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deltares/fews-web-oc-components.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Deltares/fews-web-oc-components/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "registry": "https://registry.npmjs.org"
   }
 }
