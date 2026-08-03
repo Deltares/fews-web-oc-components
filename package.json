@@ -8,10 +8,11 @@
     "dev:components": "npm run -w @deltares/fews-web-oc-components dev",
     "dev:mf": "npm run -w @deltares/fews-web-oc-micro-frontends dev",
     "build": "npm run --workspaces --if-present build",
+    "playwright:install": "npm run --workspaces --if-present playwright:install",
     "test": "npm run --workspaces --if-present test",
     "test:unit": "npm run --workspaces --if-present test:unit",
-    "test:components": "npm run --workspaces --if-present test:components",
-    "test:components:ui": "npm run --workspaces --if-present test:components:ui",
+    "test:component": "npm run --workspaces --if-present test:component",
+    "test:component:ui": "npm run --workspaces --if-present test:component:ui",
     "test:e2e": "npm run --workspaces --if-present test:e2e",
     "ci:test:e2e": "npm run --workspaces --if-present ci:test:e2e",
     "lint": "npm run --workspaces --if-present lint"

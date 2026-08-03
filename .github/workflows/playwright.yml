@@ -17,8 +17,8 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Install Playwright Browsers
         run: npm run playwright:install --workspace=packages/components
-      - name: Run Playwright component tests
-        run: npm run test:components
+      - name: Run Playwright E2E tests
+        run: npm run test:e2e
       - uses: actions/upload-artifact@v7
         if: always()
         with:
