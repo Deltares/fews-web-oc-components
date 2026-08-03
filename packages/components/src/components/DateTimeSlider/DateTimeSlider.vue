@@ -198,7 +198,7 @@ watch(
   () => props.selectedDate,
   (selectedDate) => {
     if (selectedDate === undefined) return
-    let index = findClosestIndex(
+    const index = findClosestIndex(
       props.dates,
       selectedDate,
       props.dateComparator,

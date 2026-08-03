@@ -29,6 +29,7 @@
     "test:e2e": "playwright test --project=components",
     "test:e2e:ui": "playwright test --project=components --ui",
     "lint": "eslint --ext .js,.ts,.vue src tests",
+    "lint:fix": "eslint --ext .js,.ts,.vue src tests --fix",
     "sonar": "sonar-scanner -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$SONAR_KEY -Dsonar.projectName='Delft-FEWS Web OC Components'",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
