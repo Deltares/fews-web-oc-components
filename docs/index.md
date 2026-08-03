@@ -7,6 +7,8 @@ Documentation for the FEWS Web OC packages in this monorepo.
 - [Components](./components/)
 - [Composables](./composables/)
 
+Storybook is also published with this site at `/storybook/`.
+
 ## Quick Start
 
 ```bash
