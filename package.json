@@ -7,6 +7,9 @@
   "scripts": {
     "dev:components": "npm run -w @deltares/fews-web-oc-components dev",
     "dev:mf": "npm run -w @deltares/fews-web-oc-micro-frontends dev",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "build": "npm run --workspaces --if-present build",
     "playwright:install": "npm run --workspaces --if-present playwright:install",
     "publish:packages": "npm publish -w @deltares/fews-web-oc-components --access public && npm publish -w @deltares/fews-web-oc-composables --access public",
@@ -20,6 +23,9 @@
   },
   "volta": {
     "node": "24.18.1"
+  },
+  "devDependencies": {
+    "vitepress": "^2.0.0-alpha.12"
   },
   "version": "0.3.0-alpha.1"
 }
