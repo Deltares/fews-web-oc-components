@@ -21,6 +21,26 @@ npm run lint
 npm run test
 ```
 
+## Documentation with VitePress
+
+Run documentation locally:
+
+```bash
+npm run docs:dev
+```
+
+Build static documentation:
+
+```bash
+npm run docs:build
+```
+
+Preview built documentation:
+
+```bash
+npm run docs:preview
+```
+
 ## Run scripts directly in a workspace
 
 ```bash
