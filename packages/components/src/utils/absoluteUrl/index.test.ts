@@ -5,7 +5,7 @@
 import { expect, test } from 'vitest'
 import { absoluteUrl } from '.'
 
-test("absolute url from '/'", () => {
+test('absolute url from \'/\'', () => {
   expect(absoluteUrl('/')).toEqual(new URL('http://localhost:3000/'))
 })
 
