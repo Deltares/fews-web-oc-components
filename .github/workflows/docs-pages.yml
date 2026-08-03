@@ -38,13 +38,22 @@ jobs:
           VITEPRESS_BASE: /fews-web-oc-components/
         run: npm run docs:build
 
+      - name: Build Storybook
+        run: npm run -w @deltares/fews-web-oc-components build-storybook -- --output-dir storybook-static
+
+      - name: Compose static site artifact
+        run: |
+          mkdir -p _site/storybook
+          cp -R docs/.vitepress/dist/. _site/
+          cp -R packages/components/storybook-static/. _site/storybook/
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: docs/.vitepress/dist
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
