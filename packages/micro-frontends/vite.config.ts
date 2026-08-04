@@ -15,7 +15,7 @@ export default defineConfig({
   base: 'http://localhost:2010/',
   plugins: [
     vue(),
-    federation(mfConfig),
+    ...(process.env.STORYBOOK ? [] : [federation(mfConfig)]),
     vuetify({
       autoImport: true,
     }),
