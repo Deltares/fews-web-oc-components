@@ -11,7 +11,7 @@ export default defineConfig({
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Components', link: '/components/' },
       { text: 'Composables', link: '/composables/' },
-      { text: 'Storybook', link: 'https://deltares.github.io/fews-web-oc-components/storybook/', target: '_blank' }
+      { text: 'Storybook', link: '/storybook/' }
     ],
     sidebar: {
       '/guide/': [

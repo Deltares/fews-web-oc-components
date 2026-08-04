@@ -19,14 +19,7 @@ const config: StorybookConfig = {
   ],
   framework: getAbsolutePath('@storybook/vue3-vite'),
   async viteFinal(config) {
-    const plugins = (config.plugins ?? []).filter((plugin) => {
-      return plugin && typeof plugin === 'object' && 'name' in plugin
-        ? !(plugin.name as string).includes('module-federation')
-        : true
-    })
-
     return mergeConfig(config, {
-      plugins,
       publicDir: false,
       base: process.env.STORYBOOK_BASE ?? '/',
       resolve: {

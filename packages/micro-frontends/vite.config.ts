@@ -6,6 +6,11 @@ import { federation } from '@module-federation/vite'
 import vuetify from 'vite-plugin-vuetify'
 import mfConfig from './module-federation.config'
 
+const isStorybookRun =
+  Boolean(process.env.STORYBOOK) ||
+  Boolean(process.env.STORYBOOK_BASE) ||
+  process.env.npm_lifecycle_event?.includes('storybook') === true
+
 // https://vite.dev/config/
 export default defineConfig({
   server: {
@@ -15,7 +20,7 @@ export default defineConfig({
   base: 'http://localhost:2010/',
   plugins: [
     vue(),
-    ...(process.env.STORYBOOK ? [] : [federation(mfConfig)]),
+    ...(isStorybookRun ? [] : [federation(mfConfig)]),
     vuetify({
       autoImport: true,
     }),
