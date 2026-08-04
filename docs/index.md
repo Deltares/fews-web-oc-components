@@ -7,7 +7,12 @@ Documentation for the FEWS Web OC packages in this monorepo.
 - [Components](./components/)
 - [Composables](./composables/)
 
-Storybook is also published with this site at `/storybook/`.
+Storybook is also published with this site.
+
+- [Storybook landing page](./storybook/)
+
+- [Storybook (Components)](https://deltares.github.io/fews-web-oc-components/storybook/components/)
+- [Storybook (Micro Frontends)](https://deltares.github.io/fews-web-oc-components/storybook/micro-frontends/)
 
 ## Quick Start
 
