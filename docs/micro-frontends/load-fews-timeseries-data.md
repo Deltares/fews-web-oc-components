@@ -5,7 +5,7 @@
 
 This guide shows two supported ways for a Web OC micro frontend to load time series data from Delft-FEWS.
 
-In practice, the host application provides the FEWS service URL and authentication context, while the micro frontend is responsible for building the request and mapping the returned series into its own view model.
+In practice, the host application provides the FEWS service URL and authentication context, while the micro frontend is responsible for building the request and mapping the returned series into its own view model. [link](https://example.com)
 
 Supported approaches:
 
@@ -50,8 +50,8 @@ If the micro frontend is exposed through module federation, keep the data-loadin
 
 ## 1. Load Data with PiWebserviceProvider
 
-> [!IMPORTANT]
-> We are considering a new major PiWebserviceProvider release with API changes to better support batch requests and `AbortController`.
+> [!INFO]
+> We are considering a new major PiWebserviceProvider release with API changes to better support batch requests and `AbortController` <ExternalResourceLink source="MDN" title="AbortController" href="https://developer.mozilla.org/en-US/docs/Web/API/AbortController" />.
 
 Use this approach if you want full control over requests and response mapping.
 
@@ -111,7 +111,7 @@ export async function loadTimeSeriesDirect(
 
 ## 2. Load Data with useTimeSeries Composable
 
-> [!IMPORTANT]
+> [!INFO]
 > We are currently implementing FEWS system time support and a central method for the data refresh strategy.
 
 Use this approach if you want reactive loading, polling, abort handling, and series mapping out of the box.
