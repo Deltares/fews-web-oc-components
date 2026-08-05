@@ -12,20 +12,35 @@
 </template>
 
 <script setup lang="ts">
-import type { Location } from '@deltares/fews-pi-requests'
+import type { Location, TopologyNode } from '@deltares/fews-pi-requests'
 import type { FeatureCollection, Feature, Geometry } from 'geojson'
-import { onMounted, useTemplateRef, watch } from 'vue'
+import { onMounted, ref, useTemplateRef, watch } from 'vue'
 import * as d3 from 'd3'
 import boundaries from '@/assets/eThekwini_Municipal_Boundary.geojson.json'
 import land from '@/assets/south-africa.geojson.json'
 
+interface HostSettings {
+  baseUrl: string
+  webservicesUrl: string
+  getHeaders: () => Promise<Headers>
+}
+
+interface D3MapSettings {
+  locationsRequest?: string
+  selectedLocationId?: string
+  navigateRouteName?: string
+  mockGeojson?: FeatureCollection<Geometry, Location>
+}
+
 interface Props {
-  locationIds?: string
-  geojson: FeatureCollection<Geometry, Location>
+  selectedDate: Date
+  topologyNode: TopologyNode
+  hostSettings: HostSettings
+  settings: D3MapSettings
 }
 
 interface Emits {
-  (event: 'click:location', location: Location): void
+  (event: 'navigate', route: { name: string; params?: { locationIds?: string } }): void
 }
 
 const props = defineProps<Props>()
@@ -35,9 +50,11 @@ const svgRef = useTemplateRef('svgRef')
 const width = 800
 const height = 800
 const margin = { top: 10, right: 10, bottom: 10, left: 10 }
+const geojson = ref<FeatureCollection<Geometry, Location>>({ type: 'FeatureCollection', features: [] })
 let locationsGroup: d3.Selection<SVGGElement, unknown, null, undefined>
 let projection: d3.GeoProjection
-let circles: d3.Selection<SVGCircleElement, Feature<Geometry, Location>, SVGGElement, unknown>
+let circles: d3.Selection<SVGCircleElement, Feature<Geometry, Location>, SVGGElement, unknown> | null =
+  null
 
 onMounted(() => {
   const svgElemement = svgRef.value
@@ -79,13 +96,18 @@ onMounted(() => {
     .attr('stroke', '#999')
 
   locationsGroup = selection.append('g')
-  drawLocations(props.geojson)
+  void loadLocationsAndDraw()
 })
 
 watch(
-  () => props.geojson,
+  () => [
+    props.selectedDate.getTime(),
+    getTopologyNodeIdentifier(props.topologyNode),
+    props.settings.locationsRequest,
+    props.settings.mockGeojson,
+  ],
   () => {
-    drawLocations(props.geojson)
+    void loadLocationsAndDraw()
   },
 )
 
@@ -112,24 +134,92 @@ function drawLocations(geojson: FeatureCollection<Geometry, Location>) {
     })
     .attr('r', 5)
     .attr('fill', (d) =>
-      d.properties.locationId === props.locationIds ? 'orange' : 'rgb(33, 150, 243)',
+      d.properties.locationId === props.settings.selectedLocationId ? 'orange' : 'rgb(33, 150, 243)',
     )
     .attr('stroke', '#fff')
     .attr('stroke-width', 1)
     .on('click', (event, d) => {
-      emit('click:location', d.properties)
+      emit('navigate', {
+        name: props.settings.navigateRouteName ?? 'MicroFrontendTimeSeriesDisplay',
+        params: { locationIds: d.properties.locationId },
+      })
     })
-
-  circles.exit().remove()
 }
 
 watch(
-  () => props.locationIds,
+  () => props.settings.selectedLocationId,
   (newLocationId) => {
-    if (!locationsGroup) return
+    if (!circles) return
     circles.attr('fill', (d: Feature<Geometry, Location>) => {
       return d.properties.locationId === newLocationId ? 'orange' : 'rgb(33, 150, 243)'
     })
   },
 )
+
+async function loadLocationsAndDraw() {
+  try {
+    const fetchedGeojson = await loadGeojson()
+    geojson.value = fetchedGeojson
+    drawLocations(fetchedGeojson)
+  } catch {
+    const emptyGeojson = { type: 'FeatureCollection', features: [] } as FeatureCollection<
+      Geometry,
+      Location
+    >
+    geojson.value = emptyGeojson
+    drawLocations(emptyGeojson)
+  }
+}
+
+async function loadGeojson(): Promise<FeatureCollection<Geometry, Location>> {
+  if (props.settings.mockGeojson) {
+    return props.settings.mockGeojson
+  }
+
+  const requestPath = props.settings.locationsRequest
+  if (!requestPath) {
+    return { type: 'FeatureCollection', features: [] }
+  }
+
+  const requestUrl = toRequestUrl(requestPath)
+  const headers = await props.hostSettings.getHeaders()
+  const response = await fetch(requestUrl, { headers })
+
+  if (!response.ok) {
+    throw new Error(`Failed to load map locations (${response.status})`)
+  }
+
+  const data = await response.json()
+  if (!isFeatureCollection(data)) {
+    throw new Error('Locations response is not a GeoJSON FeatureCollection')
+  }
+
+  return data
+}
+
+function getTopologyNodeIdentifier(topologyNode: TopologyNode): string {
+  const dynamicTopologyNode = topologyNode as unknown as Record<string, unknown>
+  const id = dynamicTopologyNode.id ?? dynamicTopologyNode.nodeId
+  return typeof id === 'string' ? id : ''
+}
+
+function toRequestUrl(pathOrUrl: string): string {
+  const topologyNodeId = encodeURIComponent(getTopologyNodeIdentifier(props.topologyNode))
+  const selectedDateIso = encodeURIComponent(props.selectedDate.toISOString())
+  const resolvedPath = pathOrUrl
+    .replace(/\{topologyNodeId\}/g, topologyNodeId)
+    .replace(/\{selectedDateIso\}/g, selectedDateIso)
+
+  if (/^https?:\/\//i.test(resolvedPath)) {
+    return resolvedPath
+  }
+
+  return new URL(resolvedPath, props.hostSettings.webservicesUrl).toString()
+}
+
+function isFeatureCollection(value: unknown): value is FeatureCollection<Geometry, Location> {
+  if (!value || typeof value !== 'object') return false
+  const candidate = value as { type?: unknown; features?: unknown }
+  return candidate.type === 'FeatureCollection' && Array.isArray(candidate.features)
+}
 </script>
