@@ -11,6 +11,7 @@ export default defineConfig({
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Components', link: '/components/' },
       { text: 'Composables', link: '/composables/' },
+      { text: 'Micro Frontends', link: '/micro-frontends/' },
       { text: 'Storybook', link: '/storybook/' }
     ],
     sidebar: {
@@ -38,6 +39,15 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/composables/' },
             { text: 'useWms', link: '/composables/use-wms' }
+          ]
+        }
+      ],
+      '/micro-frontends/': [
+        {
+          text: 'Micro Frontends',
+          items: [
+            { text: 'Overview', link: '/micro-frontends/' },
+            { text: 'Time Series Data', link: '/micro-frontends/load-fews-timeseries-data' }
           ]
         }
       ]

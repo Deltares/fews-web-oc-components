@@ -6,6 +6,7 @@ Documentation for the FEWS Web OC packages in this monorepo.
 
 - [Components](./components/)
 - [Composables](./composables/)
+- [Micro Frontends](./micro-frontends/)
 
 Storybook is also published with this site.
 
