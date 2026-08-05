@@ -1,6 +1,7 @@
 import type { Location } from '@deltares/fews-pi-requests'
 import type { Feature, FeatureCollection, Geometry } from 'geojson'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { userEvent, expect, fn, waitFor } from 'storybook/test'
 
 import D3Map from './D3Map.vue'
 
@@ -42,6 +43,8 @@ const geojson: FeatureCollection<Geometry, Location> = {
   features,
 }
 
+const onNavigate = fn<(route: { name: string; params?: { locationIds?: string } }) => void>()
+
 const meta = {
   title: 'MicroFrontends/D3Map',
   component: D3Map,
@@ -74,7 +77,39 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+function renderWithNavigate(args: Story['args']) {
+  return {
+    components: { D3Map },
+    setup() {
+      return { args, onNavigate }
+    },
+    template: '<D3Map v-bind="args" @navigate="onNavigate" />',
+  }
+}
+
+export const Default: Story = {
+  render: renderWithNavigate,
+  play: async ({ canvasElement }) => {
+    onNavigate.mockClear()
+
+    const circles = canvasElement.querySelectorAll('circle')
+    expect(circles.length).toBeGreaterThan(0)
+
+    const firstCircle = circles[0]
+    expect(firstCircle).toBeDefined()
+    await userEvent.click(firstCircle as SVGCircleElement)
+
+    await waitFor(() => {
+      expect(onNavigate).toHaveBeenCalledTimes(1)
+    })
+
+    expect(onNavigate).toHaveBeenLastCalledWith({
+      name: 'MicroFrontendTimeSeriesDisplay',
+      params: { locationIds: 'durban-central' },
+    })
+    expect(canvasElement.querySelector('svg')).toBeTruthy()
+  },
+}
 
 export const NoSelection: Story = {
   args: {
@@ -87,12 +122,40 @@ export const NoSelection: Story = {
 }
 
 export const DifferentSelection: Story = {
+  render: renderWithNavigate,
   args: {
     settings: {
       selectedLocationId: 'bluff',
       navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
       mockGeojson: geojson,
     },
+  },
+  play: async ({ canvasElement }) => {
+    onNavigate.mockClear()
+
+    const circles = canvasElement.querySelectorAll('circle')
+
+    expect(circles).toHaveLength(3)
+    const circle0 = circles[0]
+    const circle1 = circles[1]
+    const circle2 = circles[2]
+    expect(circle0).toBeDefined()
+    expect(circle1).toBeDefined()
+    expect(circle2).toBeDefined()
+    expect((circle0 as SVGCircleElement).getAttribute('fill')).toBe('rgb(33, 150, 243)')
+    expect((circle1 as SVGCircleElement).getAttribute('fill')).toBe('rgb(33, 150, 243)')
+    expect((circle2 as SVGCircleElement).getAttribute('fill')).toBe('orange')
+
+    await userEvent.click(circle2 as SVGCircleElement)
+
+    await waitFor(() => {
+      expect(onNavigate).toHaveBeenCalledTimes(1)
+    })
+
+    expect(onNavigate).toHaveBeenLastCalledWith({
+      name: 'MicroFrontendTimeSeriesDisplay',
+      params: { locationIds: 'bluff' },
+    })
   },
 }
 
