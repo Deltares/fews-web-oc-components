@@ -14,7 +14,24 @@ Supported approaches:
 
 ## Prerequisites
 
-A micro frontend loaded by Web OC receives `hostSettings` from the host:
+A micro frontend loaded by Web OC receives at least these props from the host:
+
+```ts
+export interface HostSettings {
+  baseUrl: string
+  webservicesUrl: string
+  getHeaders: () => Promise<Headers>
+}
+
+interface Props {
+  selectedDate: Date
+  topologyNode: TopologyNode
+  hostSettings: HostSettings
+  settings: unknown
+}
+```
+
+For FEWS time series loading, `hostSettings` is the critical part of the contract:
 
 - `baseUrl`: Web OC base path.
 - `webservicesUrl`: FEWS WebServices base URL.
@@ -27,7 +44,7 @@ If the micro frontend is exposed through module federation, keep the data-loadin
 ## Typical Flow
 
 1. The host (FEWS Web OC) mounts the component and passes the current context through props.
-2. The component derives a FEWS time series request from those props.
+2. The component derives a FEWS time series request from `selectedDate`, `topologyNode`, and `settings`.
 3. The component forwards the host headers to each request.
 4. The component renders the returned time series or emits an event when the user changes the selection.
 
@@ -111,34 +128,48 @@ import { useTimeSeries } from '@deltares/fews-web-oc-composables'
 
 ### Example
 
-The example below assumes the micro frontend receives the active filter, selected location IDs, and the FEWS WebServices base URL from its host.
+The example below assumes the micro frontend derives the FEWS filter and selected series from `topologyNode`, `settings`, and `selectedDate`, and uses the FEWS WebServices base URL from `hostSettings`.
 
 ```ts
-import { computed, toRef } from 'vue'
+import { computed } from 'vue'
 import type { ActionRequest } from '@deltares/fews-pi-requests'
 import { useTimeSeries } from '@/services/useTimeSeries'
+import type { TopologyNode } from '@deltares/fews-pi-requests'
+
+interface HostSettings {
+  baseUrl: string
+  webservicesUrl: string
+  getHeaders: () => Promise<Headers>
+}
 
 interface Props {
-  hostSettings: {
-    webservicesUrl: string
+  selectedDate: Date
+  topologyNode: TopologyNode
+  hostSettings: HostSettings
+  settings: {
+    filterId: string
+    selectedLocationIds: string[]
   }
-  filterId: string
-  selectedLocationIds: string[]
 }
 
 const props = defineProps<Props>()
 
 const requests = computed<ActionRequest[]>(() => {
-  if (!props.filterId || props.selectedLocationIds.length === 0) return []
+  const filterId = props.settings.filterId
+  const selectedLocationIds = props.settings.selectedLocationIds
+
+  if (!filterId || selectedLocationIds.length === 0) return []
 
   return [
     {
       key: 'main',
       request:
         '/timeseries?filterId=' +
-        encodeURIComponent(props.filterId) +
+        encodeURIComponent(filterId) +
         '&locationIds=' +
-        props.selectedLocationIds.map(encodeURIComponent).join(',') +
+        selectedLocationIds.map(encodeURIComponent).join(',') +
+        '&startTime=' +
+        encodeURIComponent(props.selectedDate.toISOString()) +
         '&documentFormat=PI_JSON',
     },
   ]
@@ -172,7 +203,7 @@ const { series, isLoading, loadingSeriesIds, refresh, interval } = useTimeSeries
 - Grid time series requests produce indexed keys such as `key[0]`, `key[1]`.
 - `refresh()` can be called manually.
 - Set the final `refresh` argument to `false` if you only want one load (no polling).
-- Use the host selection props to derive the `requests` computed value so the component reloads when the host state changes.
+- Use `selectedDate`, `topologyNode`, and `settings` to derive the `requests` computed value so the component reloads when the host state changes.
 
 > [!INFO]
 > We are currently implementing FEWS system time support and a central method for the data refresh strategy.
