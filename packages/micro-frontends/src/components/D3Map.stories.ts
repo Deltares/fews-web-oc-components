@@ -47,12 +47,25 @@ const meta = {
   component: D3Map,
   tags: ['autodocs'],
   args: {
-    geojson,
-    locationIds: 'phoenix',
+    selectedDate: new Date('2026-08-05T12:00:00Z'),
+    topologyNode: {
+      id: 'durban-coast',
+      name: 'Durban Coast',
+    },
+    hostSettings: {
+      baseUrl: '/weboc',
+      webservicesUrl: 'https://example.invalid/fews',
+      getHeaders: async () => new Headers({ Authorization: 'Bearer storybook-token' }),
+    },
+    settings: {
+      selectedLocationId: 'phoenix',
+      navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
+      mockGeojson: geojson,
+    },
   },
   parameters: {
     actions: {
-      handles: ['click:location'],
+      handles: ['navigate'],
     },
     layout: 'centered',
   },
@@ -65,12 +78,37 @@ export const Default: Story = {}
 
 export const NoSelection: Story = {
   args: {
-    locationIds: '',
+    settings: {
+      selectedLocationId: '',
+      navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
+      mockGeojson: geojson,
+    },
   },
 }
 
 export const DifferentSelection: Story = {
   args: {
-    locationIds: 'bluff',
+    settings: {
+      selectedLocationId: 'bluff',
+      navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
+      mockGeojson: geojson,
+    },
+  },
+}
+
+export const WithFetchRequestTemplate: Story = {
+  args: {
+    selectedDate: new Date('2026-08-10T09:30:00Z'),
+    topologyNode: {
+      id: 'umhlanga',
+      name: 'Umhlanga',
+    },
+    settings: {
+      selectedLocationId: 'durban-central',
+      navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
+      locationsRequest:
+        '/locations?documentFormat=GEOJSON&topologyNodeId={topologyNodeId}&time={selectedDateIso}',
+      mockGeojson: geojson,
+    },
   },
 }

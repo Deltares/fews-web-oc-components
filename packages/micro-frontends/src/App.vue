@@ -4,39 +4,27 @@ import { RouterView } from 'vue-router'
 
 const times = ref([new Date('2025-05-26T22:00:00Z'), new Date('2025-05-27T22:00:00Z')])
 const currentTime = ref(times.value[0])
-const geosjon = ref({
-  type: 'FeatureCollection',
-  features: [
-    {
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        // set point to be clost to Durban, South Africa
-        coordinates: [31.0, -29.0],
-      },
-      properties: {
-        locationId: 'location-1',
-        name: 'Location 1',
-      },
-    },
-    {
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        // set point to be in South Africa
-        coordinates: [31.0, -29.0],
-      },
-      properties: {
-        locationId: 'location-2',
-        name: 'Location 2',
-      },
-    },
-  ],
-})
+
+const topologyNode = ref({ id: 'durban-coast', name: 'Durban Coast' })
+const hostSettings = {
+  baseUrl: '/',
+  webservicesUrl: 'https://example.invalid/fews',
+  getHeaders: async () => new Headers(),
+}
+const settings = {
+  selectedLocationId: 'location-1',
+  locationsRequest:
+    '/locations?documentFormat=GEOJSON&topologyNodeId={topologyNodeId}&time={selectedDateIso}',
+}
 </script>
 
 <template>
-  <RouterView :time="currentTime" :timeSeries="times" :geojson="geosjon" />
+  <RouterView
+    :selectedDate="currentTime"
+    :topologyNode="topologyNode"
+    :hostSettings="hostSettings"
+    :settings="settings"
+  />
 </template>
 
 <style>
