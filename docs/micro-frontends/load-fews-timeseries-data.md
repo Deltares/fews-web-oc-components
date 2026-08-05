@@ -1,6 +1,6 @@
 # Micro Frontend Time Series Data
 
-> [!INFO]
+> [!IMPORTANT]
 > This document is currently in proposal state. APIs, package names, and implementation details may change before final release.
 
 This guide shows two supported ways for a Web OC micro frontend to load time series data from Delft-FEWS.
@@ -105,7 +105,7 @@ export async function loadTimeSeriesDirect(
 - You are responsible for mapping FEWS PI response objects to your chart/table model.
 - Reuse one provider instance per component where possible.
 
-> [!INFO]
+> [!IMPORTANT]
 > We are considering a new major release with API changes to better support batch requests and `AbortController`.
 
 ## 2. Load Data with useTimeSeries Composable
@@ -205,7 +205,7 @@ const { series, isLoading, loadingSeriesIds, refresh, interval } = useTimeSeries
 - Set the final `refresh` argument to `false` if you only want one load (no polling).
 - Use `selectedDate`, `topologyNode`, and `settings` to derive the `requests` computed value so the component reloads when the host state changes.
 
-> [!INFO]
+> [!IMPORTANT]
 > We are currently implementing FEWS system time support and a central method for the data refresh strategy.
 
 ## Which Option to Choose?
