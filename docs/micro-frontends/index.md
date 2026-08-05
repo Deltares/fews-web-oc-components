@@ -1,6 +1,6 @@
 # Micro Frontend Components
 
-> [!INFO]
+> [!IMPORTANT]
 > This document is currently in proposal state. APIs, package names, and implementation details may change before final release.
 
 Micro frontend components are Vue components exposed from the micro-frontends package and mounted by the Web OC host. They should stay small, host-aware, and focused on a single user flow such as showing a map, rendering a time series, or drilling into a location selection.
