@@ -80,7 +80,9 @@ describe('D3Map', () => {
     expect(getHeaders).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledTimes(1)
 
-    const [requestUrl, requestInit] = fetchSpy.mock.calls[0]
+    const firstCall = fetchSpy.mock.calls[0]
+    expect(firstCall).toBeDefined()
+    const [requestUrl, requestInit] = firstCall!
     expect(requestUrl).toBe(
       'https://example.test/locations?documentFormat=GEOJSON&topologyNodeId=durban%20coast&time=2026-08-05T12%3A30%3A00.000Z',
     )
@@ -113,8 +115,10 @@ describe('D3Map', () => {
 
     const circles = wrapper.findAll('circle')
     expect(circles).toHaveLength(2)
+    const firstCircle = circles[0]
+    expect(firstCircle).toBeDefined()
 
-    await circles[0].trigger('click')
+    await firstCircle!.trigger('click')
 
     const navigateEvents = wrapper.emitted('navigate')
     expect(navigateEvents).toBeTruthy()
@@ -144,8 +148,12 @@ describe('D3Map', () => {
     await flushMicrotasks()
 
     let circles = wrapper.findAll('circle')
-    expect(circles[0].attributes('fill')).toBe('rgb(33, 150, 243)')
-    expect(circles[1].attributes('fill')).toBe('orange')
+    const firstCircle = circles[0]
+    const secondCircle = circles[1]
+    expect(firstCircle).toBeDefined()
+    expect(secondCircle).toBeDefined()
+    expect(firstCircle!.attributes('fill')).toBe('rgb(33, 150, 243)')
+    expect(secondCircle!.attributes('fill')).toBe('orange')
 
     await wrapper.setProps({
       settings: {
@@ -157,7 +165,11 @@ describe('D3Map', () => {
     await flushMicrotasks()
 
     circles = wrapper.findAll('circle')
-    expect(circles[0].attributes('fill')).toBe('orange')
-    expect(circles[1].attributes('fill')).toBe('rgb(33, 150, 243)')
+    const updatedFirstCircle = circles[0]
+    const updatedSecondCircle = circles[1]
+    expect(updatedFirstCircle).toBeDefined()
+    expect(updatedSecondCircle).toBeDefined()
+    expect(updatedFirstCircle!.attributes('fill')).toBe('orange')
+    expect(updatedSecondCircle!.attributes('fill')).toBe('rgb(33, 150, 243)')
   })
 })
