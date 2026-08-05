@@ -207,8 +207,8 @@ function toRequestUrl(pathOrUrl: string): string {
   const topologyNodeId = encodeURIComponent(getTopologyNodeIdentifier(props.topologyNode))
   const selectedDateIso = encodeURIComponent(props.selectedDate.toISOString())
   const resolvedPath = pathOrUrl
-    .replace(/\{topologyNodeId\}/g, topologyNodeId)
-    .replace(/\{selectedDateIso\}/g, selectedDateIso)
+    .replaceAll('{topologyNodeId}', topologyNodeId)
+    .replaceAll('{selectedDateIso}', selectedDateIso)
 
   if (/^https?:\/\//i.test(resolvedPath)) {
     return resolvedPath
