@@ -16,7 +16,7 @@ describe('hostNotifications', () => {
     )
 
     const notifications: HostNotifications = {
-      addNotification: vi.fn(),
+      addAlert: vi.fn(),
     }
 
     provideHostNotifications(notifications)
@@ -30,20 +30,20 @@ describe('hostNotifications', () => {
     )
 
     const notifications: HostNotifications = {
-      addNotification: vi.fn(),
+      addAlert: vi.fn(),
     }
 
     provideHostNotifications(notifications)
 
     const host = useHostNotifications()
 
-    host.addNotification({
+    host.addAlert({
       id: '1',
       type: 'success',
       message: 'Operation completed',
     })
 
-    expect(notifications.addNotification).toHaveBeenCalledWith({
+    expect(notifications.addAlert).toHaveBeenCalledWith({
       id: '1',
       type: 'success',
       message: 'Operation completed',
