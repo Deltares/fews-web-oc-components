@@ -15,5 +15,6 @@ export default createModuleFederationConfig({
       singleton: true,
     },
     'vuetify/lib/framework.mjs': { singleton: true },
+    '@deltares/fews-web-oc-composables': {},
   },
 })
