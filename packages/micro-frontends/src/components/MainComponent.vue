@@ -1,9 +1,12 @@
 <template>
   <div class="mf-main-component">
     <h2>
-      Micro Frontend Main Panel - <time>{{ selectedDate.toLocaleString() }}</time>
+      Micro Frontend Main Panel -
+      <time>{{ selectedDate.toLocaleString() }}</time>
     </h2>
-    <v-btn variant="flat" color="primary" @click="snackbar = true">Show message</v-btn>
+    <v-btn variant="flat" color="primary" @click="showInfoMessage()"
+      >Show message</v-btn
+    >
     <v-card>
       <v-card-text>Props: {{ Object.keys(props) }}</v-card-text>
       <v-card-text>Emits: {{ emit }}</v-card-text>
@@ -16,18 +19,13 @@
       :settings="settings"
       @navigate="onNavigate"
     />
-    <v-snackbar v-model="snackbar">
-      This is a snackbar message.
-      <template v-slot:actions>
-        <v-btn color="pink" variant="text" @click="snackbar = false"> Close </v-btn>
-      </template>
-    </v-snackbar>
   </div>
 </template>
 <script setup lang="ts">
 import type { TopologyNode } from '@deltares/fews-pi-requests'
 import D3Map from './D3Map.vue'
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
+import { useHostNotifications } from '@deltares/fews-web-oc-composables'
 
 interface HostSettings {
   baseUrl: string
@@ -49,12 +47,18 @@ interface Props {
 }
 
 interface Emits {
-  (event: 'navigate', route: { name: string; params?: { locationIds: string } }): void
+  (
+    event: 'navigate',
+    route: { name: string; params?: { locationIds: string } },
+  ): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const snackbar = ref(false)
+const alertStore = useHostNotifications()
+
+const id = 'test-micro-frontend/main_component'
+
 
 watch(
   () => props.selectedDate,
@@ -70,12 +74,23 @@ watch(
   },
 )
 
-function onNavigate(route: { name: string; params?: { locationIds?: string } }) {
+function onNavigate(route: {
+  name: string
+  params?: { locationIds?: string }
+}) {
   if (!route.params?.locationIds) return
 
   emit('navigate', {
     name: route.name,
     params: { locationIds: route.params.locationIds },
+  })
+}
+
+function showInfoMessage() {
+  alertStore.addAlert({
+    id,
+    type: 'info',
+    message: '[Important] Hello WebOC this is a notification from the μf-Demo',
   })
 }
 </script>
