@@ -7,7 +7,7 @@ export interface NotificationRequest {
 }
 
 export interface HostNotifications {
-  addNotification(request: NotificationRequest): void
+  addAlert(request: NotificationRequest): void
 }
 
 let hostNotifications: HostNotifications | null = null
