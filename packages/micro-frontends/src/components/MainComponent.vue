@@ -103,9 +103,7 @@
             <div class="prop-group">
               <div class="prop-row px-4 py-2">
                 <span class="prop-name"> topologyNode </span>
-                <span class="prop-value">
-                  TopologyNode
-                </span>
+                <span class="prop-value"> TopologyNode </span>
               </div>
 
               <div
