@@ -43,7 +43,8 @@ const geojson: FeatureCollection<Geometry, Location> = {
   features,
 }
 
-const onNavigate = fn<(route: { name: string; params?: { locationIds?: string } }) => void>()
+const onNavigate =
+  fn<(route: { name: string; params?: { locationIds?: string } }) => void>()
 
 const meta = {
   title: 'MicroFrontends/D3Map',
@@ -51,20 +52,6 @@ const meta = {
   tags: ['autodocs'],
   args: {
     selectedDate: new Date('2026-08-05T12:00:00Z'),
-    topologyNode: {
-      id: 'durban-coast',
-      name: 'Durban Coast',
-    },
-    hostSettings: {
-      baseUrl: '/weboc',
-      webservicesUrl: 'https://example.invalid/fews',
-      getHeaders: async () => new Headers({ Authorization: 'Bearer storybook-token' }),
-    },
-    settings: {
-      selectedLocationId: 'phoenix',
-      navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
-      mockGeojson: geojson,
-    },
   },
   parameters: {
     actions: {
@@ -113,22 +100,14 @@ export const Default: Story = {
 
 export const NoSelection: Story = {
   args: {
-    settings: {
-      selectedLocationId: '',
-      navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
-      mockGeojson: geojson,
-    },
+    geojson,
   },
 }
 
 export const DifferentSelection: Story = {
   render: renderWithNavigate,
   args: {
-    settings: {
-      selectedLocationId: 'bluff',
-      navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
-      mockGeojson: geojson,
-    },
+    geojson,
   },
   play: async ({ canvasElement }) => {
     onNavigate.mockClear()
@@ -142,8 +121,12 @@ export const DifferentSelection: Story = {
     expect(circle0).toBeDefined()
     expect(circle1).toBeDefined()
     expect(circle2).toBeDefined()
-    expect((circle0 as SVGCircleElement).getAttribute('fill')).toBe('rgb(33, 150, 243)')
-    expect((circle1 as SVGCircleElement).getAttribute('fill')).toBe('rgb(33, 150, 243)')
+    expect((circle0 as SVGCircleElement).getAttribute('fill')).toBe(
+      'rgb(33, 150, 243)',
+    )
+    expect((circle1 as SVGCircleElement).getAttribute('fill')).toBe(
+      'rgb(33, 150, 243)',
+    )
     expect((circle2 as SVGCircleElement).getAttribute('fill')).toBe('orange')
 
     await userEvent.click(circle2 as SVGCircleElement)
@@ -162,16 +145,6 @@ export const DifferentSelection: Story = {
 export const WithFetchRequestTemplate: Story = {
   args: {
     selectedDate: new Date('2026-08-10T09:30:00Z'),
-    topologyNode: {
-      id: 'umhlanga',
-      name: 'Umhlanga',
-    },
-    settings: {
-      selectedLocationId: 'durban-central',
-      navigateRouteName: 'MicroFrontendTimeSeriesDisplay',
-      locationsRequest:
-        '/locations?documentFormat=GEOJSON&topologyNodeId={topologyNodeId}&time={selectedDateIso}',
-      mockGeojson: geojson,
-    },
+    geojson,
   },
 }
