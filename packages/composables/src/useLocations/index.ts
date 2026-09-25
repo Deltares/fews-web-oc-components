@@ -1,9 +1,7 @@
 import {
   computed,
-  MaybeRefOrGetter,
   onBeforeUnmount,
   ref,
-  ShallowRef,
   shallowRef,
   watch,
   type ComputedRef,
@@ -280,7 +278,7 @@ export function usePiLocations(
 }
 
 function isFeatureCollection(
-  geojson: FeatureCollection<Geometry, Location> | unknown,
+  geojson: FeatureCollection<Geometry, Location> | unknown, // NOSONAR(S6571) - valid use of unknown in typeguard
 ): geojson is FeatureCollection<Geometry, Location> {
   return (
     (geojson as FeatureCollection<Geometry, Location>).type ===
