@@ -109,88 +109,77 @@ function drawLocations(
 ) {
   if (!locationsGroup || !geojson) return
 
-  locationsGroup
-    .selectAll<
-      SVGCircleElement | SVGLineElement,
-      Feature<Geometry, PiLocation>
-    >('circle, line')
-    .remove()
+  const features = geojson.features
 
-  // Draw vertical lines from the ground location to the elevated marker.
+  const projectLocation = (d: Feature<Geometry, PiLocation>) => {
+    if (d.geometry.type !== 'Point') return null
+
+    return projection(d.geometry.coordinates as [number, number])
+  }
+
+  const getPosition = (d: Feature<Geometry, PiLocation>) => {
+    const projected = projectLocation(d)
+
+    if (!projected) {
+      return { x: 0, y: 0 }
+    }
+
+    const height = Number.parseFloat(d.properties.z ?? '0') * heightShiftScale
+
+    return {
+      x: projected[0],
+      y: projected[1] - height,
+    }
+  }
+
+  // Ground → elevated marker lines.
   locationsGroup
     .selectAll<SVGLineElement, Feature<Geometry, PiLocation>>('line')
-    .data(geojson.features)
-    .join('line')
-    .attr('x1', (d) => {
-      const coords =
-        d.geometry.type === 'Point' ? d.geometry.coordinates : [0, 0]
-      const projected = projection(coords as [number, number])
-      return projected ? projected[0] : 0
-    })
+    .data(features, (d) => d.properties.locationId)
+    .join(
+      (enter) =>
+        enter.append('line').attr('stroke', '#666').attr('stroke-width', 1),
+      (update) => update,
+      (exit) => exit.remove(),
+    )
+    .attr('x1', (d) => getPosition(d).x)
     .attr('y1', (d) => {
-      const coords =
-        d.geometry.type === 'Point' ? d.geometry.coordinates : [0, 0]
-      const projected = projection(coords as [number, number])
-      return projected ? projected[1] : 0
+      const projected = projectLocation(d)
+      return projected?.[1] ?? 0
     })
-    .attr('x2', (d) => {
-      const coords =
-        d.geometry.type === 'Point' ? d.geometry.coordinates : [0, 0]
-      const projected = projection(coords as [number, number])
-      return projected ? projected[0] : 0
-    })
-    .attr('y2', (d) => {
-      const coords =
-        d.geometry.type === 'Point' ? d.geometry.coordinates : [0, 0]
-      const projected = projection(coords as [number, number])
+    .attr('x2', (d) => getPosition(d).x)
+    .attr('y2', (d) => getPosition(d).y)
 
-      if (!projected) return 0
-
-      return (
-        projected[1] -
-        Number.parseFloat(d.properties.z ?? '0') * heightShiftScale
-      )
-    })
-    .attr('stroke', '#666')
-    .attr('stroke-width', 1)
-
-  // Draw the elevated location markers.
+  // Elevated location markers.
   locationsGroup
     .selectAll<SVGCircleElement, Feature<Geometry, PiLocation>>('circle')
-    .data(geojson.features)
-    .join('circle')
-    .attr('cx', (d) => {
-      const coords =
-        d.geometry.type === 'Point' ? d.geometry.coordinates : [0, 0]
-      const projected = projection(coords as [number, number])
-      return projected ? projected[0] : 0
-    })
-    .attr('cy', (d) => {
-      const coords =
-        d.geometry.type === 'Point' ? d.geometry.coordinates : [0, 0]
-      const projected = projection(coords as [number, number])
+    .data(features, (d) => d.properties.locationId)
+    .join(
+      (enter) =>
+        enter
+          .append('circle')
+          .attr('r', 5)
+          .attr('stroke', '#fff')
+          .attr('stroke-width', 1)
+          .on('click', (event, d) => {
+            selectedLocationId.value = d.properties.locationId
 
-      if (!projected) return 0
-      return (
-        projected[1] -
-        Number.parseFloat(d.properties.z ?? '0') * heightShiftScale
-      )
-    })
-    .attr('r', 5)
+            emit('navigate', {
+              name: 'MicroFrontendTimeSeriesDisplay',
+              params: {
+                locationIds: d.properties.locationId,
+              },
+            })
+          }),
+      (update) => update,
+      (exit) => exit.remove(),
+    )
+    .attr('cx', (d) => getPosition(d).x)
+    .attr('cy', (d) => getPosition(d).y)
     .attr('fill', (d) =>
       d.properties.locationId === selectedLocationId.value
         ? 'orange'
         : 'rgb(33, 150, 243)',
     )
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 1)
-    .on('click', (event, d) => {
-      const locationId = d.properties.locationId
-      selectedLocationId.value = locationId
-      emit('navigate', {
-        name: 'MicroFrontendTimeSeriesDisplay',
-        params: { locationIds: d.properties.locationId },
-      })
-    })
 }
 </script>
