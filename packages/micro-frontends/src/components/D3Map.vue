@@ -52,12 +52,6 @@ const margin = { top: 10, right: 10, bottom: 10, left: 10 }
 
 let locationsGroup: d3.Selection<SVGGElement, unknown, null, undefined>
 let projection: d3.GeoProjection
-let circles: d3.Selection<
-  SVGCircleElement,
-  Feature<Geometry, PiLocation>,
-  SVGGElement,
-  unknown
-> | null = null
 
 onMounted(() => {
   const svgElemement = svgRef.value
@@ -161,7 +155,7 @@ function drawLocations(
     .attr('stroke-width', 1)
 
   // Draw the elevated location markers.
-  circles = locationsGroup
+  locationsGroup
     .selectAll<SVGCircleElement, Feature<Geometry, PiLocation>>('circle')
     .data(geojson.features)
     .join('circle')
