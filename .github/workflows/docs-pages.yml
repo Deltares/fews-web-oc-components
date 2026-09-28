@@ -48,6 +48,9 @@ jobs:
           STORYBOOK_BASE: /fews-web-oc-components/storybook/micro-frontends/
         run: npm run -w @deltares/fews-web-oc-micro-frontends build-storybook -- --output-dir storybook-static
 
+      - name: Build composables
+        run: npm run -w @deltares/fews-web-oc-composables build
+
       - name: Build micro-frontends
         env:
           MICRO_FRONTEND_BASE: /fews-web-oc-components/micro-frontends/
