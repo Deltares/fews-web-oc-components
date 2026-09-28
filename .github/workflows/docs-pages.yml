@@ -53,7 +53,7 @@ jobs:
 
       - name: Build micro-frontends
         env:
-          MICRO_FRONTEND_BASE: /fews-web-oc-components/micro-frontends/
+          MICRO_FRONTEND_BASE: https://deltares.github.io/fews-web-oc-components/micro-frontends/
         run: npm run -w @deltares/fews-web-oc-micro-frontends build
 
       - name: Compose static site artifact
