@@ -48,7 +48,12 @@
       </v-card>
 
       <!-- Controls -->
-      <v-card class="ml-2 controls-panel" width="320" elevation="1">
+      <v-card
+        v-if="!locationIds"
+        class="ml-2 controls-panel"
+        width="320"
+        elevation="1"
+      >
         <!-- Controls -->
         <v-card-title class="text-title-medium"> Controls </v-card-title>
 
@@ -85,7 +90,16 @@
             <div class="prop-row px-3 py-1">
               <span class="prop-name">selectedDate</span>
               <span class="prop-value">
-                {{ selectedDate.toLocaleString() }}
+                {{ selectedDate?.toLocaleString() }}
+              </span>
+            </div>
+
+            <v-divider />
+
+            <div class="prop-row px-3 py-1">
+              <span class="prop-name">locationIds</span>
+              <span class="prop-value">
+                {{ locationIds }}
               </span>
             </div>
 
@@ -135,6 +149,7 @@ import D3WorldMap from './D3WorldMap.vue'
 interface Props {
   selectedDate: Date
   topologyNode: TopologyNode
+  locationIds?: string
 }
 
 interface Emits {
@@ -149,7 +164,7 @@ interface Emits {
   ): void
 }
 
-const props = defineProps<Props>()
+const { selectedDate, topologyNode, locationIds = '' } = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const alertStore = useHostNotifications()
@@ -159,7 +174,7 @@ const zoom = ref(0)
 const debouncedZoom = refThrottled(zoom, 100)
 
 const filter = computed<LocationsFilter>(() => {
-  const filterId = props.topologyNode.filterIds?.[0]
+  const filterId = topologyNode.filterIds?.[0]
 
   return filterId
     ? {
