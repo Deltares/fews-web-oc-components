@@ -9,7 +9,11 @@
       <v-spacer />
 
       <span class="text-body-small text-medium-emphasis mr-4">
-        <time>{{ selectedDate.toLocaleString() }}</time>
+        System sync:
+        <time v-if="systemTick">
+          {{ systemTick.toLocaleString() }}
+        </time>
+        <span v-else>—</span>
       </span>
 
       <v-btn
@@ -135,6 +139,7 @@ import {
 } from '@deltares/fews-pi-requests'
 import {
   useHostNotifications,
+  useHostRefreshContext,
   usePiLocations,
 } from '@deltares/fews-web-oc-composables'
 
@@ -161,6 +166,8 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const alertStore = useHostNotifications()
+const { systemTick } = useHostRefreshContext()
+
 const heightShiftScale = ref(0.1)
 
 const filter = computed<LocationsFilter>(() => {
