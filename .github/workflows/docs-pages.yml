@@ -51,7 +51,7 @@ jobs:
       - name: Build micro-frontends
         env:
           MICRO_FRONTEND_BASE: /fews-web-oc-components/micro-frontends/
-        run: npm run -w @deltares/fews-web-oc-micro-frontends build -- --outDir micro-frontends-static
+        run: npm run -w @deltares/fews-web-oc-micro-frontends build
 
       - name: Compose static site artifact
         run: |
@@ -61,7 +61,7 @@ jobs:
           cp -R docs/.vitepress/dist/. _site/
           cp -R packages/components/storybook-static/. _site/storybook/components/
           cp -R packages/micro-frontends/storybook-static/. _site/storybook/micro-frontends/
-          cp -R packages/micro-frontends/micro-frontends-static/. _site/micro-frontends/
+          cp -R packages/micro-frontends/dist/. _site/micro-frontends/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
