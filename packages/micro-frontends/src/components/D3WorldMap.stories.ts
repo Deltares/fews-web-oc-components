@@ -3,7 +3,7 @@ import type { Feature, FeatureCollection, Geometry } from 'geojson'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { userEvent, expect, fn, waitFor } from 'storybook/test'
 
-import D3Map from './D3Map.vue'
+import D3WorldMap from './D3WorldMap.vue'
 
 const features: Array<Feature<Geometry, Location>> = [
   {
@@ -47,30 +47,28 @@ const onNavigate =
   fn<(route: { name: string; params?: { locationIds?: string } }) => void>()
 
 const meta = {
-  title: 'MicroFrontends/D3Map',
-  component: D3Map,
+  title: 'MicroFrontends/D3WorldMap',
+  component: D3WorldMap,
   tags: ['autodocs'],
-  args: {
-    selectedDate: new Date('2026-08-05T12:00:00Z'),
-  },
+  args: {},
   parameters: {
     actions: {
       handles: ['navigate'],
     },
     layout: 'centered',
   },
-} satisfies Meta<typeof D3Map>
+} satisfies Meta<typeof D3WorldMap>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 function renderWithNavigate(args: Story['args']) {
   return {
-    components: { D3Map },
+    components: { D3WorldMap },
     setup() {
       return { args, onNavigate }
     },
-    template: '<D3Map v-bind="args" @navigate="onNavigate" />',
+    template: '<D3WorldMap v-bind="args" @navigate="onNavigate" />',
   }
 }
 
@@ -144,7 +142,6 @@ export const DifferentSelection: Story = {
 
 export const WithFetchRequestTemplate: Story = {
   args: {
-    selectedDate: new Date('2026-08-10T09:30:00Z'),
     geojson,
   },
 }
