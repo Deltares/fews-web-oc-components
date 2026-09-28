@@ -6,8 +6,6 @@
         Demo Micro Frontend Main Panel
       </v-toolbar-title>
 
-      <v-spacer />
-
       <span class="text-body-small text-medium-emphasis mr-4">
         System sync:
         <time v-if="systemTick">
@@ -41,12 +39,10 @@
     <div class="d-flex flex-1-1 overflow-hidden pa-2">
       <!-- Map -->
       <v-card class="d-flex flex-1-1 overflow-hidden" elevation="1">
-        <D3Map
+        <D3WorldMap
           class="map"
-          :selected-date="selectedDate"
-          :topology-node="topologyNode"
-          :height-shift-scale="heightShiftScale"
           :geojson="geojson"
+          :zoom="debouncedZoom"
           @navigate="onNavigate"
         />
       </v-card>
@@ -60,23 +56,21 @@
 
         <v-card-text>
           <div class="text-body-small text-medium-emphasis mb-2">
-            Location elevation
+            Zoom level
           </div>
 
           <div class="d-flex align-center">
             <v-slider
-              v-model="heightShiftScale"
+              v-model="zoom"
               class="flex-grow-1"
               min="0"
-              max="0.2"
-              step="0.01"
+              max="32"
+              step="1"
+              show-ticks="always"
               thumb-label
               hide-details
+              indent-details
             />
-
-            <span class="text-body-small ml-3 value-label">
-              {{ heightShiftScale.toFixed(2) }}
-            </span>
           </div>
         </v-card-text>
 
@@ -86,40 +80,32 @@
         <v-card-title class="text-title-medium"> Props </v-card-title>
 
         <v-card-text class="pa-0">
-          <!-- Table header -->
-          <div class="props-header px-4 py-2">
-            <span>Prop / Property</span>
-            <span>Value</span>
-          </div>
-
-          <v-divider />
-
           <div class="props-content">
             <!-- selectedDate -->
-            <div class="prop-row px-4 py-2">
+            <div class="prop-row px-3 py-1">
               <span class="prop-name">selectedDate</span>
               <span class="prop-value">
                 {{ selectedDate.toLocaleString() }}
               </span>
             </div>
 
+            <v-divider />
+
             <!-- topologyNode -->
             <div class="prop-group">
-              <div class="prop-row px-4 py-2">
-                <span class="prop-name"> topologyNode </span>
-                <span class="prop-value"> TopologyNode </span>
-              </div>
+              <div class="prop-group-title px-3 py-1">topologyNode</div>
 
               <div
                 v-for="(value, key) in topologyNode"
                 :key="String(key)"
-                class="prop-row prop-row-nested"
+                class="prop-row px-3 py-1"
+                :class="{ 'prop-row-long': isLongValue(value) }"
               >
                 <span class="prop-name">
                   {{ key }}
                 </span>
 
-                <span class="prop-value">
+                <span class="prop-value" :title="formatValue(value)">
                   {{ formatValue(value) }}
                 </span>
               </div>
@@ -133,6 +119,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { refThrottled } from '@vueuse/core'
 import {
   type TopologyNode,
   type LocationsFilter,
@@ -143,7 +130,7 @@ import {
   usePiLocations,
 } from '@deltares/fews-web-oc-composables'
 
-import D3Map from './D3Map.vue'
+import D3WorldMap from './D3WorldMap.vue'
 
 interface Props {
   selectedDate: Date
@@ -168,7 +155,8 @@ const emit = defineEmits<Emits>()
 const alertStore = useHostNotifications()
 const { systemTick } = useHostRefreshContext()
 
-const heightShiftScale = ref(0.1)
+const zoom = ref(0)
+const debouncedZoom = refThrottled(zoom, 100)
 
 const filter = computed<LocationsFilter>(() => {
   const filterId = props.topologyNode.filterIds?.[0]
@@ -181,6 +169,10 @@ const filter = computed<LocationsFilter>(() => {
 })
 
 const { geojson, loading, refresh } = usePiLocations({ filter })
+
+function isLongValue(value: unknown): boolean {
+  return formatValue(value).length > 40
+}
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined) {
@@ -237,49 +229,63 @@ function showInfoMessage() {
 }
 
 .props-content {
-  overflow-y: auto;
-  max-height: 500px;
-}
-
-.props-header {
-  display: grid;
-  grid-template-columns: minmax(120px, 1fr) minmax(100px, 1.5fr);
-  gap: 16px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(var(--v-theme-on-surface), 0.6);
-  background: rgba(var(--v-theme-on-surface), 0.03);
+  width: 100%;
+  overflow: hidden;
 }
 
 .prop-row {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) minmax(100px, 1.5fr);
-  gap: 16px;
-  align-items: start;
-  min-height: 40px;
-}
-
-.prop-group-header {
-  display: flex;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px;
   align-items: center;
-  min-height: 40px;
-}
-
-.prop-row-nested {
-  padding-left: 48px !important;
+  min-height: 26px;
+  font-size: 0.75rem;
 }
 
 .prop-name {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  overflow-wrap: anywhere;
+  min-width: 0;
+  font-weight: 600;
+  color: rgba(var(--v-theme-on-surface), 0.65);
+  white-space: nowrap;
 }
 
 .prop-value {
-  font-size: 0.8125rem;
-  color: rgba(var(--v-theme-on-surface), 0.7);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.prop-row-long {
+  grid-template-columns: 1fr;
+  gap: 2px;
+  align-items: start;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+
+.prop-row-long .prop-value {
+  width: 100%;
   overflow-wrap: anywhere;
-  white-space: pre-wrap;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.35;
+  color: rgba(var(--v-theme-on-surface), 0.65);
+}
+
+.prop-group-title {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(var(--v-theme-on-surface));
+  background: rgba(var(--v-theme-on-surface), 0.04);
+}
+
+.prop-row-nested {
+  padding-left: 24px !important;
 }
 
 .value-label {
