@@ -42,6 +42,7 @@
         <D3WorldMap
           class="map"
           :geojson="geojson"
+          :locationIds="locationIds"
           :zoom="debouncedZoom"
           @navigate="onNavigate"
         />
@@ -147,7 +148,7 @@ import {
 import D3WorldMap from './D3WorldMap.vue'
 
 interface Props {
-  selectedDate: Date
+  selectedDate?: Date
   topologyNode: TopologyNode
   locationIds?: string
 }
@@ -170,7 +171,7 @@ const emit = defineEmits<Emits>()
 const alertStore = useHostNotifications()
 const { systemTick } = useHostRefreshContext()
 
-const zoom = ref(0)
+const zoom = ref(16)
 const debouncedZoom = refThrottled(zoom, 100)
 
 const filter = computed<LocationsFilter>(() => {
