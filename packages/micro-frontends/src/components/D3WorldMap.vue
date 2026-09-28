@@ -8,6 +8,7 @@ import land from '@/assets/ne_50m_land.json'
 interface Props {
   geojson?: FeatureCollection<Geometry, PiLocation>
   zoom?: number
+  locationIds?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -213,9 +214,21 @@ function render() {
   })
 }
 
-watch(() => [props.geojson, props.zoom], render, { deep: true })
+watch(() => props.zoom, render)
+
+watch(
+  () => () => [props.geojson, props.locationIds],
+  () => {
+    selectedLocationId.value = props.locationIds?.split(',')[0]?.trim()
+    render()
+  },
+  {
+    deep: true,
+  },
+)
 
 onMounted(() => {
+  selectedLocationId.value = props.locationIds?.split(',')[0]?.trim()
   render()
 
   if (container.value) {
