@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import type { Location } from '@deltares/fews-pi-requests'
 import type { Feature, FeatureCollection, Geometry } from 'geojson'
 
-import D3Map from './D3Map.vue'
+import D3WorldMap from './D3WorldMap.vue'
 
 const features: Array<Feature<Geometry, Location>> = [
   {
@@ -33,17 +33,14 @@ const geojson: FeatureCollection<Geometry, Location> = {
   features,
 }
 
-const selectedDate = new Date('2026-08-05T12:30:00Z')
-
-describe('D3Map', () => {
+describe('D3WorldMap', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })
 
   it('emits navigate with clicked location id', async () => {
-    const wrapper = mount(D3Map, {
+    const wrapper = mount(D3WorldMap, {
       props: {
-        selectedDate,
         geojson,
       },
     })
@@ -64,9 +61,8 @@ describe('D3Map', () => {
   })
 
   it('updates highlighted circle when selectedLocationId changes', async () => {
-    const wrapper = mount(D3Map, {
+    const wrapper = mount(D3WorldMap, {
       props: {
-        selectedDate,
         geojson,
       },
     })
