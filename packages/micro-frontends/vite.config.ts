@@ -11,13 +11,17 @@ const isStorybookRun =
   Boolean(process.env.STORYBOOK_BASE) ||
   process.env.npm_lifecycle_event?.includes('storybook') === true
 
+const base =
+  process.env.MICRO_FRONTEND_BASE ??
+  'http://localhost:2010/'
+
 // https://vite.dev/config/
 export default defineConfig({
   server: {
     origin: 'http://localhost:2010',
     port: 2010,
   },
-  base: 'http://localhost:2010/',
+  base,
   plugins: [
     vue(),
     ...(isStorybookRun ? [] : [federation(mfConfig)]),

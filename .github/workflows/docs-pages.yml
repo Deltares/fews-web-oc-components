@@ -48,13 +48,20 @@ jobs:
           STORYBOOK_BASE: /fews-web-oc-components/storybook/micro-frontends/
         run: npm run -w @deltares/fews-web-oc-micro-frontends build-storybook -- --output-dir storybook-static
 
+      - name: Build micro-frontends
+        env:
+          MICRO_FRONTEND_BASE: /fews-web-oc-components/micro-frontends/
+        run: npm run -w @deltares/fews-web-oc-micro-frontends build -- --outDir micro-frontends-static
+
       - name: Compose static site artifact
         run: |
           mkdir -p _site/storybook/components
           mkdir -p _site/storybook/micro-frontends
+          mkdir -p _site/micro-frontends
           cp -R docs/.vitepress/dist/. _site/
           cp -R packages/components/storybook-static/. _site/storybook/components/
           cp -R packages/micro-frontends/storybook-static/. _site/storybook/micro-frontends/
+          cp -R packages/micro-frontends/micro-frontends-static/. _site/micro-frontends/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
