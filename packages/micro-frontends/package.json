@@ -15,7 +15,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@deltares/fews-pi-requests": "^3.0.1",
+    "@deltares/fews-pi-requests": "^3.4.0",
     "@deltares/fews-web-oc-composables": "0.3.0-alpha.6",
     "@module-federation/vite": "^1.23.0",
     "@vueuse/core": "^14.3.0",
