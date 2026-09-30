@@ -7,7 +7,7 @@
       </v-toolbar-title>
 
       <span class="text-body-small text-medium-emphasis mr-4">
-        System sync:
+        Last refresh
         <time v-if="lastRefreshAt">
           {{ lastRefreshAt.toLocaleString() }}
         </time>
