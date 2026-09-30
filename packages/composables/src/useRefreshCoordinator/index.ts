@@ -2,18 +2,36 @@ import {
   useDocumentVisibility,
   useIntervalFn,
   type Pausable,
-  type UseIntervalFnOptions,
 } from '@vueuse/core'
 import { MaybeRefOrGetter, onUnmounted, ref, toValue, watch } from 'vue'
 import { useHostRefreshContext } from '../useHostRefreshContext'
 
 export type RefreshPolicy =
-  'onSystemTick' | 'onInterval' | 'onVisibilityResume' | 'manual'
+  /**
+   * Refresh when the host system time is synchronised.
+   */
+  | 'onSystemTick'
 
-interface UseRefreshCoordinatorOptions {
+  /**
+   * Refresh periodically at the configured interval.
+   */
+  | 'onInterval'
+
+  /**
+   * Refresh when the document becomes visible again.
+   */
+  | 'onVisibilityResume'
+
+  /**
+   * Do not automatically refresh.
+   *
+   * Refreshes can still be requested manually through trigger().
+   */
+  | 'manual'
+
+export interface UseRefreshCoordinatorOptions {
   policies: RefreshPolicy[]
   intervalMs?: MaybeRefOrGetter<number>
-  intervalOptions?: UseIntervalFnOptions
   immediateCallback?: boolean
   enabled?: MaybeRefOrGetter<boolean>
 }
@@ -75,11 +93,9 @@ export function useRefreshCoordinator(
   }
 
   if (policySet.has('onInterval')) {
-    intervalPausable = useIntervalFn(
-      trigger,
-      options.intervalMs ?? 1000,
-      options.intervalOptions,
-    )
+    intervalPausable = useIntervalFn(trigger, options.intervalMs ?? 1000, {
+      immediateCallback: options.immediateCallback,
+    })
   }
 
   if (policySet.has('onVisibilityResume')) {
