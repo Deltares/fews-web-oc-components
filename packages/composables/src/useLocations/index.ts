@@ -1,148 +1,161 @@
 import {
   computed,
+  MaybeRefOrGetter,
   onBeforeUnmount,
   ref,
   shallowRef,
-  watch,
   type ComputedRef,
   type Ref,
 } from 'vue'
 
 import {
   DocumentFormat,
+  PiWebserviceProvider,
   type Location as PiLocation,
   type LocationsFilter as PiLocationsFilter,
-  PiWebserviceProvider,
 } from '@deltares/fews-pi-requests'
 
 import {
+  RefreshPolicy,
+  useRefreshCoordinator,
+  type RefreshCoordinator,
+} from '../useRefreshCoordinator'
+import {
+  PiWebserviceOptions,
   resolveWebserviceContext,
-  type PiWebserviceOptions,
 } from '../useHostWebserviceContext'
 import { createTransformRequestFn } from '../lib/createTransformRequestFn'
 import { FeatureCollection, Geometry } from 'geojson'
 import { convertGeoJsonToPiLocations } from '../lib/locations/convertGeoJsonToPiLocations'
 
-export interface UseLocationsOptions {
-  /**
-   * Override the host-provided webservice configuration.
-   *
-   * If omitted, the WebOC host configuration is used.
-   */
-  webservice?: PiWebserviceOptions
-
-  /**
-   * Automatically load locations.
-   *
-   * @default true
-   */
-  immediate?: boolean
-}
-
-export interface UsePiLocationsReturn {
-  /**
-   * The latest successfully loaded locations.
-   */
-  geojson: Readonly<Ref<FeatureCollection<Geometry, PiLocation>>>
-
-  /**
-   * The latest successfully loaded locations.
-   */
-  locations: Readonly<ComputedRef<PiLocation[]>>
-
-  /**
-   * True while the initial request is running.
-   */
-  loading: Readonly<Ref<boolean>>
-
-  /**
-   * True while a subsequent refresh is running.
-   */
-  refreshing: Readonly<Ref<boolean>>
-
-  /**
-   * Error from the latest failed request.
-   *
-   * Aborted requests do not set this value.
-   */
-  error: Readonly<Ref<Error | null>>
-
-  /**
-   * True once at least one request has completed.
-   */
-  hasLoaded: Readonly<Ref<boolean>>
-
-  /**
-   * True when loading has completed and no locations
-   * were returned.
-   */
-  isEmpty: ComputedRef<boolean>
-
-  /**
-   * Fetch the latest locations.
-   *
-   * A previous request is automatically aborted.
-   */
-  refresh: () => Promise<void>
-
-  /**
-   * Abort the current request.
-   *
-   * Existing locations are retained.
-   */
-  abort: () => void
-}
+const REFRESH_INTERVAL = 60_000
 
 export interface UsePiLocationsOptions {
   /**
-   * Reactive filter used when loading locations.
+   * Reactive filter used when fetching locations.
+   *
+   * The current value is read when fetch() is executed.
    */
   filter: Ref<PiLocationsFilter>
 
   /**
-   * Controls whether locations may be loaded.
+   * Controls whether locations may be fetched automatically.
    *
-   * When false, no request is made.
+   * Defaults to true.
    *
-   * @default true
+   * When false, refresh-coordinator triggers are ignored.
    */
   enabled?: Ref<boolean>
 
   /**
-   * Override the host-provided webservice configuration.
+   * Optional webservice configuration for standalone usage.
+   *
+   * When omitted, the host-provided webservice context is used.
    */
   webservice?: PiWebserviceOptions
 
-  /**
-   * Whether to load locations immediately.
-   *
-   * @default true
-   */
-  immediate?: boolean
 
   /**
-   * Whether to automatically reload locations when the filter changes.
-   *
-   * @default true
+   * Configuration for automatic location refreshing.
    */
-  watchFilter?: boolean
+  refresh?: {
+    /**
+     * Policies that trigger an automatic refresh.
+     *
+     * Defaults to:
+     * ['onSystemTick', 'onInterval', 'onVisibilityResume']
+     */
+    policies?: RefreshPolicy[]
+
+    /**
+     * Interval between automatic refreshes when 'onInterval' is enabled.
+     *
+     * Defaults to 60 seconds.
+     */
+    intervalMs?: MaybeRefOrGetter<number>
+
+    /**
+     * Whether to fetch immediately when the composable is created.
+     *
+     * Defaults to true.
+     */
+    immediate?: boolean
+  }
+
+}
+
+export interface UsePiLocationsReturn {
+  /**
+   * The currently loaded locations.
+   */
+  locations: Readonly<Ref<PiLocation[]>>
+
+  /**
+   * The currently loaded locations as geojson.
+   */
+  geojson: Readonly<Ref<FeatureCollection<Geometry, PiLocation>>>
+
+  /**
+   * Whether the initial locations request is in progress.
+   */
+  loading: Readonly<Ref<boolean>>
+
+  /**
+   * Whether a subsequent locations request is in progress.
+   */
+  refreshing: Readonly<Ref<boolean>>
+
+  /**
+   * The error from the most recent locations request, or null when there is no error.
+   */
+  error: Readonly<Ref<Error | null>>
+
+  /**
+   * Whether at least one locations request has completed.
+   */
+  hasLoaded: Readonly<Ref<boolean>>
+
+  /**
+   * Whether locations have been loaded successfully and the result is empty.
+   */
+  isEmpty: ComputedRef<boolean>
+
+  /**
+   * Fetches locations immediately using the current filter.
+   *
+   * @returns The fetched locations.
+   */
+  fetch: () => Promise<void>
+
+  /**
+   * Cancels the currently running locations request, if any.
+   */
+  cancel: () => void
+
+  /**
+   * Requests a refresh through the refresh coordinator.
+   */
+  requestRefresh: () => void
+
+  /**
+   * Pauses automatic refreshes.
+   */
+  pauseRefresh: () => void
+
+  /**
+   * Resumes automatic refreshes after they have been paused.
+   */
+  resumeRefresh: () => void
 }
 
 const emptyFeatureCollection: FeatureCollection<Geometry, PiLocation> = {
   type: 'FeatureCollection',
   features: [],
 }
-
 export function usePiLocations(
   options: UsePiLocationsOptions,
 ): UsePiLocationsReturn {
-  const {
-    filter,
-    enabled = ref(true),
-    immediate = true,
-    webservice,
-    watchFilter = true,
-  } = options
+  const { filter, enabled = ref(true), webservice } = options
 
   const webserviceContext = resolveWebserviceContext(webservice)
 
@@ -168,38 +181,35 @@ export function usePiLocations(
     ),
   })
 
-  function abort(): void {
+  function cancel(): void {
     abortController?.abort()
     abortController = null
   }
 
-  async function refresh(): Promise<void> {
+  async function fetch(): Promise<void> {
     if (!enabled.value) {
       return
     }
 
-    abort()
+    cancel()
 
     const controller = new AbortController()
     const currentRequestId = ++requestId
 
     abortController = controller
+
     loading.value = !hasLoaded.value
     refreshing.value = hasLoaded.value
     error.value = null
 
     try {
-      // Always read the current reactive filter when starting the request.
       const locationsFilter: PiLocationsFilter = {
         documentFormat: DocumentFormat.GEO_JSON,
         ...filter.value,
       }
-      console.log('filter', locationsFilter)
       const response = await provider.getLocations(locationsFilter)
-      if (!isFeatureCollection(response)) {
-        throw new Error('Expected GeoJSON FeatureCollection')
-      }
 
+      // Ignore an obsolete or cancelled request.
       if (controller.signal.aborted || currentRequestId !== requestId) {
         return
       }
@@ -209,8 +219,10 @@ export function usePiLocations(
         PiLocation
       >
       hasLoaded.value = true
+
       return
     } catch (cause) {
+      // Cancellation and obsolete requests are not errors.
       if (controller.signal.aborted || currentRequestId !== requestId) {
         return
       }
@@ -231,37 +243,17 @@ export function usePiLocations(
     }
   }
 
-  if (watchFilter) {
-    watch(
-      filter,
-      () => {
-        if (enabled.value) {
-          void refresh()
-        }
-      },
-      { deep: true },
-    )
-  }
-
-  watch(enabled, (isEnabled) => {
-    if (isEnabled) {
-      if (immediate) {
-        void refresh()
-      }
-    } else {
-      abort()
-    }
+  const refreshCoordinator: RefreshCoordinator = useRefreshCoordinator(fetch, {
+    policies: ['onSystemTick', 'onInterval', 'onVisibilityResume'],
+    intervalMs: REFRESH_INTERVAL,
+    immediateCallback: true,
+    enabled,
   })
 
   onBeforeUnmount(() => {
-    abort()
+    cancel()
     requestId++
   })
-
-  if (immediate && enabled.value) {
-    void refresh()
-  }
-
   const locations = computed(() => convertGeoJsonToPiLocations(geojson.value))
 
   return {
@@ -272,16 +264,12 @@ export function usePiLocations(
     error,
     hasLoaded,
     isEmpty,
-    refresh,
-    abort,
-  }
-}
 
-function isFeatureCollection(
-  geojson: FeatureCollection<Geometry, Location> | unknown, // NOSONAR(S6571) - valid use of unknown in typeguard
-): geojson is FeatureCollection<Geometry, Location> {
-  return (
-    (geojson as FeatureCollection<Geometry, Location>).type ===
-    'FeatureCollection'
-  )
+    fetch,
+    cancel,
+
+    requestRefresh: refreshCoordinator.trigger,
+    pauseRefresh: refreshCoordinator.pause,
+    resumeRefresh: refreshCoordinator.resume,
+  }
 }
