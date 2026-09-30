@@ -1,5 +1,6 @@
 {
   "name": "fews-web-oc-sdk",
+  "type": "module",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -7,8 +8,9 @@
   "scripts": {
     "dev:components": "npm run -w @deltares/fews-web-oc-components dev",
     "dev:mf": "npm run -w @deltares/fews-web-oc-micro-frontends dev",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
+    "docs:api": "npm run -w @deltares/fews-web-oc-composables docs:api",
+    "docs:dev": "npm run docs:api && vitepress dev docs",
+    "docs:build": "npm run docs:api && vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "build": "npm run --workspaces --if-present build",
     "playwright:install": "npm run --workspaces --if-present playwright:install",
@@ -25,7 +27,7 @@
     "node": "24.18.1"
   },
   "devDependencies": {
-    "vitepress": "^2.0.0-alpha.12"
+    "vitepress": "^2.0.0-alpha.20"
   },
   "overrides": {
     "adm-zip": "^0.6.1",

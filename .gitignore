@@ -1,3 +1,7 @@
+# auto generated
+docs/composables/api
+docs/.vitepress/composables-api-sidebar.json
+
 .DS_Store
 node_modules
 dist/

@@ -12,7 +12,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test:unit": "vitest"
+    "test:unit": "vitest",
+    "docs:api": "typedoc && node scripts/generate-api-sidebar.mjs"
   },
   "dependencies": {
     "@deltares/fews-pi-requests": "^3.4.0",
@@ -20,6 +21,8 @@
     "vue": "^3.5.40"
   },
   "devDependencies": {
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.13.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11"
   },
