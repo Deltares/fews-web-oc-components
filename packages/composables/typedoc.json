@@ -1,0 +1,9 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "plugin": ["typedoc-plugin-markdown"],
+  "out": "../../docs/composables/api",
+  "entryFileName": "index",
+  "cleanOutputDir": true,
+  "excludePrivate": true,
+  "excludeProtected": true
+}

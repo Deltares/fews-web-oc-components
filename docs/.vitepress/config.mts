@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import composablesApiSidebar from './composables-api-sidebar.json'
 
 export default defineConfig({
   title: 'FEWS Web OC',
@@ -12,16 +13,14 @@ export default defineConfig({
       { text: 'Components', link: '/components/' },
       { text: 'Composables', link: '/composables/' },
       { text: 'Micro Frontends', link: '/micro-frontends/' },
-      { text: 'Storybook', link: '/storybook/' }
+      { text: 'Storybook', link: '/storybook/' },
     ],
     sidebar: {
       '/guide/': [
         {
           text: 'Guide',
-          items: [
-            { text: 'Getting Started', link: '/guide/getting-started' }
-          ]
-        }
+          items: [{ text: 'Getting Started', link: '/guide/getting-started' }],
+        },
       ],
       '/components/': [
         {
@@ -29,34 +28,45 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/components/' },
             { text: 'DateTimeSlider', link: '/components/date-time-slider' },
-            { text: 'ColourBar', link: '/components/colour-bar' }
-          ]
-        }
+            { text: 'ColourBar', link: '/components/colour-bar' },
+          ],
+        },
       ],
+      '/composables/api/': composablesApiSidebar,
       '/composables/': [
         {
           text: 'Composables',
           items: [
             { text: 'Overview', link: '/composables/' },
-            { text: 'useWms', link: '/composables/use-wms' }
-          ]
-        }
+            { text: 'useWms', link: '/composables/use-wms' },
+          ],
+        },
+        {
+          text: 'API Reference',
+          items: [{ text: 'Overview', link: '/composables/api/' }],
+        },
       ],
       '/micro-frontends/': [
         {
           text: 'Micro Frontends',
           items: [
             { text: 'Overview', link: '/micro-frontends/' },
-            { text: 'Time Series Data', link: '/micro-frontends/load-fews-timeseries-data' }
-          ]
-        }
-      ]
+            {
+              text: 'Time Series Data',
+              link: '/micro-frontends/load-fews-timeseries-data',
+            },
+          ],
+        },
+      ],
     },
     search: {
-      provider: 'local'
+      provider: 'local',
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Deltares/fews-web-oc-components' }
-    ]
-  }
+      {
+        icon: 'github',
+        link: 'https://github.com/Deltares/fews-web-oc-components',
+      },
+    ],
+  },
 })
