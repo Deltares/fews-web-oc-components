@@ -28,7 +28,13 @@ import { createTransformRequestFn } from '../lib/createTransformRequestFn'
 import { FeatureCollection, Geometry } from 'geojson'
 import { convertGeoJsonToPiLocations } from '../lib/locations/convertGeoJsonToPiLocations'
 
-const REFRESH_INTERVAL = 60_000
+const DEFAULT_REFRESH_POLICIES: RefreshPolicy[] = [
+  'onSystemTick',
+  'onInterval',
+  'onVisibilityResume',
+]
+
+const DEFAULT_REFRESH_INTERVAL_MS = 300_000
 
 export interface UsePiLocationsOptions {
   /**
@@ -53,7 +59,6 @@ export interface UsePiLocationsOptions {
    * When omitted, the host-provided webservice context is used.
    */
   webservice?: PiWebserviceOptions
-
 
   /**
    * Configuration for automatic location refreshing.
@@ -81,7 +86,6 @@ export interface UsePiLocationsOptions {
      */
     immediate?: boolean
   }
-
 }
 
 export interface UsePiLocationsReturn {
@@ -243,10 +247,16 @@ export function usePiLocations(
     }
   }
 
-  const refreshCoordinator: RefreshCoordinator = useRefreshCoordinator(fetch, {
-    policies: ['onSystemTick', 'onInterval', 'onVisibilityResume'],
-    intervalMs: REFRESH_INTERVAL,
-    immediateCallback: true,
+  const {
+    policies = DEFAULT_REFRESH_POLICIES,
+    intervalMs = DEFAULT_REFRESH_INTERVAL_MS,
+    immediate = true,
+  } = options.refresh ?? {}
+
+  const refreshCoordinator = useRefreshCoordinator(fetch, {
+    policies,
+    intervalMs,
+    immediateCallback: immediate,
     enabled,
   })
 
