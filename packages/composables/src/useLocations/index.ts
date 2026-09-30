@@ -1,6 +1,5 @@
 import {
   computed,
-  MaybeRefOrGetter,
   onBeforeUnmount,
   ref,
   shallowRef,
@@ -15,11 +14,7 @@ import {
   type LocationsFilter as PiLocationsFilter,
 } from '@deltares/fews-pi-requests'
 
-import {
-  RefreshPolicy,
-  useRefreshCoordinator,
-  type RefreshCoordinator,
-} from '../useRefreshCoordinator'
+import { RefreshPolicy, useRefreshCoordinator } from '../useRefreshCoordinator'
 import {
   PiWebserviceOptions,
   resolveWebserviceContext,
@@ -77,7 +72,16 @@ export interface UsePiLocationsOptions {
      *
      * Defaults to 60 seconds.
      */
-    intervalMs?: MaybeRefOrGetter<number>
+    intervalMs?: number
+
+    /**
+     * The system-time synchronization signal used by the `onSystemTick`
+     * refresh policy.
+     *
+     * When omitted, the host-provided system tick is used.
+     * Standalone applications can provide their own system tick.
+     */
+    systemTick?: Ref<Date | undefined>
 
     /**
      * Whether to fetch immediately when the composable is created.
@@ -150,6 +154,16 @@ export interface UsePiLocationsReturn {
    * Resumes automatic refreshes after they have been paused.
    */
   resumeRefresh: () => void
+
+  /**
+   * The time at which the most recent refresh completed successfully.
+   */
+  lastRefreshAt: Readonly<Ref<Date | undefined>>
+
+  /**
+   * The policy that caused the most recent refresh.
+   */
+  lastTriggerPolicy: Readonly<Ref<RefreshPolicy | undefined>>
 }
 
 const emptyFeatureCollection: FeatureCollection<Geometry, PiLocation> = {
@@ -251,6 +265,7 @@ export function usePiLocations(
     policies = DEFAULT_REFRESH_POLICIES,
     intervalMs = DEFAULT_REFRESH_INTERVAL_MS,
     immediate = true,
+    systemTick,
   } = options.refresh ?? {}
 
   const refreshCoordinator = useRefreshCoordinator(fetch, {
@@ -258,6 +273,7 @@ export function usePiLocations(
     intervalMs,
     immediateCallback: immediate,
     enabled,
+    systemTick,
   })
 
   onBeforeUnmount(() => {
@@ -281,5 +297,8 @@ export function usePiLocations(
     requestRefresh: refreshCoordinator.trigger,
     pauseRefresh: refreshCoordinator.pause,
     resumeRefresh: refreshCoordinator.resume,
+
+    lastRefreshAt: refreshCoordinator.lastRefreshAt,
+    lastTriggerPolicy: refreshCoordinator.lastTriggerPolicy,
   }
 }
