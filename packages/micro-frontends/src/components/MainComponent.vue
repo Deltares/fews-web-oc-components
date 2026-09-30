@@ -8,17 +8,25 @@
 
       <span class="text-body-small text-medium-emphasis mr-4">
         System sync:
-        <time v-if="systemTick">
-          {{ systemTick.toLocaleString() }}
+        <time v-if="lastRefreshAt">
+          {{ lastRefreshAt.toLocaleString() }}
         </time>
-        <span v-else>—</span>
+        <v-chip
+          v-if="lastTriggerPolicy"
+          class="ml-2"
+          size="small"
+          variant="tonal"
+          prepend-icon="mdi-refresh"
+        >
+          {{ formatRefreshPolicy(lastTriggerPolicy) }}
+        </v-chip>
       </span>
 
       <v-btn
         size="small"
         icon="mdi-refresh"
         aria-label="Refresh locations"
-        @click="refresh()"
+        @click="fetch()"
       />
 
       <v-btn
@@ -141,11 +149,11 @@ import {
 } from '@deltares/fews-pi-requests'
 import {
   useHostNotifications,
-  useHostRefreshContext,
   usePiLocations,
 } from '@deltares/fews-web-oc-composables'
 
 import D3WorldMap from './D3WorldMap.vue'
+import type { RefreshPolicy } from '@deltares/fews-web-oc-composables/dist/useRefreshCoordinator/index'
 
 interface Props {
   selectedDate?: Date
@@ -169,7 +177,6 @@ const { selectedDate, topologyNode, locationIds = '' } = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const alertStore = useHostNotifications()
-const { systemTick } = useHostRefreshContext()
 
 const zoom = ref(16)
 const debouncedZoom = refThrottled(zoom, 100)
@@ -184,7 +191,8 @@ const filter = computed<LocationsFilter>(() => {
     : {}
 })
 
-const { geojson, loading, refresh } = usePiLocations({ filter })
+const { geojson, loading, fetch, lastRefreshAt, lastTriggerPolicy } =
+  usePiLocations({ filter })
 
 function isLongValue(value: unknown): boolean {
   return formatValue(value).length > 40
@@ -204,6 +212,19 @@ function formatValue(value: unknown): string {
   }
 
   return String(value)
+}
+
+function formatRefreshPolicy(policy: RefreshPolicy): string {
+  switch (policy) {
+    case 'onSystemTick':
+      return 'System tick'
+    case 'onInterval':
+      return 'Interval'
+    case 'onVisibilityResume':
+      return 'Visibility'
+    case 'manual':
+      return 'Manual'
+  }
 }
 
 function onNavigate(route: {
