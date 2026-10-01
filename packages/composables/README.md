@@ -8,7 +8,9 @@ In WebOC, the host application can provide shared webservice configuration, refr
 
 Standalone Vue applications can use data-fetching composables without a WebOC host by passing explicit webservice options (and an explicit system tick when using `onSystemTick` refreshes). The `provideHost*` functions are only needed when the application uses the host-context composables or relies on host-provided defaults; call them before mounting consumers that need those contexts.
 
-## API stability
+## API availability and stability
+
+Not all composables currently used by WebOC are available in this package yet. We will gradually migrate existing composables from WebOC into this repository so they can also be used by WebOC micro-frontends and standalone Vue applications. The API reference below lists what is available now.
 
 **Beta** APIs are functional but may change before they are considered stable.
 
