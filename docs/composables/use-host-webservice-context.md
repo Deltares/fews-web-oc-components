@@ -9,7 +9,6 @@ authorization headers that micro-frontends use for requests.
 
 - `provideHostWebserviceContext(context)`
 - `useHostWebserviceContext()`
-- `resolveWebserviceContext(override?)`
 
 ## Example
 
@@ -34,31 +33,34 @@ import { useHostWebserviceContext } from '@deltares/fews-web-oc-composables'
 const { getBaseUrl, getAuthorizationHeaders } = useHostWebserviceContext()
 ```
 
-### Standalone usage via `resolveWebserviceContext`
+### Standalone usage
 
-Composables such as `usePiLocations` accept an optional `webservice` option
-so they work outside a host application too:
+Data-fetching composables such as `usePiLocations` and `usePiTimeSeries`
+accept an optional `webservice` option, so they work without a host
+application too:
 
 ```ts
-import { resolveWebserviceContext } from '@deltares/fews-web-oc-composables'
+import { usePiLocations } from '@deltares/fews-web-oc-composables'
 
-// Uses the explicit override instead of the host context:
-const { baseUrl, getAuthorizationHeaders } = resolveWebserviceContext({
-  baseUrl: 'https://example.localhost/fewswebservices',
+const { locations } = usePiLocations({
+  filter,
+  webservice: {
+    baseUrl: 'https://example.localhost/fewswebservices',
+  },
 })
 ```
 
 ## Parameters
 
-| Function/Option                                     | Description                                                                 | Default                                            |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| `provideHostWebserviceContext(context)`                 | `context.getBaseUrl` and `context.getAuthorizationHeaders` functions.          | —                                                    |
-| `useHostWebserviceContext()`                            | Returns the previously provided context, or throws if none was provided.      | —                                                    |
-| `resolveWebserviceContext(override?)`                   | `override.baseUrl` (required) and `override.getAuthorizationHeaders` (optional). | Falls back to `useHostWebserviceContext()` when `override` is omitted; `getAuthorizationHeaders` defaults to resolving empty `Headers`. |
+| Function/Option                         | Description                                                              | Default |
+| --------------------------------------- | ------------------------------------------------------------------------ | ------- |
+| `provideHostWebserviceContext(context)` | `context.getBaseUrl` and `context.getAuthorizationHeaders` functions.    | —       |
+| `useHostWebserviceContext()`            | Returns the previously provided context, or throws if none was provided. | —       |
 
 ## Behavior
 
 - `useHostWebserviceContext()` throws an `Error` when no context has been
   provided yet.
-- `resolveWebserviceContext()` is the recommended way for data-fetching
-  composables to support both micro-frontend and standalone usage.
+- Data-fetching composables use the `webservice` option when given, and fall
+  back to the host context otherwise. `getAuthorizationHeaders` defaults to
+  sending no authorization headers.
