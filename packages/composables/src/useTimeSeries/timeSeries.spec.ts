@@ -86,8 +86,6 @@ describe('usePiTimeSeries', () => {
         }),
     )
     vi.stubGlobal('fetch', fetchMock)
-    // useRefreshCoordinator registers onUnmounted outside a component instance.
-    vi.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
   afterEach(async () => {

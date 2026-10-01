@@ -1,5 +1,5 @@
 import { useDocumentVisibility, useIntervalFn } from '@vueuse/core'
-import { onUnmounted, ref, watch, type Ref } from 'vue'
+import { onScopeDispose, ref, watch, type Ref } from 'vue'
 import { useHostRefreshContext } from '../useHostRefreshContext'
 
 export type RefreshPolicy =
@@ -245,9 +245,7 @@ export function useRefreshCoordinator(
     trigger('manual')
   }
 
-  onUnmounted(() => {
-    pause()
-  })
+  onScopeDispose(pause, true)
 
   return {
     isActive,
