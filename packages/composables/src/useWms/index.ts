@@ -8,12 +8,65 @@ type Layer = GetCapabilitiesResponse['layers'][number]
 type Style = NonNullable<Layer['styles']>[number]
 
 export interface UseWmsReturn {
+  /**
+   * The WMS capabilities of the requested layer, or `undefined` when no
+   * layer is selected, or the request has not resolved yet.
+   */
   layerCapabilities: Ref<Layer | undefined>
+
+  /**
+   * The available time values for the layer, restricted to the layer's
+   * `firstValueTime`/`lastValueTime` range (if present), or `undefined`
+   * when no layer is selected.
+   */
   times: Ref<Date[] | undefined>
+
+  /**
+   * The full WMS `GetCapabilities` response, or `undefined` when no layer
+   * is selected, or the request has not resolved yet.
+   */
   capabilities: Ref<GetCapabilitiesResponse | undefined>
+
+  /**
+   * Reloads the capabilities and times. Called automatically whenever
+   * `baseUrl`, `layerName`, or `filter` change.
+   */
   loadCapabilities: () => void
 }
 
+/**
+ * Loads WMS `GetCapabilities` for a layer, and derives the layer's
+ * capabilities and available time values from the response.
+ *
+ * Reactively reloads whenever `baseUrl`, `layerName`, or `filter` change. On
+ * request failure, `capabilities` and `layerCapabilities` are reset to
+ * `undefined` and the error is logged to the console.
+ *
+ * @param baseUrl The FEWS webservices base URL (ref, getter, or plain
+ *   value). The WMS endpoint used is `${baseUrl}/wms`.
+ * @param layerName The name of the layer to load (ref, getter, or plain
+ *   value). When `undefined`, `capabilities` and `layerCapabilities` are
+ *   reset to `undefined` and no request is made.
+ * @param filter Optional overrides for the `GetCapabilities` request.
+ *
+ *   Defaults applied when not overridden:
+ *   - `importFromExternalDataSource`: `false`
+ *   - `onlyHeaders`: `false`
+ *   - `forecastCount`: `1`
+ * @returns See {@link UseWmsReturn}.
+ *
+ * @example
+ * ```ts
+ * import { ref } from 'vue'
+ * import { useWmsLayerCapabilities } from '@deltares/fews-web-oc-composables'
+ *
+ * const baseUrl = ref('https://example.localhost/data')
+ * const layerName = ref('waterlevel')
+ *
+ * const { capabilities, layerCapabilities, times } =
+ *   useWmsLayerCapabilities(baseUrl, layerName)
+ * ```
+ */
 export function useWmsLayerCapabilities(
   baseUrl: MaybeRefOrGetter<string>,
   layerName: MaybeRefOrGetter<string | undefined>,
@@ -85,6 +138,36 @@ export function useWmsLayerCapabilities(
   return { layerCapabilities, times, capabilities, loadCapabilities }
 }
 
+/**
+ * Loads a WMS legend graphic for a layer, reactively reloading whenever any
+ * of the arguments change.
+ *
+ * @param baseUrl The FEWS webservices base URL (ref, getter, or plain
+ *   value). The WMS endpoint used is `${baseUrl}/wms`.
+ * @param layerName The name of the layer to load the legend for (ref,
+ *   getter, or plain value). When `undefined`, the returned ref is reset to
+ *   `undefined` and no request is made.
+ * @param useDisplayUnits Whether to render the legend using the layer's
+ *   display units instead of its base units.
+ * @param colorScaleRange Optional `"min,max"` string overriding the color
+ *   scale range used to render the legend. When omitted, the layer's
+ *   default color scale range is used.
+ * @param style Optional WMS style (as returned in a layer's `styles`) to
+ *   render the legend with. When omitted, the layer's default style is used.
+ * @returns A ref with the legend graphic response, or `undefined` when no
+ *   layer is selected or the request has not resolved yet.
+ *
+ * @example
+ * ```ts
+ * import { ref, computed } from 'vue'
+ * import { useWmsLegend } from '@deltares/fews-web-oc-composables'
+ *
+ * const baseUrl = ref('https://example.localhost/data')
+ * const layerName = ref('waterlevel')
+ *
+ * const legendGraphic = useWmsLegend(baseUrl, layerName, true)
+ * ```
+ */
 export function useWmsLegend(
   baseUrl: MaybeRefOrGetter<string>,
   layerName: MaybeRefOrGetter<string | undefined>,
@@ -121,6 +204,35 @@ export function useWmsLegend(
   return legendGraphic
 }
 
+/**
+ * Fetches a WMS legend graphic for a layer once, as a plain `Promise`.
+ *
+ * Use this instead of {@link useWmsLegend} when a reactive, auto-reloading
+ * result is not needed (e.g. for generating a one-off image for a report).
+ *
+ * @param baseUrl The FEWS webservices base URL. The WMS endpoint used is
+ *   `${baseUrl}/wms`.
+ * @param layerName The name of the layer to load the legend for.
+ * @param useDisplayUnits Whether to render the legend using the layer's
+ *   display units instead of its base units.
+ * @param colorScaleRange Optional `"min,max"` string overriding the color
+ *   scale range used to render the legend. When omitted, the layer's
+ *   default color scale range is used.
+ * @param style Optional WMS style (as returned in a layer's `styles`) to
+ *   render the legend with. When omitted, the layer's default style is used.
+ * @returns A promise resolving to the legend graphic response.
+ *
+ * @example
+ * ```ts
+ * import { fetchWmsLegend } from '@deltares/fews-web-oc-composables'
+ *
+ * const legendGraphic = await fetchWmsLegend(
+ *   'https://example.localhost/data',
+ *   'waterlevel',
+ *   true,
+ * )
+ * ```
+ */
 export function fetchWmsLegend(
   baseUrl: string,
   layerName: string,
@@ -144,6 +256,23 @@ export function fetchWmsLegend(
   }
 }
 
+/**
+ * Loads the full WMS `GetCapabilities` response for all layers once, on
+ * creation. Unlike {@link useWmsLayerCapabilities}, this is not reactive:
+ * it is fetched a single time using the `baseUrl` passed in.
+ *
+ * @param baseUrl The FEWS webservices base URL. The WMS endpoint used is
+ *   `${baseUrl}/wms`.
+ * @returns A ref with the `GetCapabilities` response, or `undefined` until
+ *   the request resolves (or if it fails; the error is logged to console).
+ *
+ * @example
+ * ```ts
+ * import { useWmsCapilities } from '@deltares/fews-web-oc-composables'
+ *
+ * const capabilities = useWmsCapilities('https://example.localhost/data')
+ * ```
+ */
 export function useWmsCapilities(baseUrl: string): Ref<GetCapabilitiesResponse | undefined> {
   const capabilities = ref<GetCapabilitiesResponse>()
   const wmsUrl = `${baseUrl}/wms`

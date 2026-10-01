@@ -38,7 +38,17 @@ export default defineConfig({
           text: 'Composables',
           items: [
             { text: 'Overview', link: '/composables/' },
+            { text: 'useLocations', link: '/composables/use-locations' },
             { text: 'useWms', link: '/composables/use-wms' },
+            {
+              text: 'useHostWebserviceContext',
+              link: '/composables/use-host-webservice-context',
+            },
+            {
+              text: 'useHostRefreshContext',
+              link: '/composables/use-host-refresh-context',
+            },
+            { text: 'useNotifications', link: '/composables/use-notifications' },
           ],
         },
         {

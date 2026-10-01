@@ -7,38 +7,46 @@ export type RefreshPolicy =
 
 export interface UseRefreshCoordinatorOptions {
   /**
-   * The policies that can trigger a refresh.
+   * The policies that can trigger a refresh. Only policies included here
+   * have any effect; e.g. `'onInterval'` must be included for `intervalMs`
+   * to take effect.
    */
   policies: RefreshPolicy[]
 
   /**
-   * The system-time synchronization tick.
+   * The system-time synchronization tick, used by the `'onSystemTick'`
+   * policy. A refresh is triggered whenever this ref's value changes.
    *
-   * When omitted, the host-provided system tick is used.
-   * This allows standalone applications to provide their own
-   * system tick without requiring microfrontend developers to
-   * configure anything.
+   * @default
+   * When omitted, the host-provided system tick (from
+   * `useHostRefreshContext()`) is used. This allows standalone applications
+   * to provide their own system tick without requiring microfrontend
+   * developers to configure anything.
    */
   systemTick?: Ref<Date | undefined>
 
   /**
-   * The interval between automatic refreshes.
+   * The interval, in milliseconds, between automatic refreshes when
+   * `'onInterval'` is included in `policies`.
    *
-   * Defaults to 1000 ms.
+   * @default 1000
    */
   intervalMs?: number
 
   /**
-   * Whether to invoke the callback immediately.
+   * Whether to invoke the callback immediately when the coordinator is
+   * created.
    *
-   * Defaults to false.
+   * @default false
    */
   immediateCallback?: boolean
 
   /**
-   * Whether automatic refreshes are currently enabled.
+   * A reactive flag controlling whether automatic refreshes are currently
+   * enabled. When `false`, all triggers are ignored until it becomes `true`
+   * again.
    *
-   * Defaults to true.
+   * @default ref(true)
    */
   enabled?: Ref<boolean>
 }
@@ -77,6 +85,46 @@ export interface RefreshCoordinator {
   lastTriggerPolicy: Readonly<Ref<RefreshPolicy | undefined>>
 }
 
+/**
+ * Coordinates automatic refreshes for data-fetching composables, driven by
+ * one or more {@link RefreshPolicy} triggers: a shared system tick, a fixed
+ * interval, document-visibility resume, or manual triggers.
+ *
+ * Only one refresh runs at a time: if `trigger()` is called while a refresh
+ * is already in flight, a single refresh is queued to run immediately
+ * afterwards.
+ *
+ * @param callback The function to invoke on each refresh. May be async;
+ *   while it is pending, further triggers are coalesced into one pending
+ *   refresh.
+ * @param options Configuration for which policies trigger a refresh, and
+ *   their parameters. See {@link UseRefreshCoordinatorOptions}.
+ * @returns A {@link RefreshCoordinator} used to pause/resume automatic
+ *   refreshes, trigger a refresh manually, and inspect the last refresh.
+ *
+ * @example
+ * ```ts
+ * import { useRefreshCoordinator } from '@deltares/fews-web-oc-composables'
+ *
+ * const coordinator = useRefreshCoordinator(
+ *   async () => {
+ *     await fetchLatestData()
+ *   },
+ *   {
+ *     policies: ['onSystemTick', 'onInterval', 'onVisibilityResume'],
+ *     intervalMs: 60_000,
+ *     immediateCallback: true,
+ *   },
+ * )
+ *
+ * // Trigger a refresh manually, e.g. from a "Refresh now" button:
+ * coordinator.trigger()
+ *
+ * // Temporarily stop automatic refreshes, e.g. while a dialog is open:
+ * coordinator.pause()
+ * coordinator.resume()
+ * ```
+ */
 export function useRefreshCoordinator(
   callback: () => void | Promise<void>,
   options: UseRefreshCoordinatorOptions,
