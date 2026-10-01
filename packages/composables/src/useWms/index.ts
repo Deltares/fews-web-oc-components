@@ -68,6 +68,7 @@ export interface UseWmsReturn {
  * const { capabilities, layerCapabilities, times } =
  *   useWmsLayerCapabilities(baseUrl, layerName)
  * ```
+ * @group Composables
  */
 export function useWmsLayerCapabilities(
   baseUrl: MaybeRefOrGetter<string>,
@@ -171,6 +172,7 @@ export function useWmsLayerCapabilities(
  *
  * const legendGraphic = useWmsLegend(baseUrl, layerName, true)
  * ```
+ * @group Composables
  */
 export function useWmsLegend(
   baseUrl: MaybeRefOrGetter<string>,
@@ -238,6 +240,7 @@ export function useWmsLegend(
  *   true,
  * )
  * ```
+ * @group Other Functions
  */
 export function fetchWmsLegend(
   baseUrl: string,
@@ -280,6 +283,7 @@ export function fetchWmsLegend(
  *
  * const capabilities = useWmsCapilities('https://example.localhost/data')
  * ```
+ * @group Composables
  */
 export function useWmsCapilities(baseUrl: string): Ref<GetCapabilitiesResponse | undefined> {
   const capabilities = ref<GetCapabilitiesResponse>()

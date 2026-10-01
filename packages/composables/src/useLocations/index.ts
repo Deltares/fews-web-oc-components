@@ -206,6 +206,7 @@ const emptyFeatureCollection: FeatureCollection<Geometry, PiLocation> = {
  *   },
  * })
  * ```
+ * @group Composables
  */
 export function usePiLocations(
   options: UsePiLocationsOptions,
