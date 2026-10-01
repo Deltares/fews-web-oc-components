@@ -217,7 +217,7 @@ function render() {
 watch(() => props.zoom, render)
 
 watch(
-  () => () => [props.geojson, props.locationIds],
+  () => [props.geojson, props.locationIds],
   () => {
     selectedLocationId.value = props.locationIds?.split(',')[0]?.trim()
     render()
