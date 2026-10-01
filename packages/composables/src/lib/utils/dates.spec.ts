@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   getCombinedDates,
   getSortedDates,
@@ -7,9 +7,9 @@ import {
 } from './dates'
 
 describe('getCombinedDates', () => {
-  test.each([
+  it.each([
     {
-      name: 'combine dates',
+      name: 'combines dates',
       dates1: [new Date('2021-01-01'), new Date('2021-01-02')],
       dates2: [new Date('2021-01-03'), new Date('2021-01-04')],
       expected: [
@@ -20,7 +20,7 @@ describe('getCombinedDates', () => {
       ],
     },
     {
-      name: 'combine dates with duplicates',
+      name: 'combines dates without duplicates',
       dates1: [new Date('2021-01-01'), new Date('2021-01-02')],
       dates2: [new Date('2021-01-02'), new Date('2021-01-03')],
       expected: [
@@ -30,13 +30,13 @@ describe('getCombinedDates', () => {
       ],
     },
     {
-      name: 'combine dates with empty arrays',
+      name: 'combines dates with an empty array',
       dates1: [],
       dates2: [new Date('2021-01-02'), new Date('2021-01-03')],
       expected: [new Date('2021-01-02'), new Date('2021-01-03')],
     },
     {
-      name: 'combine dates without sorting',
+      name: 'combines dates without sorting',
       dates1: [new Date('2021-01-02'), new Date('2021-01-01')],
       dates2: [new Date('2021-01-03'), new Date('2021-01-04')],
       expected: [
@@ -52,9 +52,9 @@ describe('getCombinedDates', () => {
 })
 
 describe('getSortedDates', () => {
-  test.each([
+  it.each([
     {
-      name: 'sort dates',
+      name: 'sorts dates',
       dates: [
         new Date('2021-01-02'),
         new Date('2021-01-01'),
@@ -67,7 +67,7 @@ describe('getSortedDates', () => {
       ],
     },
     {
-      name: 'sort empty array',
+      name: 'sorts an empty array',
       dates: [],
       expected: [],
     },
@@ -77,9 +77,9 @@ describe('getSortedDates', () => {
 })
 
 describe('getUniqueDates', () => {
-  test.each([
+  it.each([
     {
-      name: 'return unique dates',
+      name: 'returns unique dates',
       dates: [
         new Date('2021-01-01'),
         new Date('2021-01-02'),
@@ -88,7 +88,7 @@ describe('getUniqueDates', () => {
       expected: [new Date('2021-01-01'), new Date('2021-01-02')],
     },
     {
-      name: 'return unique dates from empty array',
+      name: 'returns unique dates from an empty array',
       dates: [],
       expected: [],
     },
@@ -98,7 +98,7 @@ describe('getUniqueDates', () => {
 })
 
 describe('findDateIndex', () => {
-  test.each([
+  it.each([
     {
       name: 'returns index of exact matching date',
       dates: [
