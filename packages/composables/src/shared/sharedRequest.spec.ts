@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getInFlightRequestCount, sharedRequest } from './sharedRequest'
+import { getInFlightRequestCount, sharedRequest } from './sharedRequest.js'
 
 function deferred<T>() {
   let resolve!: (value: T) => void

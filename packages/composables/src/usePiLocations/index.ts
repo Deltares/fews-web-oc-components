@@ -14,14 +14,17 @@ import {
   type LocationsFilter as PiLocationsFilter,
 } from '@deltares/fews-pi-requests'
 
-import { type RefreshPolicy, useRefreshCoordinator } from '../useRefreshCoordinator'
+import {
+  type RefreshPolicy,
+  useRefreshCoordinator,
+} from '../useRefreshCoordinator/index.js'
 import {
   type PiWebserviceOptions,
   resolveWebserviceContext,
-} from '../lib/requests/resolveWebserviceContext'
-import { createTransformRequestFn } from '../lib/requests/createTransformRequestFn'
-import { FeatureCollection, Geometry } from 'geojson'
-import { convertGeoJsonToPiLocations } from '../lib/locations/convertGeoJsonToPiLocations'
+} from '../lib/requests/resolveWebserviceContext.js'
+import { createTransformRequestFn } from '../lib/requests/createTransformRequestFn.js'
+import type { FeatureCollection, Geometry } from 'geojson'
+import { convertGeoJsonToPiLocations } from '../lib/locations/convertGeoJsonToPiLocations.js'
 
 const DEFAULT_REFRESH_POLICIES: RefreshPolicy[] = [
   'onSystemTick',

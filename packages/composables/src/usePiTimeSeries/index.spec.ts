@@ -5,7 +5,7 @@ import {
   usePiTimeSeries,
   type PiTimeSeriesRequest,
   type UsePiTimeSeriesOptions,
-} from './index'
+} from './index.js'
 
 const baseUrl = 'https://example.localhost/fewswebservices'
 const timeSeriesUrl = `${baseUrl}/rest/fewspiservice/v1/timeseries`

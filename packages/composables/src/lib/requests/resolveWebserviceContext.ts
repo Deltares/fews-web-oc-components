@@ -1,4 +1,4 @@
-import { useHostWebserviceContext } from '../../shared/hostWebserviceContext'
+import { useHostWebserviceContext } from '../../shared/hostWebserviceContext.js'
 
 /**
  * Webservice configuration for standalone usage of the data-fetching
