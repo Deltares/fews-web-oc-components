@@ -7,11 +7,12 @@ export function load(app) {
 
     for (const reflection of page.project.getReflectionsByKind(ReflectionKind.Function)) {
       const comment = reflection.comment ?? reflection.signatures?.[0]?.comment
-      const status = comment?.hasModifier('@experimental')
-        ? 'Experimental'
-        : comment?.hasModifier('@beta')
-          ? 'Beta'
-          : undefined
+      let status
+      if (comment?.hasModifier('@experimental')) {
+        status = 'Experimental'
+      } else if (comment?.hasModifier('@beta')) {
+        status = 'Beta'
+      }
 
       if (status) {
         const link = `- [${reflection.name}](functions/${reflection.name}.md)`
