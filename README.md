@@ -21,6 +21,22 @@ npm run lint
 npm run test
 ```
 
+## Releasing
+
+All workspace packages and the root project use one shared version. Set it from the repository root:
+
+```bash
+npm run release:set -- 0.3.0-alpha.8
+```
+
+This updates the root manifest, all workspace manifests, the lockfile, and internal workspace dependency versions. Commit the changes, then create a GitHub Release for the matching `v<version>` tag (for example, `v0.3.0-alpha.8`). The release workflow checks the tag and all package versions before publishing the components and composables packages to npm. The private micro-frontend is versioned with the monorepo but is not published.
+
+To verify the current release state locally:
+
+```bash
+npm run release:check
+```
+
 ## Documentation with VitePress
 
 Run documentation locally:

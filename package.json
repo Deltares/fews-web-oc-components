@@ -14,6 +14,8 @@
     "docs:preview": "vitepress preview docs",
     "build": "npm run --workspaces --if-present build",
     "playwright:install": "npm run --workspaces --if-present playwright:install",
+    "release:set": "node scripts/release.mjs set",
+    "release:check": "node scripts/release.mjs check",
     "publish:packages": "npm publish -w @deltares/fews-web-oc-components --access public && npm publish -w @deltares/fews-web-oc-composables --access public",
     "test": "npm run --workspaces --if-present test",
     "test:unit": "npm run --workspaces --if-present test:unit",
@@ -33,5 +35,5 @@
     "adm-zip": "^0.6.1",
     "undici": "^7.3.0"
   },
-  "version": "0.3.0-alpha.3"
+  "version": "0.3.0-alpha.7"
 }
