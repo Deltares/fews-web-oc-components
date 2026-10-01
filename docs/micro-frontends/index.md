@@ -7,37 +7,28 @@ Micro frontend components are Vue components exposed from the micro-frontends pa
 
 ## Responsibilities
 
-- Receive their context from the host through props.
+- Receive component-specific inputs from the host through props.
 - Render data and handle local interactions inside the component.
 - Emit navigation and data-request events back to the host when the user changes state.
-- Use host-provided FEWS settings for authentication and data access.
+- Use shared composable context for host-provided FEWS services and refresh state.
 
 ## Typical Contract
 
-The host mounts the remote component with a small, explicit contract.
+The host mounts the remote component with only the inputs that belong to that component. For example, `MainComponent` accepts a topology node and an optional location selection; it does not take `hostSettings` or a general-purpose `settings` prop.
 
 ```vue
-<component
-  :selectedDate="selectedDateOfSlider"
+<MainComponent
   :topologyNode="topologyNode"
-  :hostSettings="hostSettings"
-  :settings="settings"
+  :locationIds="locationIds"
   @navigate="onNavigate"
 />
 ```
 
 ```ts
-export interface HostSettings {
-  baseUrl: string
-  webservicesUrl: string
-  getHeaders: () => Promise<Headers>
-}
-
 interface Props {
-  selectedDate: Date
   topologyNode: TopologyNode
-  hostSettings: HostSettings
-  settings: unknown
+  locationIds?: string
+  selectedDate?: Date
 }
 
 interface Emits {
@@ -45,7 +36,22 @@ interface Emits {
 }
 ```
 
-That pattern keeps the micro frontend focused on presentation and interaction while the host remains the source of truth for routing, FEWS connectivity, and shared session state.
+`selectedDate` is optional in `MainComponent`; the host does not need to provide it for the locations view. The host remains the source of truth for routing and FEWS connectivity, while composable providers make shared service context available without passing it through every component's props.
+
+## Host Context
+
+Before loading a micro frontend that makes FEWS requests, the host provides its Web Services URL and authentication-header function. Refresh and notification contexts can be provided the same way when needed.
+
+```ts
+import { provideHostWebserviceContext } from '@deltares/fews-web-oc-composables'
+
+provideHostWebserviceContext({
+  getBaseUrl: () => webservicesUrl,
+  getAuthorizationHeaders: () => getHeaders(),
+})
+```
+
+Data composables such as `usePiLocations` use this context by default. Components therefore do not need `hostSettings` props or to build authentication headers themselves.
 
 ## Module Federation
 
@@ -61,14 +67,14 @@ export default createModuleFederationConfig({
 
 ## Data Access
 
-When a micro frontend needs FEWS data, use `hostSettings.webservicesUrl` for requests and `hostSettings.getHeaders()` to forward the host authentication headers. The component can then either call `PiWebserviceProvider` directly or use a composable such as `useTimeSeries`.
+When a micro frontend needs FEWS data, prefer the package composables where they cover the use case. For example, `usePiLocations` reads the host webservice context and manages location loading and refreshes, while `usePiTimeSeries` provides keyed reactive time-series requests. Use `PiWebserviceProvider` directly when you need lower-level control.
 
 For a concrete time series example, see [Micro Frontend Time Series Data](./load-fews-timeseries-data).
 
 ## Design Notes
 
 - Keep host-specific logic at the boundary and isolate request-building in small helpers.
-- Prefer props and emits over shared singletons.
+- Prefer props and emits for component inputs and outputs; use host context providers for shared services.
 - Keep `settings` typed close to the owning component once its schema stabilizes.
 - Make data dependencies explicit so the component can be reused in different host shells.
 - Keep the public API narrow and semver-friendly if the component is intended for external consumption.
