@@ -7,6 +7,11 @@ export default defineConfig({
   lang: 'en-US',
   base: process.env.VITEPRESS_BASE ?? '/fews-web-oc-components/',
   cleanUrls: true,
+  transformPageData(pageData) {
+    if (pageData.relativePath.startsWith('composables/api/')) {
+      pageData.frontmatter.pageClass = 'api-reference'
+    }
+  },
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
