@@ -45,11 +45,16 @@ interface Emits {
 }
 ```
 
-`selectedDate` is optional in `MainComponent`; the host does not need to provide it for the locations view. The host remains the source of truth for routing and FEWS connectivity, while composable providers make shared service context available without passing it through every component's props.
+`topologyNode` is required by `MainComponent`; `locationIds` and `selectedDate` are optional props that the Web OC host passes only when it has those values. `selectedDate` is not required for the locations view. The component derives its location filter and renders the result; the host remains responsible for navigation and shared FEWS connectivity.
 
-## Host Context
+## What the Web OC Host Provides
 
-Before loading a micro frontend that makes FEWS requests, the host provides its Web Services URL and authentication-header function. Refresh and notification contexts can be provided the same way when needed.
+The Web OC host provides two kinds of input:
+
+- Component props, such as `topologyNode` and optional selections. Their names and types are defined by each remote component.
+- Shared service context, such as the FEWS Web Services URL and authorization headers. This is provided once by the host, not passed through component props.
+
+Before mounting a remote that makes FEWS requests, the host provides its Web Services URL and authentication-header function:
 
 ```ts
 import { provideHostWebserviceContext } from '@deltares/fews-web-oc-composables'
@@ -60,7 +65,7 @@ provideHostWebserviceContext({
 })
 ```
 
-Data composables such as `usePiLocations` use this context by default. The host must provide the context before mounting a remote that uses it. Because the context is held by the composables package, configure both host and remote to share the same `@deltares/fews-web-oc-composables` singleton; otherwise the remote may not see the host's provided context.
+Data composables such as `usePiLocations` use this context by default. If a component uses host-driven refresh or notifications, the host must also provide those contexts before mounting it. Because these contexts are held by the composables package, configure both host and remote to share the same `@deltares/fews-web-oc-composables` singleton; otherwise the remote may not see the host's provided context.
 
 ## Module Federation
 
@@ -79,6 +84,8 @@ export default createModuleFederationConfig({
 When a micro frontend needs FEWS data, prefer the package composables where they cover the use case. For example, `usePiLocations` reads the host webservice context and manages location loading and refreshes, while `usePiTimeSeries` provides keyed reactive time-series requests. Use `PiWebserviceProvider` directly when you need lower-level control.
 
 For a concrete time series example, see [Micro Frontend Time Series Data](./load-fews-timeseries-data).
+
+For a location-loading example, see [Micro Frontend Locations](./load-fews-locations).
 
 ## Design Notes
 

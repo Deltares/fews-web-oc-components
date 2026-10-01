@@ -5,11 +5,11 @@
 
 This guide shows how a Web OC micro frontend can load time series data from Delft-FEWS using `usePiTimeSeries`, or use `PiWebserviceProvider` directly for lower-level control.
 
-The host provides the FEWS Web Services URL and authentication context through composable providers. A micro frontend does not need to receive those values as component props.
+The Web OC host owns FEWS connectivity: it provides the Web Services URL and authorization headers through composable context. The micro frontend owns its time-series filters, query options, and presentation. Service URLs and credentials are not component props.
 
 ## Prerequisites
 
-A component receives only the inputs it needs for its own view. For example, `MainComponent` accepts a `topologyNode`, optional `locationIds`, and optional `selectedDate`; it does not accept `hostSettings` or a general-purpose `settings` prop. Provide the shared FEWS service context in the host before mounting the remote component:
+A component receives only the inputs it needs for its own view. For example, `MainComponent` accepts a `topologyNode`, optional `locationIds`, and optional `selectedDate`; it does not accept `hostSettings` or a general-purpose `settings` prop. For another remote, the host passes only that component's declared selection props. Provide the shared FEWS service context in the host before mounting the remote component:
 
 ```ts
 import {
@@ -25,14 +25,14 @@ provideHostWebserviceContext({
 provideHostRefreshContext({ systemTick })
 ```
 
-`provideHostRefreshContext` is optional. When omitted, configure `usePiTimeSeries` with refresh policies that do not depend on a host system tick.
+`provideHostRefreshContext` supplies the host's system-time signal. It is needed when the composable uses the default `onSystemTick` refresh policy; if the host does not provide it, configure `usePiTimeSeries` with refresh policies that omit `onSystemTick`.
 
 The webservice context is stored by the composables package. Configure both host and remote to share the same `@deltares/fews-web-oc-composables` singleton in Module Federation, or the remote may read a different module instance and fail to see the provided context.
 
 ## Typical Flow
 
-1. The host provides Web Services URL and authentication via `provideHostWebserviceContext`.
-2. The component derives keyed FEWS time-series requests from its own inputs or local state.
+1. The host provides Web Services URL and authentication via `provideHostWebserviceContext`, plus a system-time signal if the selected refresh policy needs it.
+2. The component derives keyed FEWS time-series requests from its declared props or local state; the host does not construct the request for it.
 3. `usePiTimeSeries` sends requests with the host-provided authentication headers and manages reactive response and loading state.
 4. The component renders the responses or emits an event when the user changes the selection.
 

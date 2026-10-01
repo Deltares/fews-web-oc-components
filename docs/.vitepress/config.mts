@@ -71,6 +71,10 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/micro-frontends/' },
             {
+              text: 'Locations',
+              link: '/micro-frontends/load-fews-locations',
+            },
+            {
               text: 'Time Series Data',
               link: '/micro-frontends/load-fews-timeseries-data',
             },
