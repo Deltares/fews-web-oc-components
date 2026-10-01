@@ -27,6 +27,8 @@ export interface HostNotifications {
 let hostNotifications: HostNotifications | null = null
 
 /**
+ * @beta
+ *
  * Provides the host notifications implementation, making it available to
  * micro-frontends via {@link useHostNotifications}.
  *
@@ -50,6 +52,8 @@ export function provideHostNotifications(notifications: HostNotifications) {
 }
 
 /**
+ * @beta
+ *
  * Retrieves the host notifications implementation that was previously
  * provided via {@link provideHostNotifications}.
  *

@@ -1,5 +1,7 @@
 # useHostRefreshContext
 
+> **Beta** — this API is functional but may still change before it is considered stable.
+
 Lets a host application provide a shared "system tick" signal that
 micro-frontends can use to trigger refreshes, without each micro-frontend
 needing its own timer.

@@ -1,5 +1,7 @@
 # useWms
 
+> **Experimental** — this API is not yet stable and may change without notice.
+
 Utilities for loading WMS capabilities, layer time values, and legend graphics.
 
 ## Exported APIs

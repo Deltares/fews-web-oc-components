@@ -86,6 +86,8 @@ export interface RefreshCoordinator {
 }
 
 /**
+ * @beta
+ *
  * Coordinates automatic refreshes for data-fetching composables, driven by
  * one or more {@link RefreshPolicy} triggers: a shared system tick, a fixed
  * interval, document-visibility resume, or manual triggers.

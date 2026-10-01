@@ -14,6 +14,8 @@ export interface HostRefreshContext {
 let hostRefreshContext: HostRefreshContext | null = null
 
 /**
+ * @beta
+ *
  * Provides the host refresh context, making it available to micro-frontends
  * via {@link useHostRefreshContext}.
  *
@@ -39,6 +41,8 @@ export function provideHostRefreshContext(context: HostRefreshContext): void {
 }
 
 /**
+ * @beta
+ *
  * Retrieves the host refresh context that was previously provided via
  * {@link provideHostRefreshContext}.
  *

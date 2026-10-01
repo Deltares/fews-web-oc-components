@@ -1,5 +1,7 @@
 # useNotifications
 
+> **Beta** — this API is functional but may still change before it is considered stable.
+
 Lets a host application provide a notifications/alerts implementation that
 micro-frontends can use to surface messages to the user.
 
