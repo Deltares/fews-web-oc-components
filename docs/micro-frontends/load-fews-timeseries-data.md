@@ -9,7 +9,7 @@ The host provides the FEWS Web Services URL and authentication context through c
 
 ## Prerequisites
 
-A component receives only the inputs it needs for its own view. For example, `MainComponent` accepts a `topologyNode`, optional `locationIds`, and optional `selectedDate`; it does not accept `hostSettings` or a general-purpose `settings` prop. Provide the shared FEWS service context once in the host before loading the remote:
+A component receives only the inputs it needs for its own view. For example, `MainComponent` accepts a `topologyNode`, optional `locationIds`, and optional `selectedDate`; it does not accept `hostSettings` or a general-purpose `settings` prop. Provide the shared FEWS service context in the host before mounting the remote component:
 
 ```ts
 import {
@@ -26,6 +26,8 @@ provideHostRefreshContext({ systemTick })
 ```
 
 `provideHostRefreshContext` is optional. When omitted, configure `usePiTimeSeries` with refresh policies that do not depend on a host system tick.
+
+The webservice context is stored by the composables package. Configure both host and remote to share the same `@deltares/fews-web-oc-composables` singleton in Module Federation, or the remote may read a different module instance and fail to see the provided context.
 
 ## Typical Flow
 
@@ -125,16 +127,20 @@ const {
   loading,
   refreshing,
   errors,
+  entries,
   fetch,
+  cancel,
   pauseRefresh,
   resumeRefresh,
 } = usePiTimeSeries({ requests, query })
+
+const mainTimeSeries = computed(() => responses.value.main?.timeSeries ?? [])
 ```
 
 ### Notes
 
 - `responses` and `errors` are reactive objects keyed by the request key, such as `main`.
-- Each request in `entries` contains its response, loading/refreshing state, error, and last update time.
+- Each request in `entries` contains its response, loading/refreshing state, error, and last update time. `mainTimeSeries` shows one way to read the response for the `main` key.
 - `fetch()` loads requests immediately; `cancel()` cancels requests from this composable instance.
 - Automatic refresh defaults to host system ticks and visibility resume. Configure `refresh.policies`, `refresh.intervalMs`, or `refresh.immediate` as needed.
 - Derive `requests` and `query` reactively so changes to the selected filter or time range trigger a new load.

@@ -9,7 +9,7 @@ Micro frontend components are Vue components exposed from the micro-frontends pa
 
 - Receive component-specific inputs from the host through props.
 - Render data and handle local interactions inside the component.
-- Emit navigation and data-request events back to the host when the user changes state.
+- Emit the events defined by the component contract, such as navigation; keep route handling in the host.
 - Use shared composable context for host-provided FEWS services and refresh state.
 
 ## Typical Contract
@@ -25,14 +25,23 @@ The host mounts the remote component with only the inputs that belong to that co
 ```
 
 ```ts
+import type { TopologyNode } from '@deltares/fews-pi-requests'
+
 interface Props {
   topologyNode: TopologyNode
   locationIds?: string
   selectedDate?: Date
 }
 
+interface NavigationRoute {
+  name: string
+  params?: {
+    locationIds: string
+  }
+}
+
 interface Emits {
-  (event: 'navigate', route: unknown): void
+  (event: 'navigate', route: NavigationRoute): void
 }
 ```
 
@@ -51,11 +60,11 @@ provideHostWebserviceContext({
 })
 ```
 
-Data composables such as `usePiLocations` use this context by default. Components therefore do not need `hostSettings` props or to build authentication headers themselves.
+Data composables such as `usePiLocations` use this context by default. The host must provide the context before mounting a remote that uses it. Because the context is held by the composables package, configure both host and remote to share the same `@deltares/fews-web-oc-composables` singleton; otherwise the remote may not see the host's provided context.
 
 ## Module Federation
 
-Micro frontend components are exposed from the package entry point so the host can mount them dynamically.
+The remote exposes its component under a module-federation key. For example, this repository exposes the component source directly as `./main_component`:
 
 ```ts
 export default createModuleFederationConfig({
@@ -75,6 +84,6 @@ For a concrete time series example, see [Micro Frontend Time Series Data](./load
 
 - Keep host-specific logic at the boundary and isolate request-building in small helpers.
 - Prefer props and emits for component inputs and outputs; use host context providers for shared services.
-- Keep `settings` typed close to the owning component once its schema stabilizes.
+- Keep component-specific configuration typed at the owning component boundary; avoid catch-all props such as `settings` on `MainComponent`.
 - Make data dependencies explicit so the component can be reused in different host shells.
 - Keep the public API narrow and semver-friendly if the component is intended for external consumption.
