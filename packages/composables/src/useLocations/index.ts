@@ -1,6 +1,6 @@
 import {
   computed,
-  onBeforeUnmount,
+  onScopeDispose,
   ref,
   shallowRef,
   type ComputedRef,
@@ -314,10 +314,10 @@ export function usePiLocations(
     systemTick,
   })
 
-  onBeforeUnmount(() => {
+  onScopeDispose(() => {
     cancel()
     requestId++
-  })
+  }, true)
   const locations = computed(() => convertGeoJsonToPiLocations(geojson.value))
 
   return {

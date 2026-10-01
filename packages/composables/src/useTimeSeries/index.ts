@@ -1,6 +1,5 @@
 import {
   computed,
-  getCurrentScope,
   onScopeDispose,
   ref,
   shallowRef,
@@ -424,12 +423,10 @@ export function usePiTimeSeries(
     }
   })
 
-  if (getCurrentScope()) {
-    onScopeDispose(() => {
-      cancel()
-      requestId++
-    })
-  }
+  onScopeDispose(() => {
+    cancel()
+    requestId++
+  }, true)
 
   return {
     entries,
