@@ -1,6 +1,6 @@
 {
   "entryPoints": ["src/index.ts"],
-  "plugin": ["typedoc-plugin-markdown", "./scripts/annotate-api-status.mjs"],
+  "plugin": ["typedoc-plugin-markdown", "./scripts/customize-api-docs.mjs"],
   "out": "../../docs/composables/api",
   "entryFileName": "index",
   "readme": "README.md",
