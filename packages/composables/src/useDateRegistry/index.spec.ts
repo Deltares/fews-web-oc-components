@@ -8,7 +8,7 @@ import {
   type ComputedRef,
 } from 'vue'
 import { renderToString } from 'vue/server-renderer'
-import { createDateRegistry, useDateRegistry } from './index'
+import { createDateRegistry, useDateRegistry } from './index.js'
 
 /**
  * Renders a parent with a date registry and one child per setup function.

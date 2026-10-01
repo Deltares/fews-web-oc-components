@@ -1,7 +1,5 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import {
-  type HostNotifications,
-} from './hostNotifications'
+import type { HostNotifications } from './hostNotifications.js'
 
 describe('hostNotifications', () => {
   beforeEach(() => {
@@ -12,7 +10,7 @@ describe('hostNotifications', () => {
 
   it('returns the provided host notifications instance', async () => {
     const { provideHostNotifications, useHostNotifications } = await import(
-      './hostNotifications'
+      './hostNotifications.js'
     )
 
     const notifications: HostNotifications = {
@@ -26,7 +24,7 @@ describe('hostNotifications', () => {
 
   it('allows calling addNotification on the provided instance', async () => {
     const { provideHostNotifications, useHostNotifications } = await import(
-      './hostNotifications'
+      './hostNotifications.js'
     )
 
     const notifications: HostNotifications = {
@@ -51,7 +49,7 @@ describe('hostNotifications', () => {
   })
 
   it('throws when host notifications have not been provided', async () => {
-    const { useHostNotifications } = await import('./hostNotifications')
+    const { useHostNotifications } = await import('./hostNotifications.js')
 
     expect(() => useHostNotifications()).toThrow(
       '@deltares/fews-web-oc-components host notifications were not provided.',

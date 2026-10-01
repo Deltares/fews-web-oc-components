@@ -4,7 +4,7 @@ import {
   getSortedDates,
   getUniqueDates,
   findDateIndex,
-} from './dates'
+} from './dates.js'
 
 describe('getCombinedDates', () => {
   it.each([

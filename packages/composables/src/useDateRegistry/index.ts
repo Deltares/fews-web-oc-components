@@ -1,4 +1,4 @@
-import { getCombinedDates, getSortedDates } from '../lib/dates/dates'
+import { getCombinedDates, getSortedDates } from '../lib/dates/dates.js'
 import {
   computed,
   provide,

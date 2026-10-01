@@ -18,17 +18,20 @@ import {
   type TimeSeriesResponse,
 } from '@deltares/fews-pi-requests'
 
-import { type RefreshPolicy, useRefreshCoordinator } from '../useRefreshCoordinator'
+import {
+  type RefreshPolicy,
+  useRefreshCoordinator,
+} from '../useRefreshCoordinator/index.js'
 import {
   type PiWebserviceOptions,
   resolveWebserviceContext,
-} from '../lib/requests/resolveWebserviceContext'
-import { createTransformRequestFn } from '../lib/requests/createTransformRequestFn'
-import { sharedRequest } from '../shared/sharedRequest'
+} from '../lib/requests/resolveWebserviceContext.js'
+import { createTransformRequestFn } from '../lib/requests/createTransformRequestFn.js'
+import { sharedRequest } from '../shared/sharedRequest.js'
 import {
   applyTimeSeriesQueryOptions,
   type PiTimeSeriesQueryOptions,
-} from '../lib/timeseries/applyTimeSeriesQueryOptions'
+} from '../lib/timeseries/applyTimeSeriesQueryOptions.js'
 
 const DEFAULT_REFRESH_POLICIES: RefreshPolicy[] = [
   'onSystemTick',

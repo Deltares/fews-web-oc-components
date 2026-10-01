@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { applyTimeSeriesQueryOptions } from './applyTimeSeriesQueryOptions'
+import { applyTimeSeriesQueryOptions } from './applyTimeSeriesQueryOptions.js'
 
 const baseUrl =
   'https://example.localhost/rest/fewspiservice/v1/timeseries?filterId=f&locationIds=a'
