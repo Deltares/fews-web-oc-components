@@ -1,10 +1,10 @@
 {
   "entryPoints": ["src/index.ts"],
-  "plugin": ["typedoc-plugin-markdown"],
+  "plugin": ["typedoc-plugin-markdown", "./scripts/annotate-api-status.mjs"],
   "out": "../../docs/composables/api",
   "entryFileName": "index",
   "cleanOutputDir": true,
-  "groupOrder": ["Interfaces", "Type Aliases", "Composables", "Providers", "Other Functions"],
+  "groupOrder": ["Composables", "Providers", "Other Functions", "Interfaces", "Type Aliases"],
   "excludePrivate": true,
   "excludeProtected": true
 }
