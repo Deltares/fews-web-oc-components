@@ -35,6 +35,8 @@ export interface UseWmsReturn {
 }
 
 /**
+ * @experimental This API is not yet stable and may change without notice.
+ *
  * Loads WMS `GetCapabilities` for a layer, and derives the layer's
  * capabilities and available time values from the response.
  *
@@ -139,6 +141,8 @@ export function useWmsLayerCapabilities(
 }
 
 /**
+ * @experimental This API is not yet stable and may change without notice.
+ *
  * Loads a WMS legend graphic for a layer, reactively reloading whenever any
  * of the arguments change.
  *
@@ -205,6 +209,8 @@ export function useWmsLegend(
 }
 
 /**
+ * @experimental This API is not yet stable and may change without notice.
+ *
  * Fetches a WMS legend graphic for a layer once, as a plain `Promise`.
  *
  * Use this instead of {@link useWmsLegend} when a reactive, auto-reloading
@@ -257,6 +263,8 @@ export function fetchWmsLegend(
 }
 
 /**
+ * @experimental This API is not yet stable and may change without notice.
+ *
  * Loads the full WMS `GetCapabilities` response for all layers once, on
  * creation. Unlike {@link useWmsLayerCapabilities}, this is not reactive:
  * it is fetched a single time using the `baseUrl` passed in.

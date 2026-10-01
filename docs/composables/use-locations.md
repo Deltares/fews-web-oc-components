@@ -1,5 +1,7 @@
 # useLocations
 
+> **Beta** — this API is functional but may still change before it is considered stable.
+
 Fetches FEWS PI locations matching a reactive filter, and keeps them up to date
 automatically.
 

@@ -1,5 +1,7 @@
 # useHostWebserviceContext
 
+> **Beta** — this API is functional but may still change before it is considered stable.
+
 Lets a host application provide the FEWS webservice base URL and
 authorization headers that micro-frontends use for requests.
 

@@ -27,6 +27,8 @@ export interface HostWebserviceContext {
 let hostWebserviceContext: HostWebserviceContext | null = null
 
 /**
+ * @beta
+ *
  * Provides the host webservice context, making it available to
  * micro-frontends via {@link useHostWebserviceContext}.
  *
@@ -57,6 +59,8 @@ export function provideHostWebserviceContext(
 }
 
 /**
+ * @beta
+ *
  * Retrieves the host webservice context that was previously provided via
  * {@link provideHostWebserviceContext}.
  *
@@ -88,6 +92,8 @@ interface ResolvedWebserviceOptions {
 }
 
 /**
+ * @beta
+ *
  * Resolves the webservice configuration (base URL and authorization headers)
  * to use for a request, either from an explicit `override` or, when omitted,
  * from the host-provided webservice context.

@@ -173,6 +173,8 @@ const emptyFeatureCollection: FeatureCollection<Geometry, PiLocation> = {
 }
 
 /**
+ * @beta
+ *
  * Fetches FEWS PI locations matching a reactive filter, and keeps them
  * up to date automatically via a {@link useRefreshCoordinator}.
  *
