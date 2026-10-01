@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { federation } from '@module-federation/vite'
 import vuetify from 'vite-plugin-vuetify'
-import mfConfig from './module-federation.config'
+import mfConfig from './module-federation.config.ts'
 
 const isStorybookRun =
   Boolean(process.env.STORYBOOK) ||
