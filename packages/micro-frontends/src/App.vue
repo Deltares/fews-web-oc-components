@@ -24,7 +24,9 @@ provideHostNotifications({
 })
 provideHostRefreshContext({ systemTick: ref<Date>() })
 provideHostWebserviceContext({
-  getBaseUrl: () => new URL('/sample/', window.location.origin).href,
+  getBaseUrl: () =>
+    new URL('sample/', new URL(import.meta.env.BASE_URL, window.location.origin))
+      .href,
   getAuthorizationHeaders: async () => new Headers(),
 })
 </script>
