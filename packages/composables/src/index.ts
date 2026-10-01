@@ -1,4 +1,6 @@
 export * from './useLocations/index.js'
+export * from './useTimeSeries/index.js'
+export { sharedRequest } from './lib/sharedRequest.js'
 export * from './useHostRefreshContext/index.js'
 export * from './useHostWebserviceContext/index.js'
 export * from './useNotifications/index.js'
