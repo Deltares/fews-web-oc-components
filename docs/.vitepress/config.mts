@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import composablesApiSidebar from './composables-api-sidebar.json'
+import composablesApiSidebar from './composables-api-sidebar.json' with { type: 'json' }
 
 export default defineConfig({
   title: 'FEWS Web OC',
