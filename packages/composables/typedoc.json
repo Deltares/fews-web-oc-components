@@ -3,6 +3,8 @@
   "plugin": ["typedoc-plugin-markdown", "./scripts/annotate-api-status.mjs"],
   "out": "../../docs/composables/api",
   "entryFileName": "index",
+  "readme": "README.md",
+  "mergeReadme": true,
   "cleanOutputDir": true,
   "groupOrder": ["Composables", "Providers", "Other Functions", "Interfaces", "Type Aliases"],
   "excludePrivate": true,
