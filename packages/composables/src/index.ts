@@ -11,6 +11,10 @@ export {
   type NotificationRequest,
   type NotificationType,
   sharedRequest,
+  getSharedRequestRegistrations,
+  subscribeSharedRequestRegistrations,
+  type SharedRequestRegistration,
+  type SharedRequestRegistrationsListener,
 } from './shared/index.js'
 
 export type { PiWebserviceOptions } from './lib/requests/resolveWebserviceContext.js'
@@ -46,3 +50,5 @@ export {
 } from './useRefreshCoordinator/index.js'
 
 export { createDateRegistry, useDateRegistry } from './useDateRegistry/index.js'
+
+export { useSharedRequestRegistrations } from './useSharedRequestRegistrations/index.js'
