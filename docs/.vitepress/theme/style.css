@@ -102,3 +102,10 @@
   color: inherit;
   font-size: inherit;
 }
+
+.api-reference .vp-doc li > strong:has(> code) {
+  float: right;
+  margin-left: 0.75rem;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.65rem;
+}
