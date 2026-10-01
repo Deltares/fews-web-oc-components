@@ -1,6 +1,6 @@
 import { useDocumentVisibility, useIntervalFn } from '@vueuse/core'
 import { onScopeDispose, ref, watch, type Ref } from 'vue'
-import { useHostRefreshContext } from '../useHostRefreshContext'
+import { useHostRefreshContext } from '../shared/hostRefreshContext'
 
 export type RefreshPolicy =
   'onSystemTick' | 'onInterval' | 'onVisibilityResume' | 'manual'

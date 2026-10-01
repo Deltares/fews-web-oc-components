@@ -14,12 +14,12 @@ import {
   type LocationsFilter as PiLocationsFilter,
 } from '@deltares/fews-pi-requests'
 
-import { RefreshPolicy, useRefreshCoordinator } from '../useRefreshCoordinator'
+import { type RefreshPolicy, useRefreshCoordinator } from '../useRefreshCoordinator'
 import {
-  PiWebserviceOptions,
+  type PiWebserviceOptions,
   resolveWebserviceContext,
-} from '../useHostWebserviceContext'
-import { createTransformRequestFn } from '../lib/createTransformRequestFn'
+} from '../lib/requests/resolveWebserviceContext'
+import { createTransformRequestFn } from '../lib/requests/createTransformRequestFn'
 import { FeatureCollection, Geometry } from 'geojson'
 import { convertGeoJsonToPiLocations } from '../lib/locations/convertGeoJsonToPiLocations'
 

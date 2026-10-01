@@ -18,19 +18,17 @@ import {
   type TimeSeriesResponse,
 } from '@deltares/fews-pi-requests'
 
-import { RefreshPolicy, useRefreshCoordinator } from '../useRefreshCoordinator'
+import { type RefreshPolicy, useRefreshCoordinator } from '../useRefreshCoordinator'
 import {
-  PiWebserviceOptions,
+  type PiWebserviceOptions,
   resolveWebserviceContext,
-} from '../useHostWebserviceContext'
-import { createTransformRequestFn } from '../lib/createTransformRequestFn'
-import { sharedRequest } from '../lib/sharedRequest'
+} from '../lib/requests/resolveWebserviceContext'
+import { createTransformRequestFn } from '../lib/requests/createTransformRequestFn'
+import { sharedRequest } from '../shared/sharedRequest'
 import {
   applyTimeSeriesQueryOptions,
   type PiTimeSeriesQueryOptions,
 } from '../lib/timeseries/applyTimeSeriesQueryOptions'
-
-export type { PiTimeSeriesQueryOptions }
 
 const DEFAULT_REFRESH_POLICIES: RefreshPolicy[] = [
   'onSystemTick',

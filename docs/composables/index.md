@@ -15,7 +15,6 @@ import {
   useWmsCapilities,
   provideHostWebserviceContext,
   useHostWebserviceContext,
-  resolveWebserviceContext,
   provideHostRefreshContext,
   useHostRefreshContext,
   provideHostNotifications,
