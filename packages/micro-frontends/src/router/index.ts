@@ -1,5 +1,4 @@
 import App from '@/App.vue'
-import MainComponent from '@/components/MainComponent.vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
@@ -9,7 +8,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/main',
-    component: MainComponent,
+    component: App,
   },
 ]
 

@@ -16,7 +16,8 @@ const base =
   'http://localhost:2010/'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  cacheDir: mode === 'demo' ? 'node_modules/.vite-demo' : undefined,
   server: {
     origin: 'http://localhost:2010',
     port: 2010,
@@ -24,7 +25,7 @@ export default defineConfig({
   base,
   plugins: [
     vue(),
-    ...(isStorybookRun ? [] : [federation(mfConfig)]),
+    ...(isStorybookRun || mode === 'demo' ? [] : [federation(mfConfig)]),
     vuetify({
       autoImport: true,
     }),
@@ -40,4 +41,4 @@ export default defineConfig({
   build: {
     target: 'chrome89',
   },
-})
+}))

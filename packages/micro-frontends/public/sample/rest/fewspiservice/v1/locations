@@ -1,0 +1,33 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [30.8916, -29.8201] },
+      "properties": {
+        "locationId": "Palmiet_Birdhurst_level",
+        "locationName": "Palmiet River Birdhurst",
+        "description": "Palmiet River Birdhurst",
+        "shortName": "Palmiet River Birdhurst",
+        "lat": "-29.8201",
+        "lon": "30.8916",
+        "z": "0.0",
+        "attributes": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [30.8618, -29.8169] },
+      "properties": {
+        "locationId": "Pinetwon_Club_Lane_rain",
+        "locationName": "Pinetown Club Lane",
+        "description": "Pinetown Club Lane",
+        "shortName": "Pinetown Club Lane",
+        "lat": "-29.8169",
+        "lon": "30.8618",
+        "z": "359.68",
+        "attributes": []
+      }
+    }
+  ]
+}
