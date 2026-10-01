@@ -3,8 +3,7 @@ import {
   computed,
   provide,
   inject,
-  onMounted,
-  onUnmounted,
+  onScopeDispose,
   type InjectionKey,
   toValue,
   type MaybeRefOrGetter,
@@ -21,6 +20,8 @@ interface DateRegistry {
 const DATE_REGISTRY_KEY: InjectionKey<DateRegistry> = Symbol('DateRegistry')
 
 /**
+ * @beta
+ *
  * Creates a registry that collects `Date[]` refs registered by descendant
  * components (via {@link useDateRegistry}) and combines them into a single,
  * de-duplicated, sorted list of dates.
@@ -38,6 +39,7 @@ const DATE_REGISTRY_KEY: InjectionKey<DateRegistry> = Symbol('DateRegistry')
  *
  * const { combinedDates } = createDateRegistry()
  * ```
+ * @group Composables
  */
 export function createDateRegistry() {
   const dateRefs = ref<DateRefOrGetter[]>([])
@@ -65,10 +67,12 @@ export function createDateRegistry() {
 }
 
 /**
+ * @beta
+ *
  * Registers a `Date[]` ref (or getter) with the nearest ancestor
  * {@link createDateRegistry} registry, so its dates are included in the
- * registry's combined dates. Registration/unregistration is handled
- * automatically on mount/unmount.
+ * registry's combined dates. The dates are unregistered automatically when
+ * the calling component or effect scope is disposed.
  *
  * Does nothing if no ancestor registry was created.
  *
@@ -84,16 +88,15 @@ export function createDateRegistry() {
  * const dates = ref<Date[]>([new Date('2024-01-01'), new Date('2024-01-02')])
  * useDateRegistry(dates)
  * ```
+ * @group Composables
  */
 export function useDateRegistry(dates: DateRefOrGetter) {
   const registry = inject(DATE_REGISTRY_KEY, undefined)
   if (!registry) return
 
-  onMounted(() => {
-    registry.registerDates(dates)
-  })
+  registry.registerDates(dates)
 
-  onUnmounted(() => {
+  onScopeDispose(() => {
     registry.unregisterDates(dates)
-  })
+  }, true)
 }
