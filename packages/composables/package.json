@@ -18,6 +18,7 @@
   "dependencies": {
     "@deltares/fews-pi-requests": "^3.4.0",
     "@deltares/fews-wms-requests": "^4.2.0",
+    "@vueuse/core": "^14.4.0",
     "vue": "^3.5.40"
   },
   "devDependencies": {

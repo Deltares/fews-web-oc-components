@@ -88,7 +88,7 @@ export function useHostWebserviceContext(): HostWebserviceContext {
 }
 
 
-interface ResolvedWebserviceOptions {
+export interface ResolvedWebserviceOptions {
   baseUrl: string
   getAuthorizationHeaders: () => Promise<Headers>
 }

@@ -126,6 +126,7 @@ export interface RefreshCoordinator {
  * coordinator.pause()
  * coordinator.resume()
  * ```
+ * @group Composables
  */
 export function useRefreshCoordinator(
   callback: () => void | Promise<void>,
