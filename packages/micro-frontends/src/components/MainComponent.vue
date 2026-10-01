@@ -46,7 +46,7 @@
     <!-- Main content -->
     <div class="d-flex flex-1-1 overflow-hidden pa-2">
       <!-- Map -->
-      <v-card class="d-flex flex-1-1 overflow-hidden" elevation="1">
+      <v-card class="d-flex flex-1-1 overflow-hidden map-card" elevation="1">
         <D3WorldMap
           class="map"
           :geojson="geojson"
@@ -54,44 +54,35 @@
           :zoom="debouncedZoom"
           @navigate="onNavigate"
         />
+        <div class="zoom-control">
+          <v-tooltip text="Zoom level" location="top start">
+            <template #activator="{ props }">
+              <div v-bind="props" class="zoom-slider-activator">
+                <v-slider
+                  v-model="zoom"
+                  aria-label="Zoom level"
+                  direction="vertical"
+                  min="0"
+                  max="32"
+                  step="1"
+                  show-ticks="always"
+                  thumb-label
+                  hide-details
+                />
+              </div>
+            </template>
+          </v-tooltip>
+        </div>
       </v-card>
 
-      <!-- Controls -->
+      <!-- Component props -->
       <v-card
         v-if="!locationIds"
         class="ml-2 controls-panel"
         width="320"
         elevation="1"
       >
-        <!-- Controls -->
-        <v-card-title class="text-title-medium"> Controls </v-card-title>
-
-        <v-divider />
-
-        <v-card-text>
-          <div class="text-body-small text-medium-emphasis mb-2">
-            Zoom level
-          </div>
-
-          <div class="d-flex align-center">
-            <v-slider
-              v-model="zoom"
-              class="flex-grow-1"
-              min="0"
-              max="32"
-              step="1"
-              show-ticks="always"
-              thumb-label
-              hide-details
-              indent-details
-            />
-          </div>
-        </v-card-text>
-
-        <v-divider />
-
-        <!-- Props -->
-        <v-card-title class="text-title-medium"> Props </v-card-title>
+        <v-card-title class="text-title-medium"> Component Props </v-card-title>
 
         <v-card-text class="pa-0">
           <div class="props-content">
@@ -254,11 +245,38 @@ function showInfoMessage() {
 </script>
 
 <style scoped>
+.map-card {
+  position: relative;
+}
+
 .map {
   min-width: 0;
   min-height: 0;
   width: 100%;
   height: 100%;
+}
+
+.zoom-control {
+  position: absolute;
+  top: 40px;
+  left: 16px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 220px;
+  padding: 8px;
+}
+
+.zoom-control .v-slider {
+  min-height: 0;
+  flex: 1;
+}
+
+.zoom-slider-activator {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 .controls-panel {
@@ -316,7 +334,6 @@ function showInfoMessage() {
   align-items: center;
   min-height: 28px;
   font-size: 0.75rem;
-  font-weight: 600;
   color: rgb(var(--v-theme-on-surface));
   background: rgba(var(--v-theme-on-surface), 0.04);
 }
