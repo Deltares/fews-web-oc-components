@@ -1,11 +1,15 @@
 import { defineConfig } from 'vitepress'
 import composablesApiSidebar from './composables-api-sidebar.json' with { type: 'json' }
 
+// vitepress's dev command does not reliably report `command: 'serve'` to the
+// config function, so detect the local dev server via the npm script name instead.
+const isLocalDev = process.env.npm_lifecycle_event === 'docs:dev'
+
 export default defineConfig({
   title: 'FEWS Web OC',
   description: 'Documentation for FEWS Web OC components and composables.',
   lang: 'en-US',
-  base: process.env.VITEPRESS_BASE ?? '/fews-web-oc-components/',
+  base: process.env.VITEPRESS_BASE ?? (isLocalDev ? '/' : '/fews-web-oc-components/'),
   cleanUrls: true,
   themeConfig: {
     nav: [
@@ -80,3 +84,5 @@ export default defineConfig({
     ],
   },
 })
+
+
