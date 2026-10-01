@@ -46,3 +46,59 @@
   flex: 0 0 auto;
   text-decoration: none;
 }
+
+.api-reference .vp-doc h1 {
+  margin-bottom: 0.75rem;
+}
+
+.api-reference .vp-doc h2 {
+  margin: 1.5rem 0 0.5rem;
+  padding-top: 0.75rem;
+}
+
+.api-reference .vp-doc h3 {
+  margin: 1.25rem 0 0.35rem;
+}
+
+.api-reference .vp-doc h4 {
+  margin: 1rem 0 0.25rem;
+}
+
+.api-reference .vp-doc p,
+.api-reference .vp-doc blockquote,
+.api-reference .vp-doc ul {
+  margin: 0.5rem 0;
+}
+
+.api-reference .vp-doc hr {
+  margin: 1.25rem 0;
+}
+
+.api-reference .vp-doc div[class*='language-'] {
+  margin: 0.75rem 0;
+}
+
+.api-reference .vp-doc strong:has(> code) {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, #b45309 40%, transparent);
+  border-radius: 4px;
+  padding: 0.15rem 0.55rem;
+  background: color-mix(in srgb, #d97706 13%, var(--vp-c-bg));
+  color: #92400e;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.dark .api-reference .vp-doc strong:has(> code) {
+  color: #fbbf24;
+}
+
+.api-reference .vp-doc strong:has(> code) code {
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
