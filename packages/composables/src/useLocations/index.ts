@@ -42,9 +42,9 @@ export interface UsePiLocationsOptions {
   /**
    * Controls whether locations may be fetched automatically.
    *
-   * Defaults to true.
-   *
    * When false, refresh-coordinator triggers are ignored.
+   *
+   * @default ref(true)
    */
   enabled?: Ref<boolean>
 
@@ -62,15 +62,14 @@ export interface UsePiLocationsOptions {
     /**
      * Policies that trigger an automatic refresh.
      *
-     * Defaults to:
-     * ['onSystemTick', 'onInterval', 'onVisibilityResume']
+     * @default ['onSystemTick', 'onInterval', 'onVisibilityResume']
      */
     policies?: RefreshPolicy[]
 
     /**
      * Interval between automatic refreshes when 'onInterval' is enabled.
      *
-     * Defaults to 60 seconds.
+     * @default 300000 (5 minutes)
      */
     intervalMs?: number
 
@@ -78,15 +77,17 @@ export interface UsePiLocationsOptions {
      * The system-time synchronization signal used by the `onSystemTick`
      * refresh policy.
      *
-     * When omitted, the host-provided system tick is used.
      * Standalone applications can provide their own system tick.
+     *
+     * @default
+     * When omitted, the host-provided system tick is used.
      */
     systemTick?: Ref<Date | undefined>
 
     /**
      * Whether to fetch immediately when the composable is created.
      *
-     * Defaults to true.
+     * @default true
      */
     immediate?: boolean
   }
@@ -170,6 +171,40 @@ const emptyFeatureCollection: FeatureCollection<Geometry, PiLocation> = {
   type: 'FeatureCollection',
   features: [],
 }
+
+/**
+ * Fetches FEWS PI locations matching a reactive filter, and keeps them
+ * up to date automatically via a {@link useRefreshCoordinator}.
+ *
+ * @param options Configuration for the locations request and automatic
+ *   refreshing. See {@link UsePiLocationsOptions}.
+ * @returns Reactive locations/geojson data, loading/error state, and controls
+ *   for fetching and refreshing. See {@link UsePiLocationsReturn}.
+ *
+ * @example
+ * ```ts
+ * import { ref } from 'vue'
+ * import { usePiLocations } from '@deltares/fews-web-oc-composables'
+ *
+ * const filter = ref({ filterIds: ['example-filter'] })
+ *
+ * const { locations, loading, error, isEmpty } = usePiLocations({ filter })
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Standalone usage, with custom refresh configuration
+ * const { locations, requestRefresh } = usePiLocations({
+ *   filter,
+ *   webservice: { baseUrl: 'https://example.localhost/fewswebservices' },
+ *   refresh: {
+ *     policies: ['onInterval'],
+ *     intervalMs: 30_000,
+ *     immediate: true,
+ *   },
+ * })
+ * ```
+ */
 export function usePiLocations(
   options: UsePiLocationsOptions,
 ): UsePiLocationsReturn {
