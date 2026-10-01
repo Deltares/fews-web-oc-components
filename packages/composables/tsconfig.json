@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2019",
-    "module": "es2020",
-    "moduleResolution": "bundler",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "verbatimModuleSyntax": true,
     "declaration": true,
     "strict": true,
