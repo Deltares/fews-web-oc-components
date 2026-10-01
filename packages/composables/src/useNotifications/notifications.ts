@@ -46,6 +46,7 @@ let hostNotifications: HostNotifications | null = null
  *   addAlert: ({ type, message }) => showSnackbar(type, message),
  * })
  * ```
+ * @group Providers
  */
 export function provideHostNotifications(notifications: HostNotifications) {
   hostNotifications = notifications
@@ -71,6 +72,7 @@ export function provideHostNotifications(notifications: HostNotifications) {
  *   message: 'Saved successfully.',
  * })
  * ```
+ * @group Composables
  */
 export function useHostNotifications(): HostNotifications {
   if (!hostNotifications) {

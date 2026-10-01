@@ -23,6 +23,8 @@ function getLinks(folder) {
     .sort((a, b) => a.text.localeCompare(b.text))
 }
 
+const functions = getLinks('functions')
+
 const sidebar = [
   {
     text: '@deltares/fews-web-oc-composables',
@@ -34,8 +36,18 @@ const sidebar = [
     ],
   },
   {
-    text: 'Functions',
-    items: getLinks('functions'),
+    text: 'Composables',
+    items: functions.filter(({ text }) => text.startsWith('use')),
+  },
+  {
+    text: 'Providers',
+    items: functions.filter(({ text }) => text.startsWith('provide')),
+  },
+  {
+    text: 'Other Functions',
+    items: functions.filter(
+      ({ text }) => !text.startsWith('use') && !text.startsWith('provide'),
+    ),
   },
   {
     text: 'Interfaces',

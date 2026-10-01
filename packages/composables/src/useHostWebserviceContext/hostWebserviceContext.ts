@@ -51,6 +51,7 @@ let hostWebserviceContext: HostWebserviceContext | null = null
  *   },
  * })
  * ```
+ * @group Providers
  */
 export function provideHostWebserviceContext(
   context: HostWebserviceContext,
@@ -73,6 +74,7 @@ export function provideHostWebserviceContext(
  *
  * const { getBaseUrl, getAuthorizationHeaders } = useHostWebserviceContext()
  * ```
+ * @group Composables
  */
 export function useHostWebserviceContext(): HostWebserviceContext {
   if (!hostWebserviceContext) {
@@ -121,6 +123,7 @@ interface ResolvedWebserviceOptions {
  * // Micro-frontend usage, relying on the host-provided context:
  * const { baseUrl, getAuthorizationHeaders } = resolveWebserviceContext()
  * ```
+ * @group Other Functions
  */
 export function resolveWebserviceContext(
   override?: PiWebserviceOptions,

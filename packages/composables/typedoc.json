@@ -4,6 +4,7 @@
   "out": "../../docs/composables/api",
   "entryFileName": "index",
   "cleanOutputDir": true,
+  "groupOrder": ["Interfaces", "Type Aliases", "Composables", "Providers", "Other Functions"],
   "excludePrivate": true,
   "excludeProtected": true
 }

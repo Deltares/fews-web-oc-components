@@ -35,6 +35,7 @@ let hostRefreshContext: HostRefreshContext | null = null
  *
  * provideHostRefreshContext({ systemTick })
  * ```
+ * @group Providers
  */
 export function provideHostRefreshContext(context: HostRefreshContext): void {
   hostRefreshContext = context
@@ -55,6 +56,7 @@ export function provideHostRefreshContext(context: HostRefreshContext): void {
  *
  * const { systemTick } = useHostRefreshContext()
  * ```
+ * @group Composables
  */
 export function useHostRefreshContext(): HostRefreshContext {
   if (!hostRefreshContext) {
