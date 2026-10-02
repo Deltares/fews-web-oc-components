@@ -1,136 +1,124 @@
-# FEWS WebOC Micro Frontend Components
+# Micro-frontends in FEWS WebOC
 
 > [!IMPORTANT]
-> This document is currently in proposal state. APIs, package names, and implementation details may change before final release.
+> This documentation is currently in proposal state. Package names and implementation details may change before final release.
 
-Micro frontend components are Vue components exposed from the micro-frontends package and mounted by the Web OC host. They should stay small, host-aware, and focused on a single user flow such as showing a map, rendering a time series, or drilling into a location selection.
+Micro-frontends add focused views and tools to FEWS WebOC. A team can build a map, data-quality view, forecast summary, or another workflow that fits its users, then make it available from the WebOC interface.
 
-Micro-frontends let teams extend WebOC with components tailored to their own workflows. They can build custom visualizations with JavaScript libraries such as [D3.js](https://d3js.org/) and [Vega](https://vega.github.io/vega/), as well as develop specialized tools and overview screens, while using FEWS data and permissions model. Example tools include a threshold-exceedance triage panel, a location data-quality review tool, and a scenario comparison workbench.
+This guide assumes your micro-frontend runs inside WebOC. WebOC loads the view, provides the FEWS connection and user authentication, and passes the selections configured for that view. Your component focuses on presenting information and responding to the user's actions.
 
+## What You Can Build
 
+Use a micro-frontend when you need a purpose-built way for people to explore data or complete a task in WebOC. For example, a view could:
 
-Micro-frontends can also load data that does not fit the FEWS data model. For example, a remote could call a public weather API such as [Open-Meteo](https://open-meteo.com/) or visualize cloud-hosted [Cloud Optimized GeoTIFF](https://www.cogeo.org/), [Zarr](https://zarr.dev/), or [Apache Parquet](https://parquet.apache.org/) datasets.
+- Show FEWS locations on a map and open their time series when selected.
+- Summarize forecasts or highlight threshold exceedances.
+- Help review data quality or compare scenarios.
+- Combine FEWS information with data from an external service or dataset.
 
-Micro-frontends are implemented much like Vue components in WebOC, with component-specific props and events and access to shared composables. When a micro-frontend addresses a broadly useful use case, it can also be considered for inclusion in WebOC so it is available to the wider community.
+You choose how to present the information and which interactions your view supports. WebOC remains responsible for the overall application experience, including navigation and the shared FEWS connection.
+
+## How It Fits into WebOC
+
+Each micro-frontend is configured as a view in FEWS. The configuration determines where it appears and which FEWS selections, such as a Filter, are available to it. WebOC passes those selections to the view and handles navigation when the user moves between views.
+
+When a view uses FEWS data, it can use the composables in this package to load locations or time series through the connection provided by WebOC. The view can also load external data when its workflow calls for it. Handle loading, errors, and empty results as part of the user experience, and make sure external services are available to the WebOC deployment.
+
+## Demo Apps
+
+Explore the [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontends/) to see two example apps. They illustrate how focused views can help people explore FEWS data. When loaded in WebOC, each app uses the FEWS instance, Filter, and user access configured for that environment.
+
+### D3 World Map: FEWS Locations
+
+The map displays locations from a FEWS Filter. Select a location to open its time series in WebOC. This example is useful as a starting point for map-based data exploration and location-focused workflows.
+
+It uses [`usePiLocations`](../composables/use-pi-locations) to request locations from FEWS and keep the map data up to date.
+
+### Critical Points: River Forecasts
+
+This view brings river forecasts and threshold information together so users can quickly spot critical conditions. Users can search and filter the list, then select a location to open its time series in WebOC. It is a starting point for operational summary views that help users decide where to investigate.
+
+It uses [`usePiTimeSeries`](../composables/use-pi-time-series) to load forecast data and [`useDateRegistry`](../composables/use-date-registry) to share the forecast's available dates with WebOC's date control.
+
+## Get Started
+
+- [Configure a Micro-frontend in FEWS](./configure-in-fews): add a view to FEWS and select the Filter or other settings it should use.
+- [Develop a Micro-frontend for WebOC](./development): run a remote during development and connect it to WebOC.
+- [Load FEWS Locations](./load-fews-locations): build a view around FEWS locations.
+- [Load FEWS Time Series](./load-fews-timeseries-data): build a view around forecast or observation time series.
+- [Show available dates](./date-registry): share a view's available dates with the WebOC date control.
+
+For the available shared data tools, see the [Composables API](../composables/api/). For FEWS Web Services concepts, see the [Delft-FEWS documentation](https://fewsdocs.deltares.nl/).
+
+> The sections below provide a more detailed implementation description for developers building a micro-frontend that runs in WebOC.
 
 ## Responsibilities
 
-- Define a narrow, typed prop contract for required inputs and host selections, such as `topologyNode`, `locationIds`, and `selectedDate`.
-- Load, transform, and present the data needed for the feature. Use FEWS composables when they fit; a micro-frontend can also call other APIs or read supported external data sources.
-- Own view-specific state and interactions, such as map zoom, table search, category filters, and selected rows.
-- Emit declared events for host-owned actions such as navigation. Keep application routing and cross-view coordination in WebOC.
-- Use shared composable context for host-provided services such as FEWS Web Services access, refresh signals, notifications, and the date registry instead of passing service configuration through component props.
-- Handle loading, error, and empty states, and clean up component-owned subscriptions or resources when the component is disposed.
+A micro-frontend owns the content and interactions inside its view. In practice, it should:
+
+- Declare the inputs it needs, such as the configured FEWS node, selected locations, or date.
+- Load and present the data for its task. Use the shared FEWS composables when they fit, or connect to an external data source when needed.
+- Manage view-specific interactions, such as map zoom, search, filters, or selected rows.
+- Notify WebOC about host-owned actions, such as opening another view. WebOC remains responsible for navigation and coordination between views.
+- Use services provided by WebOC instead of passing service URLs or authentication settings through view props.
+- Show loading, error, and empty states, and release subscriptions or other resources when the view is removed.
 
 ## Typical Contract
 
-The host mounts the remote component with the inputs defined by that component's contract. For example, `MainComponent` accepts a `topologyNode` and optional `locationIds` and `selectedDate` values.
+WebOC passes a view its configured inputs as props and responds to events emitted by the view. The exact inputs depend on the component. For example, this view receives a FEWS topology node and optional location and date selections, and emits a navigation event when a user chooses a location:
 
 ```vue
 <MainComponent
-  :topologyNode="topologyNode"
-  :locationIds="locationIds"
-  @navigate="onNavigate"
+	:topologyNode="topologyNode"
+	:locationIds="locationIds"
+	:selectedDate="selectedDate"
+	@navigate="onNavigate"
 />
 ```
+
+The component declares the shape of those inputs and events:
 
 ```ts
 import type { TopologyNode } from '@deltares/fews-pi-requests'
 
 interface Props {
-  topologyNode: TopologyNode
-  locationIds?: string
-  selectedDate?: Date
+	topologyNode: TopologyNode
+	locationIds?: string
+	selectedDate?: Date
 }
 
 interface NavigationRoute {
-  name: string
-  params?: {
-    locationIds: string
-  }
+	name: string
+	params?: {
+		locationIds: string
+	}
 }
 
 interface Emits {
-  (event: 'navigate', route: NavigationRoute): void
+	(event: 'navigate', route: NavigationRoute): void
 }
 ```
 
-`topologyNode` is required by `MainComponent`; `locationIds` and `selectedDate` are optional props that the Web OC host passes when available. When opening the time series window, WebOC gets `locationIds` from its router and passes them to the micro frontend. The `selectedDate` prop stays synchronized with the user's date selection: it changes through interactions with the component or through the WebOC dashboard group time slider. `selectedDate` is not required for the locations view. The component derives its location filter and renders the result; the host remains responsible for navigation and shared FEWS connectivity.
+Here, `topologyNode` is required; the other selections are optional. WebOC supplies them when available. For example, it can pass the selected location to a time-series view and keep the date in sync with its date control. The component uses these inputs to decide what to show; WebOC handles navigation and the shared FEWS connection.
 
 ## What the Web OC Host Provides
 
-The Web OC host provides two kinds of input:
+WebOC gives the view two kinds of input:
 
-- Component props, such as `topologyNode` and optional selections. Their names and types are defined by each remote component.
-- Shared service context, such as the FEWS Web Services URL and authorization headers. This is provided once by the host, not passed through component props.
+- **View selections**, passed as props and defined by the component, such as a topology node, location, or date.
+- **Shared services**, such as the FEWS Web Services URL and authentication headers. These are provided by WebOC and should not be passed as component props.
 
-Before mounting a remote that makes FEWS requests, the host provides its Web Services URL and authentication-header function:
+Before mounting a view that requests FEWS data, WebOC provides its service connection and authentication function. For example:
 
 ```ts
 import { provideHostWebserviceContext } from '@deltares/fews-web-oc-composables'
 
 provideHostWebserviceContext({
-  getBaseUrl: () => webservicesUrl,
-  getAuthorizationHeaders: () => getHeaders(),
+	getBaseUrl: () => webservicesUrl,
+	getAuthorizationHeaders: () => getHeaders(),
 })
 ```
 
-Data composables such as `usePiLocations` use this context by default. If a component uses host-driven refresh or notifications, the host must also provide those contexts before mounting it. Because these contexts are held by the composables package, configure both host and remote to share the same `@deltares/fews-web-oc-composables` singleton; otherwise the remote may not see the host's provided context.
+Data composables such as [`usePiLocations`](../composables/use-pi-locations) use this connection by default. Views that need host-driven refresh or notifications also rely on the corresponding context being provided before they mount. Because WebOC and the view share these services through the composables package, both must use the same shared package instance in the module-federation setup.
 
-Micro-frontends can register their available dates with the host so WebOC and the WebOC dashboard can populate and show the DateTimeSlider, and keep its selected date synchronized with the remote. See [Showing the Date Time Slider](./date-registry) for the setup and examples.
-
-## Demo App
-
-Explore the hosted [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontends/). It runs both remote components with bundled sample data and demonstrates how the host passes props, handles navigation events, and provides shared composable context. When these components are loaded in FEWS WebOC, they use live data from the configured FEWS instance, selected by the Filter ID configured on the topology node.
-
-### D3 World Map: Locations for a FEWS Filter
-
-The Main Panel uses `usePiLocations` to load the FEWS locations selected by the `filterIds` value on its `topologyNode` (the demo uses the `palmiet` filter). It displays the returned GeoJSON on a map rendered with [D3.js](https://d3js.org/) and uses host-provided Web Services context. The component accepts `topologyNode`, optional `locationIds`, and optional `selectedDate` props. Selecting a location emits `navigate` with its ID so the host can open the time-series view; the refresh button calls the composable's `fetch`, and the notification button demonstrates `useHostNotifications`.
-
-### Critical Points: River Forecasts
-
-The Critical Points view uses `usePiTimeSeries` to load forecast time series and thresholds for the filter on its `topologyNode` (the demo uses `SWMM Models_Simplified`). It accepts `topologyNode`, `selectedDate`, and optional `locationIds` props; `selectedDate` sets the forecast's current-time reference, and `locationIds` identifies selected rows. Clicking a row emits `navigate` with its location ID for the host to open the time-series window. Search, threshold-category filtering, and manual refresh are handled in the component, while `useDateRegistry` registers available forecast dates with the host DateTimeSlider.
-
-## Module Federation
-
-See [Module Federation](https://module-federation.io/) for an overview. The remote exposes its component under a module-federation key. For example, this repository exposes the component source directly as `./main_component`:
-
-For standalone sample-data development and WebOC integration setups, see [Micro-Frontend Development Setup](./development).
-
-For deployment instructions, see [Deploying Micro Frontends | fews-web-oc](https://deltares.github.io/fews-web-oc/micro_frontends/).
-
-```ts
-export default createModuleFederationConfig({
-  exposes: {
-    './main_component': './src/components/MainComponent.vue'
-  }
-})
-```
-
-To register a remote and reference it from FEWS topology, see [Configure a Micro Frontend in FEWS](./configure-in-fews).
-
-### Shared Runtime Dependencies
-
-WebOC and each micro-frontend must share `vue` and `@deltares/fews-web-oc-composables` as Module Federation singletons. This keeps Vue's component runtime and the host-provided composable contexts shared across the host and remote. When a new WebOC release becomes available, review its dependency versions and update the micro-frontend dependencies and federation configuration as needed.
-
-## FEWS Data Access
-
-When a micro frontend needs FEWS data, prefer the package composables where they cover the use case. For example, `usePiLocations` reads the host webservice context and manages location loading and refreshes, while `usePiTimeSeries` provides keyed reactive time-series requests. Use `PiWebserviceProvider` directly when you need lower-level control.
-
-We plan to make more composables available in this package over time. Until then, see the [current WebOC composables](https://github.com/Deltares/fews-web-oc/tree/main/src/composables). If you need a composable migrated for your micro-frontend, contact the WebOC maintainers to discuss it.
-
-For the complete composable API reference, see [Composables API](../composables/api/).
-
-For FEWS Web Services documentation, see [Delft-FEWS Documentation](https://fewsdocs.deltares.nl/).
-
-For a concrete time series example, see [Micro Frontend Time Series Data](./load-fews-timeseries-data).
-
-For a location-loading example, see [Micro Frontend Locations](./load-fews-locations).
-
-## Design Notes
-
-- Keep host-specific logic at the boundary and isolate request-building in small helpers.
-- Prefer props and emits for component inputs and outputs; use host context providers for shared services.
-- Keep component-specific configuration typed at the owning component boundary.
-- Make data dependencies explicit so the component can be reused in different host shells.
-- Keep the public API narrow and semver-friendly if the component is intended for external consumption.
+Views can also share their available dates with WebOC's date control using [`useDateRegistry`](../composables/use-date-registry). See [Showing the Date Time Slider](./date-registry) for the setup and example.
