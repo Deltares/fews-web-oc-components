@@ -92,6 +92,7 @@ function summarize(
   const levelIndex =
     levels.filter((level) => peakValue >= level.value).length - 1
   const next = levels[levelIndex + 1]
+  const lowestLevel = levels[0]
 
   return {
     locationId: header.locationId,
@@ -103,8 +104,8 @@ function summarize(
     current,
     peak,
     levelIndex,
-    firstExceedance: levels.length
-      ? values.find((point) => point.value >= levels[0].value)?.time
+    firstExceedance: lowestLevel
+      ? values.find((point) => point.value >= lowestLevel.value)?.time
       : undefined,
     margin: peak && next ? next.value - peak.value : undefined,
   }
@@ -112,8 +113,9 @@ function summarize(
 
 /** Relative position of the peak with respect to the threshold ladder. */
 function severityScore(point: CriticalPoint): number {
-  if (!point.levels.length || !point.peak) return -Infinity
-  const lowest = point.levels[0].value
+  const lowestLevel = point.levels[0]
+  if (!lowestLevel || !point.peak) return -Infinity
+  const lowest = lowestLevel.value
   const highest = Math.max(...point.levels.map((level) => level.value))
   const span = highest - lowest || 1
   return (point.peak.value - lowest) / span
@@ -150,11 +152,11 @@ export function toCriticalPoints(
     )
 }
 
-const LEVEL_COLORS = ['#fbc02d', '#fb8c00', '#e53935']
+const LEVEL_COLORS = ['#fbc02d', '#fb8c00', '#e53935'] as const
 
 /** Colour of a threshold, with the highest threshold always red. */
 export function levelColor(index: number, count: number): string {
   if (index < 0) return '#43a047'
   const offset = Math.max(0, LEVEL_COLORS.length - count)
-  return LEVEL_COLORS[Math.min(index + offset, LEVEL_COLORS.length - 1)]
+  return LEVEL_COLORS[Math.min(index + offset, LEVEL_COLORS.length - 1)] ?? '#e53935'
 }
