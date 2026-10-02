@@ -14,7 +14,7 @@ Micro frontend components are Vue components exposed from the micro-frontends pa
 
 ## Typical Contract
 
-The host mounts the remote component with only the inputs that belong to that component. For example, `MainComponent` accepts a topology node and an optional location selection; it does not take `hostSettings` or a general-purpose `settings` prop.
+The host mounts the remote component with the inputs defined by that component's contract. For example, `MainComponent` accepts a `topologyNode` and optional `locationIds` and `selectedDate` values.
 
 ```vue
 <MainComponent
@@ -45,7 +45,7 @@ interface Emits {
 }
 ```
 
-`topologyNode` is required by `MainComponent`; `locationIds` and `selectedDate` are optional props that the Web OC host passes only when it has those values. `selectedDate` is not required for the locations view. The component derives its location filter and renders the result; the host remains responsible for navigation and shared FEWS connectivity.
+`topologyNode` is required by `MainComponent`; `locationIds` and `selectedDate` are optional props that the Web OC host passes when available. When opening the time series window, WebOC gets `locationIds` from its router and passes them to the micro frontend. The `selectedDate` prop stays synchronized with the user's date selection: it changes through interactions with the component or through the WebOC dashboard group time slider. `selectedDate` is not required for the locations view. The component derives its location filter and renders the result; the host remains responsible for navigation and shared FEWS connectivity.
 
 ## What the Web OC Host Provides
 
@@ -66,6 +66,8 @@ provideHostWebserviceContext({
 ```
 
 Data composables such as `usePiLocations` use this context by default. If a component uses host-driven refresh or notifications, the host must also provide those contexts before mounting it. Because these contexts are held by the composables package, configure both host and remote to share the same `@deltares/fews-web-oc-composables` singleton; otherwise the remote may not see the host's provided context.
+
+Micro-frontends can register their available dates with the host so WebOC and the WebOC dashboard can populate and show the DateTimeSlider, and keep its selected date synchronized with the remote. See [Showing the Date Time Slider](./date-registry) for the setup and examples.
 
 ## Module Federation
 
@@ -88,6 +90,8 @@ To register a remote and reference it from FEWS topology, see [Configure a Micro
 ## Data Access
 
 When a micro frontend needs FEWS data, prefer the package composables where they cover the use case. For example, `usePiLocations` reads the host webservice context and manages location loading and refreshes, while `usePiTimeSeries` provides keyed reactive time-series requests. Use `PiWebserviceProvider` directly when you need lower-level control.
+
+For the complete composable API reference, see [Composables API](../composables/api/).
 
 For a concrete time series example, see [Micro Frontend Time Series Data](./load-fews-timeseries-data).
 

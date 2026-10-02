@@ -86,6 +86,10 @@ export default defineConfig({
               text: 'Loading Time Series',
               link: '/micro-frontends/load-fews-timeseries-data',
             },
+            {
+              text: 'Showing the Date Time Slider',
+              link: '/micro-frontends/date-registry',
+            },
           ],
         },
       ],

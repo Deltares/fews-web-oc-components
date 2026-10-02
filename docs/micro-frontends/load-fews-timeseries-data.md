@@ -9,7 +9,7 @@ The Web OC host owns FEWS connectivity: it provides the Web Services URL and aut
 
 ## Prerequisites
 
-A component receives only the inputs it needs for its own view. For example, `MainComponent` accepts a `topologyNode`, optional `locationIds`, and optional `selectedDate`; it does not accept `hostSettings` or a general-purpose `settings` prop. For another remote, the host passes only that component's declared selection props. Provide the shared FEWS service context in the host before mounting the remote component:
+A component receives the inputs it needs for its own view. For example, `MainComponent` accepts a `topologyNode`, optional `locationIds`, and optional `selectedDate`. For another remote, the host passes that component's declared selection props. Provide the shared FEWS service context in the host before mounting the remote component:
 
 ```ts
 import {
@@ -161,7 +161,7 @@ Use `usePiTimeSeries` when:
 
 ## Packaging Guidance for @deltares/fews-web-oc-composables
 
-The host context is shared by composables such as `usePiTimeSeries`; component-specific selections remain regular props or local reactive state. Do not pass `hostSettings` or a catch-all `settings` object to `MainComponent`.
+The host context is shared by composables such as `usePiTimeSeries`; component-specific selections remain regular props or local reactive state.
 
 ## See Also
 
