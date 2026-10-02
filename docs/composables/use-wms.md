@@ -1,6 +1,6 @@
 # useWms
 
-> **Experimental** — this API is not yet stable and may change without notice.
+> **Experimental** — this API does not yet support refresh coordination through `useRefreshCoordinator` or the host-provided `useHostRefreshContext`.
 
 Utilities for loading WMS capabilities, layer time values, and legend graphics.
 

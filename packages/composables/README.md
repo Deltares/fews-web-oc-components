@@ -14,4 +14,4 @@ Not all composables currently used by WebOC are available in this package yet. W
 
 **Beta** APIs are functional but may change before they are considered stable.
 
-**Experimental** APIs are not yet stable and may change without notice.
+**Experimental** APIs are not yet stable and may change in future versions.
