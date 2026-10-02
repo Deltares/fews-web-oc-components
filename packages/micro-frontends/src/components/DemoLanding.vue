@@ -27,7 +27,7 @@ const demos = [
     to: '/main',
     icon: 'mdi-earth',
     title: 'Main panel',
-    subtitle: 'Palmiet locations',
+    subtitle: 'D3 world map with locations for a FEWS filter',
     text: 'Locations from a FEWS filter on an interactive globe.',
   },
   {

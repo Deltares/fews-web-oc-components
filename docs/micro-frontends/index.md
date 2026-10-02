@@ -5,6 +5,18 @@
 
 Micro frontend components are Vue components exposed from the micro-frontends package and mounted by the Web OC host. They should stay small, host-aware, and focused on a single user flow such as showing a map, rendering a time series, or drilling into a location selection.
 
+## Demo App
+
+Explore the hosted [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontends/). It runs both remote components with sample FEWS data and demonstrates how the host passes props, handles navigation events, and provides shared composable context.
+
+### D3 World Map: Locations for a FEWS Filter
+
+The Main Panel uses `usePiLocations` to load the FEWS locations selected by the `filterIds` value on its `topologyNode` (the demo uses the `palmiet` filter). It displays the returned GeoJSON on a map and uses host-provided Web Services context. The component accepts `topologyNode`, optional `locationIds`, and optional `selectedDate` props. Selecting a location emits `navigate` with its ID so the host can open the time-series view; the refresh button calls the composable's `fetch`, and the notification button demonstrates `useHostNotifications`.
+
+### Critical Points: River Forecasts
+
+The Critical Points view uses `usePiTimeSeries` to load forecast time series and thresholds for the filter on its `topologyNode` (the demo uses `SWMM Models_Simplified`). It accepts `topologyNode`, `selectedDate`, and optional `locationIds` props; `selectedDate` sets the forecast's current-time reference, and `locationIds` identifies selected rows. Clicking a row emits `navigate` with its location ID for the host to open the time-series window. Search, threshold-category filtering, and manual refresh are handled in the component, while `useDateRegistry` registers available forecast dates with the host DateTimeSlider.
+
 ## Responsibilities
 
 - Receive component-specific inputs from the host through props.
@@ -87,11 +99,13 @@ export default createModuleFederationConfig({
 
 To register a remote and reference it from FEWS topology, see [Configure a Micro Frontend in FEWS](./configure-in-fews).
 
-## Data Access
+## FEWS Data Access
 
 When a micro frontend needs FEWS data, prefer the package composables where they cover the use case. For example, `usePiLocations` reads the host webservice context and manages location loading and refreshes, while `usePiTimeSeries` provides keyed reactive time-series requests. Use `PiWebserviceProvider` directly when you need lower-level control.
 
 For the complete composable API reference, see [Composables API](../composables/api/).
+
+For FEWS Web Services documentation, see [Delft-FEWS Documentation](https://fewsdocs.deltares.nl/).
 
 For a concrete time series example, see [Micro Frontend Time Series Data](./load-fews-timeseries-data).
 
@@ -101,6 +115,6 @@ For a location-loading example, see [Micro Frontend Locations](./load-fews-locat
 
 - Keep host-specific logic at the boundary and isolate request-building in small helpers.
 - Prefer props and emits for component inputs and outputs; use host context providers for shared services.
-- Keep component-specific configuration typed at the owning component boundary; avoid catch-all props such as `settings` on `MainComponent`.
+- Keep component-specific configuration typed at the owning component boundary.
 - Make data dependencies explicit so the component can be reused in different host shells.
 - Keep the public API narrow and semver-friendly if the component is intended for external consumption.
