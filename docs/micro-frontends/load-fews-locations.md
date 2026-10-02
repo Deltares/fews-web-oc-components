@@ -115,5 +115,7 @@ const locationsState = usePiLocations({
 ## See Also
 
 - [Micro Frontend Components](./index)
-- [useLocations API](../composables/use-locations)
+- [usePiLocations](../composables/use-pi-locations)
+- [useHostWebserviceContext](../composables/use-host-webservice-context)
+- [useHostRefreshContext](../composables/use-host-refresh-context)
 - [Loading Time Series](./load-fews-timeseries-data)

@@ -17,6 +17,7 @@ export default defineConfig({
     }
   },
   themeConfig: {
+    outline: { level: [2, 3] },
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Components', link: '/components/' },
@@ -45,10 +46,32 @@ export default defineConfig({
       '/composables/': [
         {
           text: 'Composables',
+          items: [{ text: 'Overview', link: '/composables/' }],
+        },
+        {
+          text: 'Load FEWS Data',
           items: [
-            { text: 'Overview', link: '/composables/' },
-            { text: 'useLocations', link: '/composables/use-locations' },
+            { text: 'usePiLocations', link: '/composables/use-pi-locations' },
+            {
+              text: 'usePiTimeSeries',
+              link: '/composables/use-pi-time-series',
+            },
             { text: 'useWms', link: '/composables/use-wms' },
+          ],
+        },
+        {
+          text: 'Send Information to WebOC',
+          items: [
+            { text: 'useNotifications', link: '/composables/use-notifications' },
+            {
+              text: 'useDateRegistry',
+              link: '/composables/use-date-registry',
+            },
+          ],
+        },
+        {
+          text: 'Use Host-Provided Context',
+          items: [
             {
               text: 'useHostWebserviceContext',
               link: '/composables/use-host-webservice-context',
@@ -57,7 +80,19 @@ export default defineConfig({
               text: 'useHostRefreshContext',
               link: '/composables/use-host-refresh-context',
             },
-            { text: 'useNotifications', link: '/composables/use-notifications' },
+          ],
+        },
+        {
+          text: 'Advanced Controls and Diagnostics',
+          items: [
+            {
+              text: 'useRefreshCoordinator',
+              link: '/composables/use-refresh-coordinator',
+            },
+            {
+              text: 'Shared Request Inspection',
+              link: '/composables/shared-request-inspection',
+            },
           ],
         },
         {
