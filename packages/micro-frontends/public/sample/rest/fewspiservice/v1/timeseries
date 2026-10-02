@@ -1,0 +1,113 @@
+{
+  "version": "1.34",
+  "timeZone": "0.0",
+  "timeSeries": [
+    {
+      "header": {
+        "type": "instantaneous",
+        "moduleInstanceId": "HydraulicPCSWMMFC_Central_Simplified",
+        "locationId": "umgeni_estuary",
+        "parameterId": "H_simulated",
+        "startDate": { "date": "2025-03-13", "time": "09:00:00" },
+        "endDate": { "date": "2025-03-13", "time": "21:00:00" },
+        "forecastDate": { "date": "2025-03-13", "time": "12:00:00" },
+        "missVal": "-999.0",
+        "stationName": "umgeni_estuary",
+        "units": "m + MSL",
+        "thresholds": [
+          { "id": "Watch_WL", "name": "Watch", "value": "2.66", "type": "highLevelThreshold", "groupId": "Waterlevels", "groupName": "Water levels" },
+          { "id": "Alert_WL", "name": "Alert", "value": "3.04", "type": "highLevelThreshold", "groupId": "Waterlevels", "groupName": "Water levels" },
+          { "id": "Warning_WL", "name": "Warning", "value": "3.42", "type": "highLevelThreshold", "groupId": "Waterlevels", "groupName": "Water levels" }
+        ]
+      },
+      "events": [
+        { "date": "2025-03-13", "time": "09:00:00", "value": "1.92", "flag": "0" },
+        { "date": "2025-03-13", "time": "10:00:00", "value": "2.05", "flag": "0" },
+        { "date": "2025-03-13", "time": "11:00:00", "value": "2.21", "flag": "0" },
+        { "date": "2025-03-13", "time": "12:00:00", "value": "2.40", "flag": "0" },
+        { "date": "2025-03-13", "time": "13:00:00", "value": "2.71", "flag": "0" },
+        { "date": "2025-03-13", "time": "14:00:00", "value": "3.10", "flag": "0" },
+        { "date": "2025-03-13", "time": "15:00:00", "value": "3.48", "flag": "0" },
+        { "date": "2025-03-13", "time": "16:00:00", "value": "3.55", "flag": "0" },
+        { "date": "2025-03-13", "time": "17:00:00", "value": "3.31", "flag": "0" },
+        { "date": "2025-03-13", "time": "18:00:00", "value": "2.94", "flag": "0" },
+        { "date": "2025-03-13", "time": "19:00:00", "value": "2.60", "flag": "0" },
+        { "date": "2025-03-13", "time": "20:00:00", "value": "-999.0", "flag": "9" },
+        { "date": "2025-03-13", "time": "21:00:00", "value": "2.21", "flag": "0" }
+      ]
+    },
+    {
+      "header": {
+        "type": "instantaneous",
+        "moduleInstanceId": "HydraulicPCSWMMFC_Central_Simplified",
+        "locationId": "Blue Lagoon",
+        "parameterId": "H_simulated",
+        "startDate": { "date": "2025-03-13", "time": "09:00:00" },
+        "endDate": { "date": "2025-03-13", "time": "21:00:00" },
+        "forecastDate": { "date": "2025-03-13", "time": "12:00:00" },
+        "missVal": "-999.0",
+        "stationName": "Blue Lagoon",
+        "units": "m + MSL",
+        "thresholds": [
+          { "id": "Watch_WL", "name": "Watch", "value": "1.80", "type": "highLevelThreshold" },
+          { "id": "Alert_WL", "name": "Alert", "value": "2.10", "type": "highLevelThreshold" },
+          { "id": "Warning_WL", "name": "Warning", "value": "2.40", "type": "highLevelThreshold" }
+        ]
+      },
+      "events": [
+        { "date": "2025-03-13", "time": "09:00:00", "value": "1.20", "flag": "0" },
+        { "date": "2025-03-13", "time": "11:00:00", "value": "1.45", "flag": "0" },
+        { "date": "2025-03-13", "time": "13:00:00", "value": "1.75", "flag": "0" },
+        { "date": "2025-03-13", "time": "15:00:00", "value": "1.98", "flag": "0" },
+        { "date": "2025-03-13", "time": "17:00:00", "value": "2.16", "flag": "0" },
+        { "date": "2025-03-13", "time": "19:00:00", "value": "2.02", "flag": "0" },
+        { "date": "2025-03-13", "time": "21:00:00", "value": "1.70", "flag": "0" }
+      ]
+    },
+    {
+      "header": {
+        "type": "instantaneous",
+        "moduleInstanceId": "HydraulicPCSWMMFC_Central_Simplified",
+        "locationId": "Palmiet_gauge",
+        "parameterId": "H_simulated",
+        "startDate": { "date": "2025-03-13", "time": "09:00:00" },
+        "endDate": { "date": "2025-03-13", "time": "21:00:00" },
+        "forecastDate": { "date": "2025-03-13", "time": "12:00:00" },
+        "missVal": "-999.0",
+        "stationName": "Palmiet_gauge",
+        "units": "m",
+        "thresholds": [
+          { "id": "Watch_WL", "name": "Watch", "value": "1.50", "type": "highLevelThreshold" },
+          { "id": "Alert_WL", "name": "Alert", "value": "2.00", "type": "highLevelThreshold" },
+          { "id": "Warning_WL", "name": "Warning", "value": "2.50", "type": "highLevelThreshold" }
+        ]
+      },
+      "events": [
+        { "date": "2025-03-13", "time": "09:00:00", "value": "0.62", "flag": "0" },
+        { "date": "2025-03-13", "time": "12:00:00", "value": "0.81", "flag": "0" },
+        { "date": "2025-03-13", "time": "15:00:00", "value": "1.12", "flag": "0" },
+        { "date": "2025-03-13", "time": "18:00:00", "value": "1.31", "flag": "0" },
+        { "date": "2025-03-13", "time": "21:00:00", "value": "1.04", "flag": "0" }
+      ]
+    },
+    {
+      "header": {
+        "type": "instantaneous",
+        "moduleInstanceId": "SFINCSInlandForecast",
+        "locationId": "Mdoni Road Ped Brg",
+        "parameterId": "WD.simulated",
+        "startDate": { "date": "2025-03-13", "time": "09:00:00" },
+        "endDate": { "date": "2025-03-13", "time": "21:00:00" },
+        "forecastDate": { "date": "2025-03-13", "time": "12:00:00" },
+        "missVal": "-999.0",
+        "stationName": "Mdoni Road Ped Brg",
+        "units": "m"
+      },
+      "events": [
+        { "date": "2025-03-13", "time": "09:00:00", "value": "0.00", "flag": "0" },
+        { "date": "2025-03-13", "time": "15:00:00", "value": "0.18", "flag": "0" },
+        { "date": "2025-03-13", "time": "21:00:00", "value": "0.05", "flag": "0" }
+      ]
+    }
+  ]
+}
