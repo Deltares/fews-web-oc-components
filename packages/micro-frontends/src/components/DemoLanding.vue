@@ -1,6 +1,6 @@
 <template>
   <v-container class="py-8" max-width="960">
-    <h1 class="text-headline-medium mb-2">Micro frontend demos</h1>
+    <h1 class="text-headline-medium mb-2">FEWS WebOC micro frontend demos</h1>
     <p class="text-body-medium text-medium-emphasis mb-6">
       Select a micro frontend component to open it with sample data.
     </p>

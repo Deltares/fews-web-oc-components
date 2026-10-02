@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
+import { useDark } from '@vueuse/core'
+import { useTheme } from 'vuetify'
 import type { TopologyNode } from '@deltares/fews-pi-requests'
 import {
   createDateRegistry,
@@ -13,6 +15,9 @@ import CriticalPointsOverview from './components/CriticalPointsOverview.vue'
 import DemoLanding from './components/DemoLanding.vue'
 
 const route = useRoute()
+const theme = useTheme()
+const isDark = useDark()
+watchEffect(() => theme.change(isDark.value ? 'dark' : 'light'))
 const showLanding = computed(() => route.path === '/')
 const showCriticalPoints = computed(() => route.path === '/critical-points')
 const pageTitle = computed(() => {
@@ -72,7 +77,7 @@ provideHostWebserviceContext({
         <v-btn icon="mdi-arrow-left" to="/" aria-label="Back to demos" />
       </template>
       <v-app-bar-title class="text-title-medium"
-        >Micro Frontend Demo</v-app-bar-title
+        >FEWS WebOC Micro Frontend Demo</v-app-bar-title
       >
       <v-select
         v-if="showCriticalPoints"
@@ -90,6 +95,16 @@ provideHostWebserviceContext({
         class="text-body-small text-medium-emphasis mr-3"
         >{{ pageTitle }}</span
       >
+      <v-switch
+        v-model="isDark"
+        class="flex-0-0 mr-3"
+        false-icon="mdi-weather-sunny"
+        true-icon="mdi-weather-night"
+        :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+        density="compact"
+        inset
+        hide-details
+      />
     </v-app-bar>
 
     <v-main class="demo-main" :class="{ 'overflow-y-auto': showLanding }">
