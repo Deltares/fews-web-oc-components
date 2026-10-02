@@ -109,9 +109,15 @@ export default createModuleFederationConfig({
 
 To register a remote and reference it from FEWS topology, see [Configure a Micro Frontend in FEWS](./configure-in-fews).
 
+### Shared Runtime Dependencies
+
+WebOC and each micro-frontend must share `vue` and `@deltares/fews-web-oc-composables` as Module Federation singletons. This keeps Vue's component runtime and the host-provided composable contexts shared across the host and remote. When a new WebOC release becomes available, review its dependency versions and update the micro-frontend dependencies and federation configuration as needed.
+
 ## FEWS Data Access
 
 When a micro frontend needs FEWS data, prefer the package composables where they cover the use case. For example, `usePiLocations` reads the host webservice context and manages location loading and refreshes, while `usePiTimeSeries` provides keyed reactive time-series requests. Use `PiWebserviceProvider` directly when you need lower-level control.
+
+We plan to make more composables available in this package over time. Until then, see the [current WebOC composables](https://github.com/Deltares/fews-web-oc/tree/main/src/composables). If you need a composable migrated for your micro-frontend, contact the WebOC maintainers to discuss it.
 
 For the complete composable API reference, see [Composables API](../composables/api/).
 
