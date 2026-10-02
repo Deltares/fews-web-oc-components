@@ -9,7 +9,7 @@ All settings on a topology node are passed to the microfrontend in a Vue prop na
 
 ## Register the microfrontend
 
-Add a `<microFrontEnd>` entry to `WebOCMicroFrontends.xml`. Set `<id>` to a unique FEWS configuration ID, `<remoteId>` to the registered remote application, and `<componentId>` to the component exposed by that remote. The optional `<icon>` sets the menu icon.
+Add a `<microFrontEnd>` entry to `WebOCMicroFrontends.xml`. Set `<id>` to a unique FEWS configuration ID. The `<remoteId>` must match the remote ID configured in WebOC's Module Federation manifest configuration. The `<componentId>` must match a component exposed in the micro-frontend remote's manifest. These identifiers must match exactly. The optional `<icon>` sets the menu icon.
 
 For now, the only supported display value is `main`:
 

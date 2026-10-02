@@ -79,11 +79,11 @@ export default defineConfig({
               link: '/micro-frontends/configure-in-fews',
             },
             {
-              text: 'Locations',
+              text: 'Loading Locations',
               link: '/micro-frontends/load-fews-locations',
             },
             {
-              text: 'Time Series Data',
+              text: 'Loading Time Series',
               link: '/micro-frontends/load-fews-timeseries-data',
             },
           ],
