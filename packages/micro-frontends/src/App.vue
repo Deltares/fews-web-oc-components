@@ -1,40 +1,29 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useDark } from '@vueuse/core'
 import { useTheme } from 'vuetify'
-import type { TopologyNode } from '@deltares/fews-pi-requests'
 import {
   createDateRegistry,
   provideHostNotifications,
   provideHostRefreshContext,
   provideHostWebserviceContext,
 } from '@deltares/fews-web-oc-composables'
-import MainComponent from './components/MainComponent.vue'
-import CriticalPointsOverview from './components/CriticalPointsOverview.vue'
-import DemoLanding from './components/DemoLanding.vue'
+import { resolveSelectedTime } from './demoConfig.js'
 
 const route = useRoute()
+const router = useRouter()
 const theme = useTheme()
 const isDark = useDark()
 watchEffect(() => theme.change(isDark.value ? 'dark' : 'light'))
-const normalizedPath = computed(() => route.path.replace(/\/+$/, '') || '/')
-const showLanding = computed(() => normalizedPath.value === '/')
-const showCriticalPoints = computed(() => normalizedPath.value === '/critical-points')
-const pageTitle = computed(() => {
-  if (showCriticalPoints.value) return 'Critical points'
-  if (showLanding.value) return ''
-  return 'D3 world map'
+const selectedTime = computed({
+  get: () => resolveSelectedTime(route.query.selectedTime),
+  set: (value: number) => {
+    void router.replace({
+      query: { ...route.query, selectedTime: String(value) },
+    })
+  },
 })
-const criticalPointsNode: TopologyNode = {
-  id: 'viewer_rivers_critical_points_forecast',
-  name: 'Critical points',
-  filterIds: ['SWMM Models_Simplified'],
-}
-const selectedLocationIds = ref('')
-// The sample data is historical, so the demo starts at a fixed time within the forecast.
-const selectedTime = ref(Date.parse('2025-03-13T13:00:00Z'))
-const selectedDate = computed(() => new Date(selectedTime.value))
 
 const { combinedDates } = createDateRegistry()
 const dateFormat = new Intl.DateTimeFormat(undefined, {
@@ -50,10 +39,12 @@ const dateItems = computed(() =>
 
 const notification = ref('')
 const showNotification = ref(false)
-const topologyNode: TopologyNode = {
-  id: 'palmiet',
-  name: 'D3 world map',
-  filterIds: ['palmiet'],
+
+function onNavigate(event: { params?: { locationIds?: string } }): void {
+  const locationIds = event.params?.locationIds
+  if (!locationIds) return
+
+  void router.replace({ query: { ...route.query, locationIds } })
 }
 
 provideHostNotifications({
@@ -74,14 +65,14 @@ provideHostWebserviceContext({
 <template>
   <v-app class="demo-app">
     <v-app-bar density="compact" flat border>
-      <template v-if="!showLanding" #prepend>
+      <template v-if="route.name !== 'landing'" #prepend>
         <v-btn icon="mdi-arrow-left" to="/" aria-label="Back to demos" />
       </template>
       <v-app-bar-title class="text-title-medium"
         >FEWS WebOC Micro Frontend Demo</v-app-bar-title
       >
       <v-select
-        v-if="showCriticalPoints"
+        v-if="route.name === 'critical-points'"
         v-model="selectedTime"
         :items="dateItems"
         class="flex-0-0 mr-3"
@@ -91,11 +82,6 @@ provideHostWebserviceContext({
         variant="outlined"
         hide-details
       />
-      <span
-        v-if="pageTitle"
-        class="text-body-small text-medium-emphasis mr-3"
-        >{{ pageTitle }}</span
-      >
       <v-switch
         v-model="isDark"
         class="flex-0-0 mr-3"
@@ -108,16 +94,13 @@ provideHostWebserviceContext({
       />
     </v-app-bar>
 
-    <v-main class="demo-main" :class="{ 'overflow-y-auto': showLanding }">
-      <DemoLanding v-if="showLanding" />
-      <CriticalPointsOverview
-        v-else-if="showCriticalPoints"
-        :topologyNode="criticalPointsNode"
-        :selectedDate="selectedDate"
-        :locationIds="selectedLocationIds"
-        @navigate="selectedLocationIds = $event.params.locationIds"
-      />
-      <MainComponent v-else :topologyNode="topologyNode" />
+    <v-main
+      class="demo-main"
+      :class="{ 'overflow-y-auto': route.name === 'landing' }"
+    >
+      <RouterView v-slot="{ Component }">
+        <component :is="Component" @navigate="onNavigate" />
+      </RouterView>
     </v-main>
 
     <v-snackbar v-model="showNotification">{{ notification }}</v-snackbar>
