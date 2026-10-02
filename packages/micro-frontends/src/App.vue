@@ -24,7 +24,7 @@ const showCriticalPoints = computed(() => normalizedPath.value === '/critical-po
 const pageTitle = computed(() => {
   if (showCriticalPoints.value) return 'Critical points'
   if (showLanding.value) return ''
-  return 'Palmiet locations'
+  return 'D3 world map'
 })
 const criticalPointsNode: TopologyNode = {
   id: 'viewer_rivers_critical_points_forecast',
@@ -52,7 +52,7 @@ const notification = ref('')
 const showNotification = ref(false)
 const topologyNode: TopologyNode = {
   id: 'palmiet',
-  name: 'Palmiet',
+  name: 'D3 world map',
   filterIds: ['palmiet'],
 }
 
