@@ -18,8 +18,9 @@ const route = useRoute()
 const theme = useTheme()
 const isDark = useDark()
 watchEffect(() => theme.change(isDark.value ? 'dark' : 'light'))
-const showLanding = computed(() => route.path === '/')
-const showCriticalPoints = computed(() => route.path === '/critical-points')
+const normalizedPath = computed(() => route.path.replace(/\/+$/, '') || '/')
+const showLanding = computed(() => normalizedPath.value === '/')
+const showCriticalPoints = computed(() => normalizedPath.value === '/critical-points')
 const pageTitle = computed(() => {
   if (showCriticalPoints.value) return 'Critical points'
   if (showLanding.value) return ''

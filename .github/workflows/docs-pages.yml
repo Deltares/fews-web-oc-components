@@ -68,6 +68,10 @@ jobs:
           cp -R packages/components/storybook-static/. _site/storybook/components/
           cp -R packages/micro-frontends/storybook-static/. _site/storybook/micro-frontends/
           cp -R packages/micro-frontends/dist/. _site/micro-frontends/
+          for route in main critical-points; do
+            mkdir -p "_site/micro-frontends/$route"
+            cp _site/micro-frontends/index.html "_site/micro-frontends/$route/index.html"
+          done
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
