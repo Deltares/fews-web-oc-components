@@ -34,6 +34,8 @@ The map displays locations from a FEWS Filter. Select a location to open its tim
 
 It uses [`usePiLocations`](../composables/use-pi-locations) to request locations from FEWS and keep the map data up to date.
 
+The map also imports `ne_50m_land.json` as GeoJSON to draw land shapes. An imported JSON file can provide bundled data or configuration; the FEWS locations themselves are still loaded from the selected Filter.
+
 ### Critical Points: River Forecasts
 
 This view brings river forecasts and threshold information together so users can quickly spot critical conditions. Users can search and filter the list, then select a location to open its time series in WebOC. It is a starting point for operational summary views that help users decide where to investigate.
