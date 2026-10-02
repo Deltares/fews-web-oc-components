@@ -53,7 +53,7 @@ export function provideHostNotifications(notifications: HostNotifications) {
 }
 
 /**
- * @beta
+ * @alpha
  *
  * Retrieves the host notifications implementation that was previously
  * provided via {@link provideHostNotifications}.

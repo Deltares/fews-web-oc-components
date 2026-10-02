@@ -5,7 +5,7 @@ import {
 } from '../shared/sharedRequest.js'
 
 /**
- * @beta
+ * @alpha
  *
  * Reactive list of the requests that are currently in flight via
  * {@link sharedRequest}. Unsubscribes when the current effect scope is

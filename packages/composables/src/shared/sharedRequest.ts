@@ -11,7 +11,7 @@ interface InFlightRequest<T> {
  * Read-only snapshot of a request that is currently in flight via
  * {@link sharedRequest}.
  *
- * @group Other Functions
+ * @group Interfaces
  */
 export interface SharedRequestRegistration {
   /**
@@ -31,7 +31,7 @@ export interface SharedRequestRegistration {
  *
  * Receives the current in-flight request registrations.
  *
- * @group Other Functions
+ * @group Type Aliases
  */
 export type SharedRequestRegistrationsListener = (
   registrations: readonly SharedRequestRegistration[],
@@ -72,7 +72,7 @@ function notifyRegistrationsChanged(): void {
 }
 
 /**
- * @beta
+ * @alpha
  *
  * Returns a snapshot of the requests that are currently in flight via
  * {@link sharedRequest}. Settled and fully aborted requests are not included.
@@ -91,7 +91,7 @@ export function getSharedRequestRegistrations(): readonly SharedRequestRegistrat
 }
 
 /**
- * @beta
+ * @alpha
  *
  * Subscribes to changes of the in-flight request registrations. `listener` is
  * called immediately with the current snapshot, and again whenever a request
@@ -126,7 +126,7 @@ function abortReason(signal: AbortSignal): unknown {
 }
 
 /**
- * @beta
+ * @alpha
  *
  * Runs `run` at most once per `key` while a request with that key is pending.
  * Concurrent callers with the same key share the result.

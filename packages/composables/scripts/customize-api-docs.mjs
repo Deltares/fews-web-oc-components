@@ -44,8 +44,8 @@ export function load(app) {
     for (const reflection of page.project.getReflectionsByKind(ReflectionKind.Function)) {
       const comment = reflection.comment ?? reflection.signatures?.[0]?.comment
       let status
-      if (comment?.hasModifier('@experimental')) {
-        status = 'Experimental'
+      if (comment?.hasModifier('@alpha')) {
+        status = 'Alpha'
       } else if (comment?.hasModifier('@beta')) {
         status = 'Beta'
       }
