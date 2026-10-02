@@ -25,9 +25,6 @@
     "ci:test:e2e": "npm run --workspaces --if-present ci:test:e2e",
     "lint": "npm run --workspaces --if-present lint"
   },
-  "volta": {
-    "node": "24.18.1"
-  },
   "devDependencies": {
     "vitepress": "^2.0.0-alpha.20"
   },
@@ -35,5 +32,8 @@
     "adm-zip": "^0.6.1",
     "undici": "^7.3.0"
   },
-  "version": "0.3.0-alpha.8"
+  "version": "0.3.0-alpha.8",
+  "volta": {
+    "node": "24.21.0"
+  }
 }
