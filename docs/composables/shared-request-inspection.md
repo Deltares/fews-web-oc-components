@@ -1,8 +1,8 @@
 # Shared Request Inspection
 
-> **Experimental** — these APIs are functional but willmay change.
+> **Alpha** — these APIs may be incomplete or not fully functional, and may change.
 
-> **Development-only** — These helpers are intended only for development diagnostics and are expected to remain experimental for the foreseeable future.
+> **Development-only** — These helpers are intended only for development diagnostics and are expected to remain alpha for the foreseeable future.
 
 Use the shared-request inspection APIs to build diagnostics or monitoring views for requests currently being deduplicated by `sharedRequest`. They are not a general network monitor: settled requests and requests that do not use `sharedRequest` are not included.
 
