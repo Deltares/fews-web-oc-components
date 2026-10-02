@@ -9,6 +9,8 @@ export default createModuleFederationConfig({
   },
   exposes: {
     './main_component': './src/components/MainComponent.vue',
+    './critical_points_overview':
+      './src/components/CriticalPointsOverview.vue',
   },
   shared: {
     vue: {

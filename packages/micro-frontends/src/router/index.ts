@@ -10,6 +10,10 @@ const routes: RouteRecordRaw[] = [
     path: '/main',
     component: App,
   },
+  {
+    path: '/critical-points',
+    component: App,
+  },
 ]
 
 const router = createRouter({
