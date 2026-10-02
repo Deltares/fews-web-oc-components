@@ -166,3 +166,4 @@ The host context is shared by composables such as `usePiTimeSeries`; component-s
 ## See Also
 
 - [Micro Frontend Components](./index)
+- [Loading Locations](./load-fews-locations)

@@ -116,4 +116,4 @@ const locationsState = usePiLocations({
 
 - [Micro Frontend Components](./index)
 - [useLocations API](../composables/use-locations)
-- [Micro Frontend Time Series Data](./load-fews-timeseries-data)
+- [Loading Time Series](./load-fews-timeseries-data)
