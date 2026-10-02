@@ -60,8 +60,5 @@
     "vite-plugin-vuetify": "^2.1.2",
     "vitest": "^4.1.11",
     "vue-tsc": "^3.2.1"
-  },
-  "volta": {
-    "node": "24.12.0"
   }
 }
