@@ -75,6 +75,10 @@ export default defineConfig({
               link: '/micro-frontends/development',
             },
             {
+              text: 'Configure in FEWS',
+              link: '/micro-frontends/configure-in-fews',
+            },
+            {
               text: 'Locations',
               link: '/micro-frontends/load-fews-locations',
             },

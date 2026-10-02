@@ -73,6 +73,8 @@ See [Module Federation](https://module-federation.io/) for an overview. The remo
 
 For standalone sample-data development and WebOC integration setups, see [Micro-Frontend Development Setup](./development).
 
+For deployment instructions, see [Deploying Micro Frontends | fews-web-oc](https://deltares.github.io/fews-web-oc/micro_frontends/).
+
 ```ts
 export default createModuleFederationConfig({
   exposes: {
@@ -80,6 +82,8 @@ export default createModuleFederationConfig({
   }
 })
 ```
+
+To register a remote and reference it from FEWS topology, see [Configure a Micro Frontend in FEWS](./configure-in-fews).
 
 ## Data Access
 
