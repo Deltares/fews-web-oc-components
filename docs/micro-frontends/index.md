@@ -7,7 +7,7 @@ Micro frontend components are Vue components exposed from the micro-frontends pa
 
 ## Demo App
 
-Explore the hosted [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontends/). It runs both remote components with sample FEWS data and demonstrates how the host passes props, handles navigation events, and provides shared composable context.
+Explore the hosted [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontends/). It runs both remote components with bundled sample data and demonstrates how the host passes props, handles navigation events, and provides shared composable context. When these components are loaded in FEWS WebOC, they use live data from the configured FEWS instance, selected by the Filter ID configured on the topology node.
 
 ### D3 World Map: Locations for a FEWS Filter
 
