@@ -1,28 +1,26 @@
-# Micro Frontend Components
+# FEWS WebOC Micro Frontend Components
 
 > [!IMPORTANT]
 > This document is currently in proposal state. APIs, package names, and implementation details may change before final release.
 
 Micro frontend components are Vue components exposed from the micro-frontends package and mounted by the Web OC host. They should stay small, host-aware, and focused on a single user flow such as showing a map, rendering a time series, or drilling into a location selection.
 
-## Demo App
+Micro-frontends let teams extend WebOC with components tailored to their own workflows. They can build custom visualizations with JavaScript libraries such as [D3.js](https://d3js.org/) and [Vega](https://vega.github.io/vega/), as well as develop specialized tools and overview screens, while using FEWS data and permissions model. Example tools include a threshold-exceedance triage panel, a location data-quality review tool, and a scenario comparison workbench.
 
-Explore the hosted [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontends/). It runs both remote components with bundled sample data and demonstrates how the host passes props, handles navigation events, and provides shared composable context. When these components are loaded in FEWS WebOC, they use live data from the configured FEWS instance, selected by the Filter ID configured on the topology node.
 
-### D3 World Map: Locations for a FEWS Filter
 
-The Main Panel uses `usePiLocations` to load the FEWS locations selected by the `filterIds` value on its `topologyNode` (the demo uses the `palmiet` filter). It displays the returned GeoJSON on a map and uses host-provided Web Services context. The component accepts `topologyNode`, optional `locationIds`, and optional `selectedDate` props. Selecting a location emits `navigate` with its ID so the host can open the time-series view; the refresh button calls the composable's `fetch`, and the notification button demonstrates `useHostNotifications`.
+Micro-frontends can also load data that does not fit the FEWS data model. For example, a remote could call a public weather API such as [Open-Meteo](https://open-meteo.com/) or visualize cloud-hosted [Cloud Optimized GeoTIFF](https://www.cogeo.org/), [Zarr](https://zarr.dev/), or [Apache Parquet](https://parquet.apache.org/) datasets.
 
-### Critical Points: River Forecasts
-
-The Critical Points view uses `usePiTimeSeries` to load forecast time series and thresholds for the filter on its `topologyNode` (the demo uses `SWMM Models_Simplified`). It accepts `topologyNode`, `selectedDate`, and optional `locationIds` props; `selectedDate` sets the forecast's current-time reference, and `locationIds` identifies selected rows. Clicking a row emits `navigate` with its location ID for the host to open the time-series window. Search, threshold-category filtering, and manual refresh are handled in the component, while `useDateRegistry` registers available forecast dates with the host DateTimeSlider.
+Micro-frontends are implemented much like Vue components in WebOC, with component-specific props and events and access to shared composables. When a micro-frontend addresses a broadly useful use case, it can also be considered for inclusion in WebOC so it is available to the wider community.
 
 ## Responsibilities
 
-- Receive component-specific inputs from the host through props.
-- Render data and handle local interactions inside the component.
-- Emit the events defined by the component contract, such as navigation; keep route handling in the host.
-- Use shared composable context for host-provided FEWS services and refresh state.
+- Define a narrow, typed prop contract for required inputs and host selections, such as `topologyNode`, `locationIds`, and `selectedDate`.
+- Load, transform, and present the data needed for the feature. Use FEWS composables when they fit; a micro-frontend can also call other APIs or read supported external data sources.
+- Own view-specific state and interactions, such as map zoom, table search, category filters, and selected rows.
+- Emit declared events for host-owned actions such as navigation. Keep application routing and cross-view coordination in WebOC.
+- Use shared composable context for host-provided services such as FEWS Web Services access, refresh signals, notifications, and the date registry instead of passing service configuration through component props.
+- Handle loading, error, and empty states, and clean up component-owned subscriptions or resources when the component is disposed.
 
 ## Typical Contract
 
@@ -80,6 +78,18 @@ provideHostWebserviceContext({
 Data composables such as `usePiLocations` use this context by default. If a component uses host-driven refresh or notifications, the host must also provide those contexts before mounting it. Because these contexts are held by the composables package, configure both host and remote to share the same `@deltares/fews-web-oc-composables` singleton; otherwise the remote may not see the host's provided context.
 
 Micro-frontends can register their available dates with the host so WebOC and the WebOC dashboard can populate and show the DateTimeSlider, and keep its selected date synchronized with the remote. See [Showing the Date Time Slider](./date-registry) for the setup and examples.
+
+## Demo App
+
+Explore the hosted [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontends/). It runs both remote components with bundled sample data and demonstrates how the host passes props, handles navigation events, and provides shared composable context. When these components are loaded in FEWS WebOC, they use live data from the configured FEWS instance, selected by the Filter ID configured on the topology node.
+
+### D3 World Map: Locations for a FEWS Filter
+
+The Main Panel uses `usePiLocations` to load the FEWS locations selected by the `filterIds` value on its `topologyNode` (the demo uses the `palmiet` filter). It displays the returned GeoJSON on a map rendered with [D3.js](https://d3js.org/) and uses host-provided Web Services context. The component accepts `topologyNode`, optional `locationIds`, and optional `selectedDate` props. Selecting a location emits `navigate` with its ID so the host can open the time-series view; the refresh button calls the composable's `fetch`, and the notification button demonstrates `useHostNotifications`.
+
+### Critical Points: River Forecasts
+
+The Critical Points view uses `usePiTimeSeries` to load forecast time series and thresholds for the filter on its `topologyNode` (the demo uses `SWMM Models_Simplified`). It accepts `topologyNode`, `selectedDate`, and optional `locationIds` props; `selectedDate` sets the forecast's current-time reference, and `locationIds` identifies selected rows. Clicking a row emits `navigate` with its location ID for the host to open the time-series window. Search, threshold-category filtering, and manual refresh are handled in the component, while `useDateRegistry` registers available forecast dates with the host DateTimeSlider.
 
 ## Module Federation
 
