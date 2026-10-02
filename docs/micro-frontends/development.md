@@ -16,7 +16,7 @@ Open `http://localhost:2010`. The demo landing page links to the available sampl
 
 ## Run WebOC dev mode with the Published Demo
 
-Use this setup to develop WebOC while loading the published micro-frontend remote. Its manifest is [mf-manifest.json](https://deltares.github.io/fews-web-oc-components/micro-frontends/mf-manifest.json).
+Use this setup to develop WebOC while loading the published micro-frontend remote. Its manifest is [mf-manifest.json](https://deltares.github.io/fews-web-oc-components/micro-frontend-demos/mf-manifest.json).
 
 Configure the WebOC remote as follows:
 
@@ -26,7 +26,7 @@ Configure the WebOC remote as follows:
 	"remotes": [
 		{
 			"name": "test-micro-frontend",
-			"entry": "https://deltares.github.io/fews-web-oc-components/micro-frontends/mf-manifest.json"
+			"entry": "https://deltares.github.io/fews-web-oc-components/micro-frontend-demos/mf-manifest.json"
 		}
 	]
 }

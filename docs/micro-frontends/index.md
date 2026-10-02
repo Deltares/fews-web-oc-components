@@ -26,7 +26,7 @@ When a view uses FEWS data, it can use the composables in this package to load l
 
 ## Demo Apps
 
-Explore the [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontends/) to see two example apps. They illustrate how focused views can help people explore FEWS data. When loaded in WebOC, each app uses the FEWS instance, Filter, and user access configured for that environment.
+Explore the [FEWS WebOC Micro Frontend Demo](https://deltares.github.io/fews-web-oc-components/micro-frontend-demos/) to see two example apps. They illustrate how focused views can help people explore FEWS data. When loaded in WebOC, each app uses the FEWS instance, Filter, and user access configured for that environment.
 
 ### D3 World Map: FEWS Locations
 

@@ -56,21 +56,21 @@ jobs:
 
       - name: Build micro-frontends
         env:
-          MICRO_FRONTEND_BASE: https://deltares.github.io/fews-web-oc-components/micro-frontends/
+          MICRO_FRONTEND_BASE: https://deltares.github.io/fews-web-oc-components/micro-frontend-demos/
         run: npm run -w @deltares/fews-web-oc-micro-frontends build
 
       - name: Compose static site artifact
         run: |
           mkdir -p _site/storybook/components
           mkdir -p _site/storybook/micro-frontends
-          mkdir -p _site/micro-frontends
+          mkdir -p _site/micro-frontend-demos
           cp -R docs/.vitepress/dist/. _site/
           cp -R packages/components/storybook-static/. _site/storybook/components/
           cp -R packages/micro-frontends/storybook-static/. _site/storybook/micro-frontends/
-          cp -R packages/micro-frontends/dist/. _site/micro-frontends/
+          cp -R packages/micro-frontends/dist/. _site/micro-frontend-demos/
           for route in main critical-points; do
-            mkdir -p "_site/micro-frontends/$route"
-            cp _site/micro-frontends/index.html "_site/micro-frontends/$route/index.html"
+            mkdir -p "_site/micro-frontend-demos/$route"
+            cp _site/micro-frontend-demos/index.html "_site/micro-frontend-demos/$route/index.html"
           done
 
       - name: Setup Pages
