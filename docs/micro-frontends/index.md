@@ -71,6 +71,8 @@ Data composables such as `usePiLocations` use this context by default. If a comp
 
 See [Module Federation](https://module-federation.io/) for an overview. The remote exposes its component under a module-federation key. For example, this repository exposes the component source directly as `./main_component`:
 
+For standalone sample-data development and WebOC integration setups, see [Micro-Frontend Development Setup](./development).
+
 ```ts
 export default createModuleFederationConfig({
   exposes: {

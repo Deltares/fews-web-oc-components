@@ -4,6 +4,8 @@
 
 - `packages/components`: Vue component library package
 - `packages/composables`: Shared composables package
+- `packages/micro-frontends`: Vue micro-frontend remotes and standalone sample-data demo
+- `docs`: VitePress documentation for the packages and micro-frontends
 
 ## Project setup
 

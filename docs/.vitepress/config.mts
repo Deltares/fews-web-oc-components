@@ -71,6 +71,10 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/micro-frontends/' },
             {
+              text: 'Development Setup',
+              link: '/micro-frontends/development',
+            },
+            {
               text: 'Locations',
               link: '/micro-frontends/load-fews-locations',
             },
