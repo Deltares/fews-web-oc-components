@@ -1,6 +1,6 @@
 {
   "name": "@deltares/fews-web-oc-composables",
-  "version": "0.3.0-alpha.9",
+  "version": "0.3.0",
   "description": "Composable utilities for FEWS Web OC",
   "license": "AGPL",
   "type": "module",
@@ -36,7 +36,6 @@
   },
   "publishConfig": {
     "access": "public",
-    "tag": "alpha",
     "registry": "https://registry.npmjs.org"
   }
 }

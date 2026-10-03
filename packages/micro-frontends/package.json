@@ -1,6 +1,6 @@
 {
   "name": "@deltares/fews-web-oc-micro-frontends",
-  "version": "0.3.0-alpha.9",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@deltares/fews-pi-requests": "^3.4.0",
-    "@deltares/fews-web-oc-composables": "0.3.0-alpha.9",
+    "@deltares/fews-web-oc-composables": "0.3.0",
     "@mdi/font": "^7.4.47",
     "@module-federation/vite": "^1.23.0",
     "@vueuse/core": "^14.3.0",
