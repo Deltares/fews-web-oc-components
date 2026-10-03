@@ -11,10 +11,10 @@ This guide assumes your micro-frontend runs inside WebOC. WebOC loads the view, 
 
 Use a micro-frontend when you need a purpose-built way for people to explore data or complete a task in WebOC. For example, a view could:
 
-- Show FEWS locations on a map and open their time series when selected.
-- Summarize forecasts or highlight threshold exceedances.
-- Help review data quality or compare scenarios.
-- Combine FEWS information with data from an external service or dataset.
+- Connect to external APIs or network-accessible files to bring additional data into view.
+- Present results from custom analysis scripts or notebooks alongside FEWS data.
+- Create task-specific dashboards that bring together the information and actions needed for a particular workflow.
+- Provide interactive schematic visualisations to explore connections between systems, locations, or processes.
 
 You choose how to present the information and which interactions your view supports. WebOC remains responsible for the overall application experience, including navigation and the shared FEWS connection.
 
