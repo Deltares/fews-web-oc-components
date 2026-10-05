@@ -36,9 +36,18 @@ export {
 
 export {
   useWmsLayerCapabilities,
+  type UseWmsLayerCapabilitiesOptions,
   useWmsLegend,
+  type UseWmsLegendOptions,
+  type UseWmsLegendReturn,
   fetchWmsLegend,
-  useWmsCapilities,
+  type FetchWmsLegendOptions,
+  useWmsCapabilities,
+  type UseWmsCapabilitiesOptions,
+  type UseWmsCapabilitiesReturn,
+  type UseWmsOptions,
+  type UseWmsRefreshOptions,
+  type UseWmsRequestReturn,
   type UseWmsReturn,
 } from './useWms/index.js'
 
