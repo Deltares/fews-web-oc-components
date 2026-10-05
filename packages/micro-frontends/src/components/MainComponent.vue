@@ -172,14 +172,14 @@ const alertStore = useHostNotifications()
 const zoom = ref(16)
 const debouncedZoom = refThrottled(zoom, 100)
 
-const filter = computed<LocationsFilter>(() => {
+const filter = computed<LocationsFilter | undefined>(() => {
   const filterId = topologyNode.filterIds?.[0]
 
   return filterId
     ? {
         filterId,
       }
-    : {}
+    : undefined
 })
 
 const { geojson, loading, fetch, lastRefreshAt, lastTriggerPolicy } =
