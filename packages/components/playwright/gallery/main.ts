@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { createApp, h, shallowRef, type App, type Component } from 'vue'
 import vuetify from '../../src/plugins/vuetify'
 
@@ -10,9 +12,7 @@ type MountOptions = {
 const stories = import.meta.glob<StoryModule>('../../src/**/*.story.ts')
 
 const toId = (filePath: string) =>
-  filePath
-    .replace(/^(\.\.\/)+src\//, '')
-    .replace(/\.story\.\w+$/, '')
+  filePath.replace(/^(\.\.\/)+src\//, '').replace(/\.story\.\w+$/, '')
 
 async function resolveStory(storyId: string): Promise<Component | null> {
   const separator = storyId.lastIndexOf('/')
@@ -31,34 +31,38 @@ async function resolveStory(storyId: string): Promise<Component | null> {
   return (module[exportName] || module.default) as Component
 }
 
-const story = shallowRef<Component | null>(null)
-const props = shallowRef<Record<string, unknown>>({})
-const host = { render: () => (story.value ? h(story.value, props.value) : null) }
-
-let app: App | undefined
-
-;(window as Window & {
-  mount: (params: MountOptions) => Promise<void>
-  unmount: () => Promise<void>
-}).mount = async ({ story: storyId, props: nextProps }: MountOptions) => {
-  const resolvedStory = await resolveStory(storyId)
-  if (!resolvedStory) {
-    throw new Error(`Unknown story: ${storyId}`)
+function createGallery() {
+  const story = shallowRef<Component | null>(null)
+  const props = shallowRef<Record<string, unknown>>({})
+  const host = {
+    render: () => (story.value ? h(story.value, props.value) : null),
   }
 
-  story.value = resolvedStory
-  props.value = nextProps ?? {}
+  let app: App | undefined
 
-  if (!app) {
-    app = createApp(host)
-    app.use(vuetify)
-    app.mount('#root')
+  return {
+    async mount({ story: storyId, props: nextProps }: MountOptions) {
+      const resolvedStory = await resolveStory(storyId)
+      if (!resolvedStory) {
+        throw new Error(`Unknown story: ${storyId}`)
+      }
+
+      story.value = resolvedStory
+      props.value = nextProps ?? {}
+
+      if (!app) {
+        app = createApp(host)
+        app.use(vuetify)
+        app.mount('#root')
+      }
+    },
+    unmount() {
+      app?.unmount()
+      app = undefined
+      story.value = null
+      props.value = {}
+    },
   }
 }
 
-;(window as Window & {
-  unmount: () => Promise<void>
-}).unmount = async () => {
-  app?.unmount()
-  app = undefined
-}
+Object.assign(window, createGallery())
