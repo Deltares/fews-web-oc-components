@@ -11,12 +11,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src')
+      '@': resolve(import.meta.dirname, 'src')
     }
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'fews-web-oc-components',
       fileName: 'fews-web-oc-components',
     },
