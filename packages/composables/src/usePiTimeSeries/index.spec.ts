@@ -117,6 +117,26 @@ describe('usePiTimeSeries', () => {
     expect(entries.value.a.updatedAt).toBeInstanceOf(Date)
   })
 
+  it('clears requests and skips network work when requests are undefined', async () => {
+    const requests = ref<PiTimeSeriesRequest[] | undefined>(undefined)
+    const { entries } = setup({ requests })
+    await flush()
+
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(entries.value).toEqual({})
+
+    requests.value = [requestA]
+    await flush()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    await respondAll()
+
+    requests.value = undefined
+    await flush()
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(entries.value).toEqual({})
+  })
+
   it('builds the URL for filter requests', async () => {
     setup({
       requests: [{ key: 'f', filter: { filterId: 'f' } as TimeSeriesFilter }],

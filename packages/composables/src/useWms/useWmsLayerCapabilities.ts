@@ -1,9 +1,7 @@
 import { WMSProvider } from '@deltares/fews-wms-requests'
 import {
   type MaybeRefOrGetter,
-  onScopeDispose,
   ref,
-  shallowRef,
   type Ref,
   toValue,
   watch,
@@ -12,6 +10,7 @@ import {
   type RefreshPolicy,
   useRefreshCoordinator,
 } from '../useRefreshCoordinator/index.js'
+import { createRequestRunner } from '../lib/requests/createRequestRunner.js'
 import { resolveWebserviceContext } from '../lib/requests/resolveWebserviceContext.js'
 import {
   DEFAULT_WMS_REFRESH_INTERVAL_MS,
@@ -74,8 +73,9 @@ export interface UseWmsReturn extends UseWmsRequestReturn {
  *
  * Reactively reloads when the layer or filter changes, and supports automatic
  * refreshing through `refresh`. On request failure,
- * `capabilities` and `layerCapabilities` are reset to `undefined`; the error
- * is exposed through `error` and rejected from an explicit `fetch()` call.
+ * the last successful result is retained when the request inputs are
+ * unchanged. Changing the layer or filter clears the previous result; errors
+ * are exposed through `error` and rejected from an explicit `fetch()` call.
  *
  * @param options Request configuration. See {@link UseWmsLayerCapabilitiesOptions}.
  *
@@ -109,88 +109,43 @@ export function useWmsLayerCapabilities(
   const times = ref<Date[]>()
   const layerCapabilities = ref<Layer>()
   const capabilities = ref<GetCapabilitiesResponse>()
-  const loading = ref(false)
-  const refreshing = ref(false)
-  const error = shallowRef<Error | null>(null)
-  const hasLoaded = ref(false)
-  let requestId = 0
-  let abortController: AbortController | null = null
-
-  function cancel(): void {
-    requestId++
-    abortController?.abort()
-    abortController = null
-    loading.value = false
-    refreshing.value = false
-  }
+  const request = createRequestRunner(enabled)
 
   async function fetch(): Promise<void> {
     if (!enabled.value) {
       return
     }
 
-    cancel()
-    const currentRequestId = requestId
     const layerName = toValue(options.layerName)
     const filter = toValue(options.filter)
 
     if (layerName === undefined) {
-      error.value = null
+      request.reset()
       capabilities.value = undefined
       layerCapabilities.value = undefined
       times.value = undefined
       return
     }
 
-    const controller = new AbortController()
-    abortController = controller
-    loading.value = !hasLoaded.value
-    refreshing.value = hasLoaded.value
-    error.value = null
-
-    try {
-      const wmsProvider = createWmsProvider(
-        webserviceContext,
-        () => controller.signal,
-      )
-      const response = await wmsProvider.getCapabilities({
-        layers: layerName,
-        importFromExternalDataSource: false,
-        onlyHeaders: false,
-        forecastCount: 1,
-        ...filter
-      })
-
-      if (controller.signal.aborted || currentRequestId !== requestId) {
-        return
-      }
-
-      capabilities.value = response
-      layerCapabilities.value =
-        response.layers?.find((layer) => layer.name === layerName) ??
-        response.layers?.[0]
-      loadTimes()
-      hasLoaded.value = true
-    } catch (cause) {
-      if (controller.signal.aborted || currentRequestId !== requestId) {
-        return
-      }
-
-      const requestError =
-        cause instanceof Error ? cause : new Error(String(cause))
-      error.value = requestError
-      capabilities.value = undefined
-      layerCapabilities.value = undefined
-      times.value = undefined
-      hasLoaded.value = true
-      throw requestError
-    } finally {
-      if (currentRequestId === requestId) {
-        loading.value = false
-        refreshing.value = false
-        abortController = null
-      }
-    }
+    await request.run(
+      (signal) => {
+        const wmsProvider = createWmsProvider(webserviceContext, () => signal)
+        return wmsProvider.getCapabilities({
+          layers: layerName,
+          importFromExternalDataSource: false,
+          onlyHeaders: false,
+          forecastCount: 1,
+          ...filter,
+        })
+      },
+      (response) => {
+        capabilities.value = response
+        layerCapabilities.value =
+          response.layers?.find((layer) => layer.name === layerName) ??
+          response.layers?.[0]
+        loadTimes()
+      },
+    )
   }
 
   function loadTimes(): void {
@@ -236,23 +191,28 @@ export function useWmsLayerCapabilities(
 
   watch(
     () => [toValue(options.layerName), toValue(options.filter)],
-    () => refreshCoordinator.trigger(),
+    () => {
+      request.reset()
+      capabilities.value = undefined
+      layerCapabilities.value = undefined
+      times.value = undefined
+      refreshCoordinator.trigger()
+    },
     { deep: true },
   )
-
-  onScopeDispose(cancel, true)
 
   return {
     layerCapabilities,
     times,
     capabilities,
-    loading,
-    refreshing,
-    error,
-    hasLoaded,
+    loading: request.loading,
+    refreshing: request.refreshing,
+    error: request.error,
+    hasLoaded: request.hasLoaded,
+    hasAttempted: request.hasAttempted,
     fetch,
     loadCapabilities: fetch,
-    cancel,
+    cancel: request.cancel,
     requestRefresh: refreshCoordinator.trigger,
     pauseRefresh: refreshCoordinator.pause,
     resumeRefresh: refreshCoordinator.resume,

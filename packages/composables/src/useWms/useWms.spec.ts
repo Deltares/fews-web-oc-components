@@ -92,6 +92,7 @@ describe('useWms composables', () => {
       '2025-01-02T00:00:00.000Z',
     ])
     expect(result.hasLoaded.value).toBe(true)
+    expect(result.hasAttempted.value).toBe(true)
     expect(result.loading.value).toBe(false)
   })
 
@@ -103,6 +104,9 @@ describe('useWms composables', () => {
     )
 
     layerName.value = 'rainfall'
+    expect(result.capabilities.value).toBeUndefined()
+    expect(result.hasLoaded.value).toBe(false)
+    expect(result.hasAttempted.value).toBe(false)
     await nextTick()
     await vi.waitFor(() => {
       expect(mocks.getCapabilities).toHaveBeenCalledTimes(1)
@@ -115,7 +119,15 @@ describe('useWms composables', () => {
 
   it('loads a legend and exposes request state', async () => {
     const legendResponse = { image: 'legend-data' }
-    mocks.getLegendGraphic.mockResolvedValue(legendResponse)
+    let resolveNextLegend: (response: unknown) => void = () => {}
+    mocks.getLegendGraphic
+      .mockResolvedValueOnce(legendResponse)
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveNextLegend = resolve
+          }),
+      )
     const layerName = ref('waterlevel')
     const result = inScope(() =>
       useWmsLegend({
@@ -141,6 +153,10 @@ describe('useWms composables', () => {
 
     layerName.value = 'rainfall'
     await nextTick()
+    expect(result.legendGraphic.value).toBeUndefined()
+    expect(result.hasLoaded.value).toBe(false)
+    expect(result.hasAttempted.value).toBe(false)
+    resolveNextLegend({ image: 'new-legend-data' })
     await vi.waitFor(() => {
       expect(mocks.getLegendGraphic).toHaveBeenCalledTimes(2)
     })
@@ -198,6 +214,7 @@ describe('useWms composables', () => {
     expect(mocks.getCapabilities).toHaveBeenCalledWith({})
     expect(result.capabilities.value).toEqual(capabilitiesResponse)
     expect(result.hasLoaded.value).toBe(true)
+    expect(result.hasAttempted.value).toBe(true)
     expect(result.error.value).toBeNull()
   })
 
@@ -227,6 +244,28 @@ describe('useWms composables', () => {
     expect(results.every((result) => !result.loading.value)).toBe(true)
   })
 
+  it('does not request layer data when no WMS layer is selected', async () => {
+    const results = inScope(() => [
+      useWmsLayerCapabilities({
+        layerName: ref<string | undefined>(undefined),
+        webservice,
+        refresh,
+      }),
+      useWmsLegend({
+        layerName: ref<string | undefined>(undefined),
+        useDisplayUnits: true,
+        webservice,
+        refresh,
+      }),
+    ])
+
+    await Promise.all(results.map((result) => result.fetch()))
+
+    expect(mocks.getCapabilities).not.toHaveBeenCalled()
+    expect(mocks.getLegendGraphic).not.toHaveBeenCalled()
+    expect(results.every((result) => !result.hasLoaded.value)).toBe(true)
+  })
+
   it('exposes request errors and rethrows them', async () => {
     const requestError = new Error('WMS request failed')
     mocks.getCapabilities.mockRejectedValue(requestError)
@@ -237,7 +276,30 @@ describe('useWms composables', () => {
     await expect(result.fetch()).rejects.toBe(requestError)
 
     expect(result.error.value).toBe(requestError)
-    expect(result.hasLoaded.value).toBe(true)
+    expect(result.hasLoaded.value).toBe(false)
+    expect(result.hasAttempted.value).toBe(true)
     expect(result.loading.value).toBe(false)
+  })
+
+  it('retains successful layer capabilities when a same-input refresh fails', async () => {
+    mocks.getCapabilities
+      .mockResolvedValueOnce(capabilitiesResponse)
+      .mockRejectedValueOnce(new Error('WMS refresh failed'))
+    const result = inScope(() =>
+      useWmsLayerCapabilities({
+        layerName: ref('waterlevel'),
+        webservice,
+        refresh,
+      }),
+    )
+
+    await result.fetch()
+    await expect(result.fetch()).rejects.toThrow('WMS refresh failed')
+
+    expect(result.capabilities.value).toEqual(capabilitiesResponse)
+    expect(result.layerCapabilities.value?.name).toBe('waterlevel')
+    expect(result.hasLoaded.value).toBe(true)
+    expect(result.hasAttempted.value).toBe(true)
+    expect(result.error.value).toEqual(new Error('WMS refresh failed'))
   })
 })
