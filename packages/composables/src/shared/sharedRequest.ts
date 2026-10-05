@@ -86,7 +86,7 @@ function notifyRegistrationsChanged(): void {
  * @group Other Functions
  */
 export function getSharedRequestRegistrations(): readonly SharedRequestRegistration[] {
-  if (!snapshot) snapshot = createSnapshot()
+  snapshot ??= createSnapshot()
   return snapshot
 }
 
