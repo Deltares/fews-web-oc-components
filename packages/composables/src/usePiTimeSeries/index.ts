@@ -77,9 +77,10 @@ export interface PiTimeSeriesEntry {
 
 export interface UsePiTimeSeriesOptions {
   /**
-   * The time series requests, identified by a unique key.
+  * The time series requests, identified by a unique key. When undefined or
+  * empty, in-flight requests are cancelled and no new requests are made.
    */
-  requests: MaybeRefOrGetter<PiTimeSeriesRequest[]>
+  requests: MaybeRefOrGetter<PiTimeSeriesRequest[] | undefined>
 
   /**
    * Query options applied to every request.
@@ -286,7 +287,7 @@ export function usePiTimeSeries(
 
   const resolvedRequests = computed<ResolvedRequest[]>(() => {
     const queryOptions = toValue(query) ?? {}
-    return toValue(requests).map((request) => {
+    return (toValue(requests) ?? []).map((request) => {
       const url =
         'filter' in request
           ? urlProvider.timeSeriesUrl({
@@ -342,6 +343,13 @@ export function usePiTimeSeries(
   }
 
   async function fetch(): Promise<void> {
+    const resolved = resolvedRequests.value
+    if (resolved.length === 0) {
+      cancel()
+      entries.value = {}
+      return
+    }
+
     if (!enabled.value) return
 
     cancel()
@@ -349,8 +357,6 @@ export function usePiTimeSeries(
     const controller = new AbortController()
     const currentRequestId = ++requestId
     abortController = controller
-
-    const resolved = resolvedRequests.value
 
     const next: Record<string, PiTimeSeriesEntry> = {}
     for (const { key } of resolved) {

@@ -60,8 +60,14 @@ export interface UseWmsRequestReturn {
   /** Error from the most recent request, or null when there is no error. */
   error: Readonly<Ref<Error | null>>
 
-  /** Whether at least one request has completed. */
+  /** Whether a successful response is available for the current inputs. */
   hasLoaded: Readonly<Ref<boolean>>
+
+  /**
+   * Whether a request has completed for the current inputs, successfully or
+   * not.
+   */
+  hasAttempted: Readonly<Ref<boolean>>
 
   /** Fetches the requested WMS data immediately. */
   fetch: () => Promise<void>

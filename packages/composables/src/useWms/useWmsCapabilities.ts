@@ -1,14 +1,10 @@
 import { WMSProvider } from '@deltares/fews-wms-requests'
-import {
-  onScopeDispose,
-  ref,
-  shallowRef,
-  type Ref,
-} from 'vue'
+import { ref, type Ref } from 'vue'
 import {
   type RefreshPolicy,
   useRefreshCoordinator,
 } from '../useRefreshCoordinator/index.js'
+import { createRequestRunner } from '../lib/requests/createRequestRunner.js'
 import { resolveWebserviceContext } from '../lib/requests/resolveWebserviceContext.js'
 import {
   DEFAULT_WMS_REFRESH_INTERVAL_MS,
@@ -56,63 +52,22 @@ export function useWmsCapabilities(
   const enabled = options.enabled ?? ref(true)
   const webserviceContext = resolveWebserviceContext(options.webservice)
   const capabilities = ref<GetCapabilitiesResponse>()
-  const loading = ref(false)
-  const refreshing = ref(false)
-  const error = shallowRef<Error | null>(null)
-  const hasLoaded = ref(false)
-  let requestId = 0
-  let abortController: AbortController | null = null
-
-  function cancel(): void {
-    requestId++
-    abortController?.abort()
-    abortController = null
-    loading.value = false
-    refreshing.value = false
-  }
+  const request = createRequestRunner(enabled)
 
   async function fetch(): Promise<void> {
     if (!enabled.value) {
       return
     }
 
-    cancel()
-    const currentRequestId = requestId
-    const controller = new AbortController()
-    abortController = controller
-    loading.value = !hasLoaded.value
-    refreshing.value = hasLoaded.value
-    error.value = null
-
-    try {
-      const wmsProvider = createWmsProvider(
-        webserviceContext,
-        () => controller.signal,
-      )
-      const response = await wmsProvider.getCapabilities({})
-      if (controller.signal.aborted || currentRequestId !== requestId) {
-        return
-      }
-
-      capabilities.value = response
-      hasLoaded.value = true
-    } catch (cause) {
-      if (controller.signal.aborted || currentRequestId !== requestId) {
-        return
-      }
-
-      const requestError =
-        cause instanceof Error ? cause : new Error(String(cause))
-      error.value = requestError
-      hasLoaded.value = true
-      throw requestError
-    } finally {
-      if (currentRequestId === requestId) {
-        loading.value = false
-        refreshing.value = false
-        abortController = null
-      }
-    }
+    await request.run(
+      (signal) => {
+        const wmsProvider = createWmsProvider(webserviceContext, () => signal)
+        return wmsProvider.getCapabilities({})
+      },
+      (response) => {
+        capabilities.value = response
+      },
+    )
   }
 
   const {
@@ -129,16 +84,15 @@ export function useWmsCapabilities(
     systemTick,
   })
 
-  onScopeDispose(cancel, true)
-
   return {
     capabilities,
-    loading,
-    refreshing,
-    error,
-    hasLoaded,
+    loading: request.loading,
+    refreshing: request.refreshing,
+    error: request.error,
+    hasLoaded: request.hasLoaded,
+    hasAttempted: request.hasAttempted,
     fetch,
-    cancel,
+    cancel: request.cancel,
     requestRefresh: refreshCoordinator.trigger,
     pauseRefresh: refreshCoordinator.pause,
     resumeRefresh: refreshCoordinator.resume,

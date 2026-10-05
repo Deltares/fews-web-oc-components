@@ -1,10 +1,10 @@
 import {
   computed,
-  onScopeDispose,
   ref,
   shallowRef,
   type ComputedRef,
   type Ref,
+  watch,
 } from 'vue'
 
 import {
@@ -22,6 +22,7 @@ import {
   type PiWebserviceOptions,
   resolveWebserviceContext,
 } from '../lib/requests/resolveWebserviceContext.js'
+import { createRequestRunner } from '../lib/requests/createRequestRunner.js'
 import { createTransformRequestFn } from '../lib/requests/createTransformRequestFn.js'
 import type { FeatureCollection, Geometry } from 'geojson'
 import { convertGeoJsonToPiLocations } from '../lib/locations/convertGeoJsonToPiLocations.js'
@@ -36,11 +37,14 @@ const DEFAULT_REFRESH_INTERVAL_MS = 300_000
 
 export interface UsePiLocationsOptions {
   /**
-   * Reactive filter used when fetching locations.
+    * Reactive filter used when fetching locations. When undefined, no request
+    * is made and the result is empty.
    *
    * The current value is read when fetch() is executed.
+    * Changing the filter clears the current result and fetches locations for
+    * the new filter automatically.
    */
-  filter: Ref<PiLocationsFilter>
+  filter: Ref<PiLocationsFilter | undefined>
 
   /**
    * Controls whether locations may be fetched automatically.
@@ -122,10 +126,11 @@ export interface UsePiLocationsReturn {
    */
   error: Readonly<Ref<Error | null>>
 
-  /**
-   * Whether at least one locations request has completed.
-   */
+  /** Whether a successful result is available for the current filter. */
   hasLoaded: Readonly<Ref<boolean>>
+
+  /** Whether a request has completed for the current filter, successfully or not. */
+  hasAttempted: Readonly<Ref<boolean>>
 
   /**
    * Whether locations have been loaded successfully and the result is empty.
@@ -221,85 +226,53 @@ export function usePiLocations(
   const geojson = shallowRef<FeatureCollection<Geometry, PiLocation>>(
     emptyFeatureCollection,
   )
-  const loading = ref(false)
-  const refreshing = ref(false)
-  const error = shallowRef<Error | null>(null)
-  const hasLoaded = ref(false)
+  const request = createRequestRunner(enabled)
 
   const isEmpty = computed(
-    () => hasLoaded.value && geojson.value.features.length === 0,
+    () => request.hasLoaded.value && geojson.value.features.length === 0,
   )
 
-  let abortController: AbortController | null = null
-  let requestId = 0
-
-  const provider = new PiWebserviceProvider(webserviceContext.baseUrl, {
-    transformRequestFn: createTransformRequestFn(
-      webserviceContext.getAuthorizationHeaders,
-      () => abortController?.signal,
-    ),
-  })
-
-  function cancel(): void {
-    abortController?.abort()
-    abortController = null
-  }
+  watch(
+    filter,
+    () => {
+      request.reset()
+      geojson.value = emptyFeatureCollection
+      if (filter.value !== undefined) {
+        refreshCoordinator.trigger()
+      }
+    },
+    { deep: true },
+  )
 
   async function fetch(): Promise<void> {
-    if (!enabled.value) {
+    const currentFilter = filter.value
+    if (currentFilter === undefined) {
+      request.reset()
+      geojson.value = emptyFeatureCollection
       return
     }
 
-    cancel()
-
-    const controller = new AbortController()
-    const currentRequestId = ++requestId
-
-    abortController = controller
-
-    loading.value = !hasLoaded.value
-    refreshing.value = hasLoaded.value
-    error.value = null
-
-    try {
-      const locationsFilter: PiLocationsFilter = {
-        documentFormat: DocumentFormat.GEO_JSON,
-        ...filter.value,
-      }
-      const response = await provider.getLocations(locationsFilter)
-
-      // Ignore an obsolete or cancelled request.
-      if (controller.signal.aborted || currentRequestId !== requestId) {
-        return
-      }
-
-      geojson.value = response as unknown as FeatureCollection<
-        Geometry,
-        PiLocation
-      >
-      hasLoaded.value = true
-
-      return
-    } catch (cause) {
-      // Cancellation and obsolete requests are not errors.
-      if (controller.signal.aborted || currentRequestId !== requestId) {
-        return
-      }
-
-      const requestError =
-        cause instanceof Error ? cause : new Error(String(cause))
-
-      error.value = requestError
-      hasLoaded.value = true
-
-      throw requestError
-    } finally {
-      if (currentRequestId === requestId) {
-        loading.value = false
-        refreshing.value = false
-        abortController = null
-      }
-    }
+    await request.run(
+      (signal) => {
+        const provider = new PiWebserviceProvider(webserviceContext.baseUrl, {
+          transformRequestFn: createTransformRequestFn(
+            webserviceContext.getAuthorizationHeaders,
+            () => signal,
+          ),
+        })
+        const locationsFilter: PiLocationsFilter = {
+          documentFormat: DocumentFormat.GEO_JSON,
+          ...currentFilter,
+        }
+        return provider.getLocations(locationsFilter)
+      },
+      (response) => {
+        geojson.value = response as unknown as FeatureCollection<
+          Geometry,
+          PiLocation
+        >
+      },
+    )
   }
 
   const {
@@ -317,23 +290,20 @@ export function usePiLocations(
     systemTick,
   })
 
-  onScopeDispose(() => {
-    cancel()
-    requestId++
-  }, true)
   const locations = computed(() => convertGeoJsonToPiLocations(geojson.value))
 
   return {
     geojson,
     locations,
-    loading,
-    refreshing,
-    error,
-    hasLoaded,
+    loading: request.loading,
+    refreshing: request.refreshing,
+    error: request.error,
+    hasLoaded: request.hasLoaded,
+    hasAttempted: request.hasAttempted,
     isEmpty,
 
     fetch,
-    cancel,
+    cancel: request.cancel,
 
     requestRefresh: refreshCoordinator.trigger,
     pauseRefresh: refreshCoordinator.pause,

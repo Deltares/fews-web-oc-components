@@ -1,8 +1,6 @@
 import {
   type MaybeRefOrGetter,
-  onScopeDispose,
   ref,
-  shallowRef,
   type Ref,
   toValue,
   watch,
@@ -12,6 +10,7 @@ import {
   type RefreshPolicy,
   useRefreshCoordinator,
 } from '../useRefreshCoordinator/index.js'
+import { createRequestRunner } from '../lib/requests/createRequestRunner.js'
 import { resolveWebserviceContext } from '../lib/requests/resolveWebserviceContext.js'
 import {
   DEFAULT_WMS_REFRESH_INTERVAL_MS,
@@ -51,6 +50,8 @@ export interface UseWmsLegendReturn extends UseWmsRequestReturn {
  *
  * Loads a WMS legend graphic for a layer, reactively reloading when legend
  * options change and supporting automatic refresh through `refresh`.
+ * Clears the previous graphic when those options change and preserves the
+ * last successful graphic when a refresh for the same options fails.
  * By default, no scheduled refresh policies are enabled.
  *
  * @param options Request configuration. See {@link UseWmsLegendOptions}.
@@ -78,80 +79,38 @@ export function useWmsLegend(
   const enabled = options.enabled ?? ref(true)
   const webserviceContext = resolveWebserviceContext(options.webservice)
   const legendGraphic = ref<GetLegendGraphicResponse>()
-  const loading = ref(false)
-  const refreshing = ref(false)
-  const error = shallowRef<Error | null>(null)
-  const hasLoaded = ref(false)
-  let requestId = 0
-  let abortController: AbortController | null = null
-
-  function cancel(): void {
-    requestId++
-    abortController?.abort()
-    abortController = null
-    loading.value = false
-    refreshing.value = false
-  }
+  const request = createRequestRunner(enabled)
 
   async function fetch(): Promise<void> {
     if (!enabled.value) {
       return
     }
 
-    cancel()
-    const currentRequestId = requestId
     const layerName = toValue(options.layerName)
     const useDisplayUnits = toValue(options.useDisplayUnits)
     const colorScaleRange = toValue(options.colorScaleRange)
     const style = toValue(options.style)
 
     if (layerName === undefined) {
-      error.value = null
+      request.reset()
       legendGraphic.value = undefined
       return
     }
 
-    const controller = new AbortController()
-    abortController = controller
-    loading.value = !hasLoaded.value
-    refreshing.value = hasLoaded.value
-    error.value = null
-
-    try {
-      const wmsProvider = createWmsProvider(
-        webserviceContext,
-        () => controller.signal,
-      )
-      const response = await wmsProvider.getLegendGraphic({
-        layers: layerName,
-        colorscalerange: colorScaleRange,
-        useDisplayUnits,
-        style: style?.name,
-      })
-
-      if (controller.signal.aborted || currentRequestId !== requestId) {
-        return
-      }
-
-      legendGraphic.value = response
-      hasLoaded.value = true
-    } catch (cause) {
-      if (controller.signal.aborted || currentRequestId !== requestId) {
-        return
-      }
-
-      const requestError =
-        cause instanceof Error ? cause : new Error(String(cause))
-      error.value = requestError
-      hasLoaded.value = true
-      throw requestError
-    } finally {
-      if (currentRequestId === requestId) {
-        loading.value = false
-        refreshing.value = false
-        abortController = null
-      }
-    }
+    await request.run(
+      (signal) => {
+        const wmsProvider = createWmsProvider(webserviceContext, () => signal)
+        return wmsProvider.getLegendGraphic({
+          layers: layerName,
+          colorscalerange: colorScaleRange,
+          useDisplayUnits,
+          style: style?.name,
+        })
+      },
+      (response) => {
+        legendGraphic.value = response
+      },
+    )
   }
 
   const {
@@ -175,20 +134,23 @@ export function useWmsLegend(
       toValue(options.colorScaleRange),
       toValue(options.style),
     ],
-    () => refreshCoordinator.trigger(),
+    () => {
+      request.reset()
+      legendGraphic.value = undefined
+      refreshCoordinator.trigger()
+    },
     { deep: true },
   )
 
-  onScopeDispose(cancel, true)
-
   return {
     legendGraphic,
-    loading,
-    refreshing,
-    error,
-    hasLoaded,
+    loading: request.loading,
+    refreshing: request.refreshing,
+    error: request.error,
+    hasLoaded: request.hasLoaded,
+    hasAttempted: request.hasAttempted,
     fetch,
-    cancel,
+    cancel: request.cancel,
     requestRefresh: refreshCoordinator.trigger,
     pauseRefresh: refreshCoordinator.pause,
     resumeRefresh: refreshCoordinator.resume,

@@ -25,10 +25,10 @@ const filterId = ref<string | undefined>('example-filter')
 const startTime = ref(new Date(Date.now() - 24 * 60 * 60 * 1000))
 const endTime = ref(new Date())
 
-const requests = computed<PiTimeSeriesRequest[]>(() =>
+const requests = computed<PiTimeSeriesRequest[] | undefined>(() =>
   filterId.value
     ? [{ key: 'forecast', filter: { filterId: filterId.value } }]
-    : [],
+    : undefined,
 )
 
 const query = computed(() => ({
@@ -57,7 +57,7 @@ Render `timeSeries` in the component's chart or table, and use `loading`, `refre
 
 ## Behavior and Options
 
-- Changes to the reactive `requests` or `query` automatically trigger a fetch. Setting `enabled` to `false` prevents requests and cancels in-flight requests; setting it back to `true` fetches again.
+- Changes to the reactive `requests` or `query` automatically trigger a fetch. Undefined or empty `requests` cancel in-flight work, clear `entries`, and make no network requests. Setting `enabled` to `false` prevents requests and cancels in-flight requests; setting it back to `true` fetches again.
 - `responses`, `errors`, and `entries` are keyed by request key. `entries` also includes each request's `loading`, `refreshing`, and `updatedAt` state.
 - A previous successful response remains available while its request refreshes. Errors are recorded per key; a failed request does not reject the overall `fetch()` call.
 - Identical in-flight requests are shared across composable instances.

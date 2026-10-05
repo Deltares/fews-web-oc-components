@@ -38,7 +38,7 @@ const { locations, requestRefresh, pauseRefresh, resumeRefresh } = usePiLocation
 
 | Option            | Type                        | Default                                                 | Description                                                      |
 | ------------------ | --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------ |
-| `filter`            | `Ref<PiLocationsFilter>`    | —                                                          | Reactive filter used when fetching locations.                     |
+| `filter`            | `Ref<PiLocationsFilter \| undefined>` | — | Reactive filter used when fetching locations. Changing it clears the current result; defined filters fetch automatically, while `undefined` leaves the result empty without requesting. |
 | `enabled`           | `Ref<boolean>`              | `ref(true)`                                               | Controls whether locations may be fetched automatically.          |
 | `webservice`        | `PiWebserviceOptions`       | host-provided webservice context                          | Webservice configuration for standalone usage.                    |
 | `refresh.policies`  | `RefreshPolicy[]`           | `['onSystemTick', 'onInterval', 'onVisibilityResume']`    | Policies that trigger an automatic refresh.                       |
@@ -52,5 +52,9 @@ const { locations, requestRefresh, pauseRefresh, resumeRefresh } = usePiLocation
   refresh policy fires.
 - `loading` is `true` only for the first request; subsequent requests set
   `refreshing` instead.
-- On request failure, `error` is populated and the previous `geojson`/`locations`
-  are preserved.
+- `hasLoaded` means a successful response is available for the current filter;
+  `hasAttempted` also becomes true when the request fails.
+- On request failure, `error` is populated and the last successful
+  `geojson`/`locations` for the unchanged filter are preserved.
+- Changing the filter clears the previous result and request state, then
+  automatically fetches locations for the new filter.

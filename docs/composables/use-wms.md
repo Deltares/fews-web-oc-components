@@ -47,6 +47,10 @@ const { legendGraphic } = useWmsLegend({
 - Layer capabilities and legends reload when their reactive options change.
 - All composables accept `enabled`, `webservice`, and `refresh` options.
 - Scheduled refresh defaults are component-specific; legend/layer option changes remain reactive.
-- Request state includes `loading`, `refreshing`, `error`, and `hasLoaded`.
+- Request state includes `loading`, `refreshing`, `error`, `hasLoaded`, and
+  `hasAttempted`. `hasLoaded` indicates that a successful result is available
+  for the current inputs; `hasAttempted` also covers failed requests.
 - Automatic refresh can be triggered, paused, and resumed through the returned controls.
-- A failed request is exposed through `error`; full capabilities and legend responses retain their last successful values, while the layer-specific capabilities composable clears its data.
+- A failed refresh for unchanged inputs is exposed through `error` and retains
+  the last successful result. Changing reactive layer/legend inputs clears the
+  old result before loading the new one.

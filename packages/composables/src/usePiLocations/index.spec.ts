@@ -121,16 +121,95 @@ describe('usePiLocations', () => {
     expect(locations.value).toEqual([])
   })
 
+  it('does not request locations when the filter is undefined', async () => {
+    const filter = ref<LocationsFilter | undefined>(undefined)
+    const { fetch, geojson, hasLoaded, hasAttempted, isEmpty } = setup({ filter })
+
+    await fetch()
+
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(geojson.value).toEqual({ type: 'FeatureCollection', features: [] })
+    expect(hasLoaded.value).toBe(false)
+    expect(hasAttempted.value).toBe(false)
+    expect(isEmpty.value).toBe(false)
+  })
+
   it('reports request errors and rethrows them', async () => {
-    const { fetch, error, hasLoaded, loading } = setup()
+    const { fetch, error, hasLoaded, hasAttempted, isEmpty, loading } = setup()
     const fetchPromise = fetch()
     await flush()
     pending[0].respond({}, 500)
 
     await expect(fetchPromise).rejects.toThrow()
     expect(error.value).toBeInstanceOf(Error)
-    expect(hasLoaded.value).toBe(true)
+    expect(hasLoaded.value).toBe(false)
+    expect(hasAttempted.value).toBe(true)
+    expect(isEmpty.value).toBe(false)
     expect(loading.value).toBe(false)
+  })
+
+  it('retains the last successful result when a refresh fails', async () => {
+    const { fetch, geojson, error, hasLoaded, hasAttempted, isEmpty } = setup()
+    const initialFetch = fetch()
+    await flush()
+    pending[0].respond({ type: 'FeatureCollection', features: [] })
+    await initialFetch
+
+    const refresh = fetch()
+    await flush()
+    pending[1].respond({}, 500)
+
+    await expect(refresh).rejects.toThrow()
+    expect(geojson.value.features).toEqual([])
+    expect(hasLoaded.value).toBe(true)
+    expect(hasAttempted.value).toBe(true)
+    expect(isEmpty.value).toBe(true)
+    expect(error.value).toBeInstanceOf(Error)
+  })
+
+  it('fetches and updates its result when the filter changes', async () => {
+    const filter = ref<LocationsFilter>({ filterId: 'first' })
+    const { fetch, geojson, hasLoaded, hasAttempted } = setup({ filter })
+    const fetchPromise = fetch()
+    await flush()
+    pending[0].respond(locationResponse)
+    await fetchPromise
+
+    filter.value = { filterId: 'second' }
+    await flush()
+
+    const refreshedRequest = pending[1].request
+    expect(new URL(refreshedRequest.url).searchParams.get('filterId')).toBe(
+      'second',
+    )
+    expect(geojson.value).toEqual({ type: 'FeatureCollection', features: [] })
+    expect(hasLoaded.value).toBe(false)
+    expect(hasAttempted.value).toBe(false)
+
+    pending[1].respond(locationResponse)
+    await flush()
+
+    expect(geojson.value).toEqual(locationResponse)
+    expect(hasLoaded.value).toBe(true)
+    expect(hasAttempted.value).toBe(true)
+  })
+
+  it('clears locations without requesting when the filter becomes undefined', async () => {
+    const filter = ref<LocationsFilter | undefined>({ filterId: 'first' })
+    const { fetch, geojson, hasLoaded, hasAttempted } = setup({ filter })
+    const fetchPromise = fetch()
+    await flush()
+    const firstRequest = pending[0].request
+
+    filter.value = undefined
+    await flush()
+    await fetchPromise
+
+    expect(firstRequest.signal.aborted).toBe(true)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(geojson.value).toEqual({ type: 'FeatureCollection', features: [] })
+    expect(hasLoaded.value).toBe(false)
+    expect(hasAttempted.value).toBe(false)
   })
 
   it('aborts the previous request when fetching again', async () => {
@@ -149,6 +228,38 @@ describe('usePiLocations', () => {
     expect(geojson.value).toEqual(locationResponse)
   })
 
+  it('keeps overlapping requests tied to their own signal while authorization resolves', async () => {
+    const authorizationResolvers: Array<(headers: Headers) => void> = []
+    const getAuthorizationHeaders = vi.fn(
+      () =>
+        new Promise<Headers>((resolve) => {
+          authorizationResolvers.push(resolve)
+        }),
+    )
+    const { fetch } = setup({
+      webservice: { baseUrl, getAuthorizationHeaders },
+    })
+
+    const firstFetch = fetch()
+    await flush()
+    const secondFetch = fetch()
+    await flush()
+
+    authorizationResolvers[0](new Headers())
+    await flush()
+    const firstRequest = pending[0].request
+    authorizationResolvers[1](new Headers())
+    await flush()
+    const secondRequest = pending[1].request
+
+    expect(firstRequest.signal.aborted).toBe(true)
+    expect(secondRequest.signal.aborted).toBe(false)
+
+    pending[0].respond(locationResponse)
+    pending[1].respond(locationResponse)
+    await Promise.all([firstFetch, secondFetch])
+  })
+
   it('cancels the current request without reporting an error', async () => {
     const { fetch, cancel, loading, refreshing, error } = setup()
     const fetchPromise = fetch()
@@ -156,6 +267,8 @@ describe('usePiLocations', () => {
     const request = pending[0].request
 
     cancel()
+    expect(loading.value).toBe(false)
+    expect(refreshing.value).toBe(false)
     await fetchPromise
 
     expect(request.signal.aborted).toBe(true)
