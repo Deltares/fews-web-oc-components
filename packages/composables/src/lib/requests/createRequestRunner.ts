@@ -8,9 +8,11 @@ export function createRequestRunner(enabled: Ref<boolean>) {
   const hasAttempted = ref(false)
   let requestId = 0
   let abortController: AbortController | null = null
+  let pendingRequest: { key: string; promise: Promise<void> } | null = null
 
   function cancel(): void {
     requestId++
+    pendingRequest = null
     abortController?.abort()
     abortController = null
     loading.value = false
@@ -24,12 +26,16 @@ export function createRequestRunner(enabled: Ref<boolean>) {
     hasAttempted.value = false
   }
 
-  async function run<T>(
+  function run<T>(
     request: (signal: AbortSignal) => Promise<T>,
     onSuccess: (response: T) => void,
     onError?: () => void,
+    key?: string,
   ): Promise<void> {
-    if (!enabled.value) return
+    if (!enabled.value) return Promise.resolve()
+    if (key !== undefined && pendingRequest?.key === key) {
+      return pendingRequest.promise
+    }
 
     cancel()
     const currentRequestId = requestId
@@ -39,26 +45,34 @@ export function createRequestRunner(enabled: Ref<boolean>) {
     refreshing.value = hasLoaded.value
     error.value = null
 
-    try {
-      const response = await request(controller.signal)
-      if (controller.signal.aborted || currentRequestId !== requestId) return
+    const promise = execute().finally(() => {
+      if (pendingRequest?.promise === promise) pendingRequest = null
+    })
+    if (key !== undefined) pendingRequest = { key, promise }
+    return promise
 
-      onSuccess(response)
-      hasLoaded.value = true
-      hasAttempted.value = true
-    } catch (cause) {
-      if (controller.signal.aborted || currentRequestId !== requestId) return
+    async function execute(): Promise<void> {
+      try {
+        const response = await request(controller.signal)
+        if (controller.signal.aborted || currentRequestId !== requestId) return
 
-      const requestError =
-        cause instanceof Error ? cause : new Error(String(cause))
-      error.value = requestError
-      hasAttempted.value = true
-      throw requestError
-    } finally {
-      if (currentRequestId === requestId) {
-        loading.value = false
-        refreshing.value = false
-        abortController = null
+        onSuccess(response)
+        hasLoaded.value = true
+        hasAttempted.value = true
+      } catch (cause) {
+        if (controller.signal.aborted || currentRequestId !== requestId) return
+
+        const requestError =
+          cause instanceof Error ? cause : new Error(String(cause))
+        error.value = requestError
+        hasAttempted.value = true
+        throw requestError
+      } finally {
+        if (currentRequestId === requestId) {
+          loading.value = false
+          refreshing.value = false
+          abortController = null
+        }
       }
     }
   }
