@@ -1,5 +1,6 @@
 import {
   computed,
+  onScopeDispose,
   ref,
   shallowRef,
   type ComputedRef,
@@ -37,12 +38,12 @@ const DEFAULT_REFRESH_INTERVAL_MS = 300_000
 
 export interface UsePiLocationsOptions {
   /**
-    * Reactive filter used when fetching locations. When undefined, no request
-    * is made and the result is empty.
+   * Reactive filter used when fetching locations. When undefined, no request
+   * is made and the result is empty.
    *
    * The current value is read when fetch() is executed.
-    * Changing the filter clears the current result and fetches locations for
-    * the new filter automatically.
+   * Meaningful parameter changes clear the current result and fetch locations
+   * for the new filter automatically. Equivalent replacements are ignored.
    */
   filter: Ref<PiLocationsFilter | undefined>
 
@@ -112,12 +113,12 @@ export interface UsePiLocationsReturn {
   geojson: Readonly<Ref<FeatureCollection<Geometry, PiLocation>>>
 
   /**
-   * Whether the initial locations request is in progress.
+    * Whether a request is in progress without a successful result for the current filter.
    */
   loading: Readonly<Ref<boolean>>
 
   /**
-   * Whether a subsequent locations request is in progress.
+    * Whether a request is in progress with a successful result for the current filter.
    */
   refreshing: Readonly<Ref<boolean>>
 
@@ -140,7 +141,9 @@ export interface UsePiLocationsReturn {
   /**
    * Fetches locations immediately using the current filter.
    *
-   * @returns The fetched locations.
+    * Identical pending requests within this instance share the same promise.
+    *
+    * @returns A promise that resolves when the request completes or is cancelled.
    */
   fetch: () => Promise<void>
 
@@ -196,7 +199,7 @@ const emptyFeatureCollection: FeatureCollection<Geometry, PiLocation> = {
  * import { ref } from 'vue'
  * import { usePiLocations } from '@deltares/fews-web-oc-composables'
  *
- * const filter = ref({ filterIds: ['example-filter'] })
+ * const filter = ref({ filterId: 'example-filter' })
  *
  * const { locations, loading, error, isEmpty } = usePiLocations({ filter })
  * ```
@@ -227,32 +230,61 @@ export function usePiLocations(
     emptyFeatureCollection,
   )
   const request = createRequestRunner(enabled)
+  let pendingRequest: { key: string; promise: Promise<void> } | null = null
 
   const isEmpty = computed(
     () => request.hasLoaded.value && geojson.value.features.length === 0,
   )
 
-  watch(
-    filter,
-    () => {
-      request.reset()
-      geojson.value = emptyFeatureCollection
-      if (filter.value !== undefined) {
-        refreshCoordinator.trigger()
-      }
-    },
-    { deep: true },
-  )
+  const requestKey = computed(() => {
+    if (filter.value === undefined) return undefined
 
-  async function fetch(): Promise<void> {
-    const currentFilter = filter.value
-    if (currentFilter === undefined) {
-      request.reset()
-      geojson.value = emptyFeatureCollection
-      return
+    const parameters = {
+      documentFormat: DocumentFormat.GEO_JSON,
+      ...Object.fromEntries(
+        Object.entries(filter.value).filter(([, value]) => value !== undefined),
+      ),
     }
 
-    await request.run(
+    return JSON.stringify(parameters, (_key, value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return Object.fromEntries(
+          Object.keys(value).sort().map((key) => [key, value[key]]),
+        )
+      }
+      return value
+    })
+  })
+
+  function cancel(): void {
+    pendingRequest = null
+    request.cancel()
+  }
+
+  watch(
+    requestKey,
+    () => {
+      pendingRequest = null
+      request.reset()
+      geojson.value = emptyFeatureCollection
+      void fetch().catch(() => {})
+    },
+    { flush: 'sync' },
+  )
+
+  function fetch(): Promise<void> {
+    const key = requestKey.value
+    if (key === undefined) {
+      pendingRequest = null
+      request.reset()
+      geojson.value = emptyFeatureCollection
+      return Promise.resolve()
+    }
+    if (!enabled.value) return Promise.resolve()
+    if (pendingRequest?.key === key) return pendingRequest.promise
+
+    const locationsFilter: PiLocationsFilter = JSON.parse(key)
+    const promise = request.run(
       (signal) => {
         const provider = new PiWebserviceProvider(webserviceContext.baseUrl, {
           transformRequestFn: createTransformRequestFn(
@@ -260,10 +292,6 @@ export function usePiLocations(
             () => signal,
           ),
         })
-        const locationsFilter: PiLocationsFilter = {
-          documentFormat: DocumentFormat.GEO_JSON,
-          ...currentFilter,
-        }
         return provider.getLocations(locationsFilter)
       },
       (response) => {
@@ -272,7 +300,12 @@ export function usePiLocations(
           PiLocation
         >
       },
-    )
+    ).finally(() => {
+      if (pendingRequest?.promise === promise) pendingRequest = null
+    })
+
+    pendingRequest = { key, promise }
+    return promise
   }
 
   const {
@@ -290,6 +323,7 @@ export function usePiLocations(
     systemTick,
   })
 
+  onScopeDispose(cancel, true)
   const locations = computed(() => convertGeoJsonToPiLocations(geojson.value))
 
   return {
@@ -303,7 +337,7 @@ export function usePiLocations(
     isEmpty,
 
     fetch,
-    cancel: request.cancel,
+    cancel,
 
     requestRefresh: refreshCoordinator.trigger,
     pauseRefresh: refreshCoordinator.pause,
