@@ -249,7 +249,9 @@ export function usePiLocations(
     return JSON.stringify(parameters, (_key, value) => {
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         return Object.fromEntries(
-          Object.keys(value).sort().map((key) => [key, value[key]]),
+          Object.keys(value)
+            .sort((leftKey, rightKey) => leftKey.localeCompare(rightKey))
+            .map((key) => [key, value[key]]),
         )
       }
       return value
