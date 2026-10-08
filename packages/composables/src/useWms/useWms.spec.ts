@@ -218,6 +218,35 @@ describe('useWms composables', () => {
     expect(result.error.value).toBeNull()
   })
 
+  it('restarts concurrent unchanged unkeyed requests and ignores stale results', async () => {
+    let resolveFirst: (response: unknown) => void = () => {}
+    let resolveSecond: (response: unknown) => void = () => {}
+    mocks.getCapabilities
+      .mockImplementationOnce(() => new Promise((resolve) => {
+        resolveFirst = resolve
+      }))
+      .mockImplementationOnce(() => new Promise((resolve) => {
+        resolveSecond = resolve
+      }))
+    const result = inScope(() =>
+      useWmsCapabilities({ webservice, refresh }),
+    )
+
+    const firstFetch = result.fetch()
+    const secondFetch = result.fetch()
+    expect(mocks.getCapabilities).toHaveBeenCalledTimes(2)
+
+    const currentResponse = { layers: [] }
+    resolveSecond(currentResponse)
+    await secondFetch
+    resolveFirst(capabilitiesResponse)
+    await firstFetch
+
+    expect(result.capabilities.value).toEqual(currentResponse)
+    expect(result.hasLoaded.value).toBe(true)
+    expect(result.loading.value).toBe(false)
+  })
+
   it('does not request data while disabled', async () => {
     const enabled = ref(false)
     const results = inScope(() => [

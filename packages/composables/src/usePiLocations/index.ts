@@ -1,6 +1,5 @@
 import {
   computed,
-  onScopeDispose,
   ref,
   shallowRef,
   type ComputedRef,
@@ -230,7 +229,6 @@ export function usePiLocations(
     emptyFeatureCollection,
   )
   const request = createRequestRunner(enabled)
-  let pendingRequest: { key: string; promise: Promise<void> } | null = null
 
   const isEmpty = computed(
     () => request.hasLoaded.value && geojson.value.features.length === 0,
@@ -258,15 +256,9 @@ export function usePiLocations(
     })
   })
 
-  function cancel(): void {
-    pendingRequest = null
-    request.cancel()
-  }
-
   watch(
     requestKey,
     () => {
-      pendingRequest = null
       request.reset()
       geojson.value = emptyFeatureCollection
       void fetch().catch(() => {})
@@ -277,16 +269,14 @@ export function usePiLocations(
   function fetch(): Promise<void> {
     const key = requestKey.value
     if (key === undefined) {
-      pendingRequest = null
       request.reset()
       geojson.value = emptyFeatureCollection
       return Promise.resolve()
     }
     if (!enabled.value) return Promise.resolve()
-    if (pendingRequest?.key === key) return pendingRequest.promise
 
     const locationsFilter: PiLocationsFilter = JSON.parse(key)
-    const promise = request.run(
+    return request.run(
       (signal) => {
         const provider = new PiWebserviceProvider(webserviceContext.baseUrl, {
           transformRequestFn: createTransformRequestFn(
@@ -302,12 +292,9 @@ export function usePiLocations(
           PiLocation
         >
       },
-    ).finally(() => {
-      if (pendingRequest?.promise === promise) pendingRequest = null
-    })
-
-    pendingRequest = { key, promise }
-    return promise
+      undefined,
+      key,
+    )
   }
 
   const {
@@ -325,7 +312,6 @@ export function usePiLocations(
     systemTick,
   })
 
-  onScopeDispose(cancel, true)
   const locations = computed(() => convertGeoJsonToPiLocations(geojson.value))
 
   return {
@@ -339,7 +325,7 @@ export function usePiLocations(
     isEmpty,
 
     fetch,
-    cancel,
+    cancel: request.cancel,
 
     requestRefresh: refreshCoordinator.trigger,
     pauseRefresh: refreshCoordinator.pause,
