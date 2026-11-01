@@ -62,8 +62,8 @@
     "sass-embedded": "^1.93.2",
     "storybook": "10.5.2",
     "typescript": "^5.9.3",
-    "vite": "^8.0.0",
-    "vite-plugin-dts": "^4.5.4",
+    "vite": "^8.3.5",
+    "vite-plugin-dts": "^5.1.2",
     "vitest": "^4.1.11",
     "vue-tsc": "^2.1.10"
   },
