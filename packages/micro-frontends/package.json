@@ -20,7 +20,7 @@
     "@deltares/fews-web-oc-composables": "0.3.1",
     "@mdi/font": "^7.4.47",
     "@module-federation/vite": "^1.23.0",
-    "@vueuse/core": "^14.3.0",
+    "@vueuse/core": "^15.0.0",
     "d3": "^7.9.0",
     "pinia": "^4.0.2",
     "vue": "^3.5.40",
