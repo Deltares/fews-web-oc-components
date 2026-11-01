@@ -7,7 +7,17 @@ import { resolve } from 'node:path'
 export default defineConfig({
   plugins: [
     vue(),
-    dts(),
+    dts({
+      entryRoot: 'src',
+      outDirs: 'dist/types',
+      include: ['src'],
+      exclude: [
+        'src/**/*.spec.ts',
+        'src/**/*.stories.ts',
+        'src/**/*.story.ts',
+        'src/**/*.test.ts',
+      ],
+    }),
   ],
   resolve: {
     alias: {
@@ -15,6 +25,7 @@ export default defineConfig({
     }
   },
   build: {
+    copyPublicDir: false,
     lib: {
       entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'fews-web-oc-components',
