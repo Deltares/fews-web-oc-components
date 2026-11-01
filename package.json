@@ -23,7 +23,8 @@
     "test:component:ui": "npm run --workspaces --if-present test:component:ui",
     "test:e2e": "npm run --workspaces --if-present test:e2e",
     "ci:test:e2e": "npm run --workspaces --if-present ci:test:e2e",
-    "lint": "npm run --workspaces --if-present lint"
+    "lint": "npm run --workspaces --if-present lint",
+    "lint:package": "npm run --workspaces --if-present lint:package"
   },
   "devDependencies": {
     "vitepress": "^2.0.0-alpha.20"
