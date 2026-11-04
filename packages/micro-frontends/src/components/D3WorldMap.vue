@@ -287,11 +287,11 @@ onBeforeUnmount(() => {
 }
 
 .location-globe :deep(.location:hover) {
-  r: 8;
+  r: 8px;
 }
 
 .location-globe :deep(.location.selected) {
   fill: #dc2626;
-  r: 8;
+  r: 8px;
 }
 </style>
