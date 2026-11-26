@@ -35,6 +35,28 @@ describe('applyTimeSeriesQueryOptions', () => {
     expect(url.searchParams.get('endTime')).toBe('2024-01-02T00:00:00Z')
   })
 
+  it('does not serialize an invalid start time or throw', () => {
+    const options = { startTime: new Date('invalid') }
+
+    expect(() =>
+      applyTimeSeriesQueryOptions(new URL(baseUrl), options),
+    ).not.toThrow()
+
+    const url = applyTimeSeriesQueryOptions(new URL(baseUrl), options)
+    expect(url.searchParams.has('startTime')).toBe(false)
+  })
+
+  it('does not serialize an invalid end time or throw', () => {
+    const options = { endTime: new Date('invalid') }
+
+    expect(() =>
+      applyTimeSeriesQueryOptions(new URL(baseUrl), options),
+    ).not.toThrow()
+
+    const url = applyTimeSeriesQueryOptions(new URL(baseUrl), options)
+    expect(url.searchParams.has('endTime')).toBe(false)
+  })
+
   it('ignores null start and end times', () => {
     const url = applyTimeSeriesQueryOptions(
       new URL(`${baseUrl}&startTime=2024-01-01T00:00:00Z`),

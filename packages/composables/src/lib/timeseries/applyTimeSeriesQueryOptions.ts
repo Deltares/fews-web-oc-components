@@ -52,8 +52,10 @@ export function applyTimeSeriesQueryOptions(
   const result = new URL(url)
   const params = result.searchParams
 
-  if (options.startTime) params.set('startTime', toPiDateTime(options.startTime))
-  if (options.endTime) params.set('endTime', toPiDateTime(options.endTime))
+  if (options.startTime && !Number.isNaN(options.startTime.getTime()))
+    params.set('startTime', toPiDateTime(options.startTime))
+  if (options.endTime && !Number.isNaN(options.endTime.getTime()))
+    params.set('endTime', toPiDateTime(options.endTime))
 
   if (options.thinning) {
     const start = Date.parse(params.get('startTime') ?? '')
